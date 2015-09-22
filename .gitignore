@@ -1,3 +1,5 @@
 *.pyc
 *.db
 log_helper/*.log.*
+
+.idea/
