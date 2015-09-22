@@ -1,0 +1,47 @@
+
+检查QQ
+"https://ssl.ptlogin2.qq.com/check?pt_tea=1&uin=" + self.qq + "&appid=501004106&js_ver=10126&js_type=0&login_sig=&u1=http%3A%2F%2Fw.qq.com%2Fproxy.html&r=0.8155406711157411"
+
+返回
+ptui_checkVC('1','nNnJ2B1lTZ7clJyVixOczj23e26Z5_NP2RaPEhCHNTCtLnD9um5SYA**','\x00\x00\x00\x00\x66\x0a\xd1\x4c','','0');
+或者
+ptui_checkVC('0','!NAK','\x00\x00\x00\x00\x54\x38\x3c\x58','093c14ebc3a299ea07d79c1cdc3708420f97ab5ca646624e9ea34012bc4b926dc72cafc9a5a13c0ddc8e37e8523bbb64af7361f0a1a66da3','0');
+
+1表示要验证码，0则不需要，
+其他的话，第三个参数会说明原因
+
+记得把第二个参数记录下来
+----------------
+获取验证码图片
+"https://ssl.captcha.qq.com/getimage?aid=501004106&r=0.7308882384095341&uin=" +qq + "&cap_cd=" + 检查QQ时返回的第二个参数
+
+----------------
+登录
+"https://ssl.ptlogin2.qq.com/login?u=" + qq "&p=" + 加密后的密码 + "&verifycode=" + 图片验证码（如果不需要验证码，那么就是检查QQ返回的第二个参数） + "&webqq_type=10&remember_uin=1&login2qq=1&aid=501004106&u1=http%3A%2F%2Fw.qq.com%2Fproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&h=1&ptredirect=0&ptlang=2052&daid=164&from_ui=1&pttype=1&dumy=&fp=loginerroralert&action=0-19-17525&mibao_css=m_webqq&t=1&g=1&js_type=0&js_ver=10126&login_sig=&pt_randsalt=0&pt_vcode_v1=0&pt_verifysession_v1=" + 从cookie里面提取verifysession
+
+返回
+ptuiCB('0','0','http://ptlogin4.web2.qq.com/check_sig?pttype=1&uin=1711984972&service=login&nodirect=0&ptsigx=be1d28c3e2452266808298d24700fbfa94e5ae2f5ec3e57bf4560866f98eb912e39e60068ee941b4c5dcacbefc284a251b3d1eafc471801d99b5449e6f1b513a&s_url=http%3A%2F%2Fw.qq.com%2Fproxy.html%3Flogin2qq%3D1%26webqq_type%3D10&f_url=&ptlang=2052&ptredirect=100&aid=501004106&daid=164&j_later=0&low_login_hour=0&regmaster=0&pt_login_type=1&pt_aid=0&pt_aaid=0&pt_light=0&pt_3rd_aid=0','0','登录成功！', '喵喵咪_two');
+    
+    再从cookie提取ptwebqq
+    ---------这一步意义不明--------
+    在GET "http://s.web2.qq.com/api/getvfwebqq?ptwebqq=" + ptwebqq + "&clientid=53999199&psessionid=&t=1434560528866"
+    返回
+        {"retcode":0,"result":{"vfwebqq":"26f2a4d02657d6798b94ea88f944e4996a5cbf5c57a84142077e9d2baca51f1aa5cc8b7972b9f6ae"}}
+
+或者返回
+ptuiCB('4','0','','0','您输入的验证码不正确，请重新输入。', '1711984972');
+
+
+-------------
+第二步登录
+http://d.web2.qq.com/channel/login2
+
+post的数据
+    r:{"ptwebqq":"3f46373e0a1c50ecf633762f08fa1814d6d88e8319658202e27829a1f9a9d79e","clientid":53999199,"psessionid":"","status":"online"}
+
+返回
+{"retcode":0,"result":{"uin":1711984972,"cip":1932452061,"index":1075,"port":56516,"status":"online","vfwebqq":"6a48451df83795822458827b4d01f54a8b54f42af6398550d7933e64176e7fd599e2584f9fbc1084","psessionid":"8368046764001d636f6e6e7365727665725f77656271714031302e3133392e372e31363000002b8000001057026e04004cd10a666d0000000a406b6470386179356a4c6d000000286a48451df83795822458827b4d01f54a8b54f42af6398550d7933e64176e7fd599e2584f9fbc1084","user_state":0,"f":0}}
+
+这就登录成功了
+    
+
