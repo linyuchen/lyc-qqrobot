@@ -1,5 +1,5 @@
 *.pyc
-*.db
+qqsdkplugins/sqlite_sserver/*.db
 log_helper/*.log.*
 
 .idea/
