@@ -52,8 +52,8 @@ class QQClient(webqq.qqapi.QQApi, threading.Thread):
             result = super(QQClient, self).login()
         except:
             print u"登录联网失败"
-            self.msg_pool.put([self.__make_event_dic(events.LOGOUT, result)])
-            return Response(LOGOUT, result)
+            self.msg_pool.put([self.__make_event_dic(events.LOGOUT, u"网络错误")])
+            return Response(LOGOUT, u"网络错误")
         if result is True:
             note = u"登录成功"
             print note

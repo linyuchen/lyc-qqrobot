@@ -1,3 +1,4 @@
+*.swp
 *.pyc
 qqsdkplugins/sqlite_sserver/*.db
 log_helper/*.log.*
