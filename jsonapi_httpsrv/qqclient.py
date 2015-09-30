@@ -35,17 +35,20 @@ class QQClient(webqq.qqapi.QQApi, threading.Thread):
         self.msg_pool = Queue.Queue()
         self.logout_codes = [121, 108, 103]
         self.get_msg_failed_count = 1
-        self.start()
 
     def first_login(self):
         self.logger = GeneralLogger(file_name="%s.log"%self.qq, err_file_name="%s_err.log"%self.qq).get_logger()
         check_result = self.check()
+        print u"登录之前账号检查结果:", check_result
         if not check_result:
             vc = raw_input(u"verify code:")
             res = self.input_verify_code(vc)
-            print res.data
         else:
             res = self.__login()
+
+        print res.data
+        if res.code == OK:
+            self.start()
 
     def __login(self):
         try:
