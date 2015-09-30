@@ -45,7 +45,7 @@ class QQClient(webqq.qqapi.QQApi, threading.Thread):
             res = self.input_verify_code(vc)
             print res.data
         else:
-            self.__login()
+            res = self.__login()
 
     def __login(self):
         try:
@@ -268,7 +268,7 @@ class QQClient(webqq.qqapi.QQApi, threading.Thread):
         if not member:
             self.__get_group_members(uin)
             group_object = self.getGroupByUin(uin)
-            member = group_object.getMemberByUin(member_uin)
+            member = group_object.getMemberByUin(member_uin)            
         member.qq = self.uin2number(member_uin)
         result = {"Event": events.GROUP_MSG,
                   "Data": {"GroupQQ": groupQQ, "ClusterNum": uin,
