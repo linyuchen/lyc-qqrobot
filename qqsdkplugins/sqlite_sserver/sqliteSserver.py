@@ -135,5 +135,5 @@ if __name__ == "__main__":
     test.add_db(sqlite_db_config.groupmdb_name, sqlite_db_config.groupmdb_path)
     test.start()
 
-    os.system("title db thread")
+    # os.system("title db thread")
 

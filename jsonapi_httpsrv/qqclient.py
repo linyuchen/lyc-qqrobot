@@ -39,7 +39,7 @@ class QQClient(webqq.qqapi.QQApi, threading.Thread):
     def first_login(self):
         self.logger = GeneralLogger(file_name="%s.log"%self.qq, err_file_name="%s_err.log"%self.qq).get_logger()
         check_result = self.check()
-        print u"登录之前账号检查结果:", check_result
+        print u"登录之前账号检查结果:", check_resut
         if not check_result:
             vc = raw_input(u"verify code:")
             res = self.input_verify_code(vc)

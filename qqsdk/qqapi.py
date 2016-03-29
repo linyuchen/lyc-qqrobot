@@ -2,6 +2,7 @@
 
 import json
 import urllib2
+import requests
 # import requests
 
 
@@ -31,10 +32,10 @@ class QQApi(object):
         self.handle_request_join_group_url = self.host + "/handle_request_join_group"
 
     def post_json(self, url, **kwargs):
-        req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
+        # req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
         # http.headers = self.headers
-        res = urllib2.urlopen(req)
-        return json.loads(res.read())
+        res = requests.get(url, kwargs)
+        return res.json()
 
     def uin2number(self, uin):
         return self.post_json(self.uin2number_url, uin=uin)
@@ -65,18 +66,26 @@ class QQApi(object):
     def getFriends(self):
         """
         获取好友列表
+        {"data":{uin: {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
+        "nick": 昵称}, ...}
+        }
         """
         return self.post_json(self.get_friends_url)
 
     def getGroups(self):
         """
         获取群列表
+        {群uin: 
+            {"uin": uin, "name": 群名, "mask": 群消息接收屏蔽设置, "members": {群成员uin:{"nick": 昵称, "isAdmin": 是否管理员, "status": 在线状态, "card": 群名片, "uin": uin, "isCreator": 是否群主},...}}, ...
+        }
         """
         return self.post_json(self.get_groups_url)
 
     def getMsg(self):
         """
         获取消息
+        好友消息: {"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}}
+        群消息: {"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}}
         """
         data = self.post_json(self.get_msgs_url)
         return data
@@ -154,17 +163,10 @@ class QQApi(object):
 
 
 if __name__ == "__main__":
-    test = QQApi(6666)
+    test = QQApi(3000)
     # print test.login()["data"]
     # print test.inputVerifyCode("knke")["data"]
     # print test.getFriends()
     # print test.sendMsg2Buddy("2725528563", u"呵呵")
-    import time
-    def run():
-         while 1:
-             print test.getMsg()
-    import threading
-    threading.Thread(target=lambda: run).start()
-    while 1:
-        print test.sendMsg2Buddy("2725528563", u"呵呵")
-        time.sleep(2)
+    # import time
+    print test.getMsg()
