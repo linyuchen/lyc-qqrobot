@@ -4,3 +4,5 @@ qqsdkplugins/sqlite_sserver/*.db
 log_helper/*.log.*
 
 .idea/
+.DS_Store
+err.txt

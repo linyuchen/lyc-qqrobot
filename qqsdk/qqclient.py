@@ -26,7 +26,7 @@ class QQClient(threading.Thread, QQApi):
 
         threading.Thread.__init__(self)
         QQApi.__init__(self, port)
-        self.interval = 0.1
+        self.interval = 1.0
         self.qqUser = entity.QQUser()
         self.__qq_numbers = {}
         self.msg_handlers = {
@@ -755,7 +755,7 @@ class QQClient(threading.Thread, QQApi):
     def run(self):
 
         while True:
-            # time.sleep(self.interval)
+            time.sleep(self.interval)
             # print self.online
             if self.online:
                 try:
@@ -911,7 +911,7 @@ class QQClient(threading.Thread, QQApi):
     # def api_sendMsg2Buddy(self, qq, content, fontstyle):
     #     QQApi.sendMsg2Buddy(self, qq, content)
     #
-    # def api_sendMsg2Group(self, qq, content, fontstyle):
+    # def api_sendMsg2Group(self, qq, contentu fontstyle):
     #     QQApi.sendMsg2Group(self, qq, content)
 
     def uin2number(self, uin):
