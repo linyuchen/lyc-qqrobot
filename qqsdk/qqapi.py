@@ -128,7 +128,7 @@ class QQApi(object):
         # print groupId
         max_length = 600
         num = math.ceil(len(content) / float(600))
-        for i in range(int(num))
+        for i in range(int(num)):
             msg = content[i * max_length: (i + 1) * max_length]
             self.post_json(self.send_msg2group_url, uin=groupId, msg=msg)
 

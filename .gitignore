@@ -1,8 +1,10 @@
 *.swp
 *.pyc
 qqsdkplugins/sqlite_sserver/*.db
+log_helper/*.log
 log_helper/*.log.*
 
 .idea/
 .DS_Store
 err.txt
+verifycode.jpg
