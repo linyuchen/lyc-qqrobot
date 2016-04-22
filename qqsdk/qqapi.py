@@ -121,8 +121,8 @@ class QQApi(object):
     def __splitSendMsg(func):
         def send(self, receiverId, content, fontStyle):
             content = self.__convertMsg(content)
-            max_length = 600
-            num = math.ceil(len(content) / float(600))
+            max_length = 300
+            num = math.ceil(len(content) / float(max_length))
             for i in range(int(num)):
                 msg = content[i * max_length: (i + 1) * max_length]
                 func(self, receiverId, msg, fontStyle)
