@@ -35,7 +35,7 @@ class GroupPlugin(GroupPluginBase):
         point = self._get_point(qq_number)
         index = self._index_of_rank(qq_number)
         level = self.get_point_level(point)
-        return u"%s (%s)的%s为%d点\n当前排名为 %d 位\n当前等级为<%s>"%(nick, qq_number, currency_name_str_g, point, index, level)
+        return u"%s (%s)的%s为%d点\n当前排名为 %d 位\n当前等级为(%s)"%(nick, qq_number, currency_name_str_g, point, index, level)
 
     def get_point_level(self,point):
         
