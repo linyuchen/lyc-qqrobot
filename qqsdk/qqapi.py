@@ -111,6 +111,27 @@ class QQApi(object):
         self.needVerifyCode = False
         return self.post_json(self.input_vc_url, vc=code)
 
+    def __convertMsg(self, content):
+
+
+        content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
+
+        return content
+
+    def __splitSendMsg(func):
+        def send(self, receiverId, content, fontStyle):
+            content = self.__convertMsg(content)
+            max_length = 600
+            num = math.ceil(len(content) / float(600))
+            for i in range(int(num)):
+                msg = content[i * max_length: (i + 1) * max_length]
+                func(self, receiverId, msg, fontStyle)
+                time.sleep(0.8)
+
+        return send
+
+
+    @__splitSendMsg
     def sendMsg2Buddy(self, buddyId, content, fontStyle=None):
         """
         :param buddyId: 好友的id
@@ -120,6 +141,7 @@ class QQApi(object):
         return self.post_json(self.send_msg2buddy_url, uin=buddyId, msg=content)
 
 
+    @__splitSendMsg
     def sendMsg2Group(self, groupId, content, fontStyle=None):
         """
         groupId:群的id
@@ -127,12 +149,7 @@ class QQApi(object):
         fontStyle: entity.FontStyle
         """
         # print groupId
-        max_length = 600
-        num = math.ceil(len(content) / float(600))
-        for i in range(int(num)):
-            msg = content[i * max_length: (i + 1) * max_length]
-            self.post_json(self.send_msg2group_url, uin=groupId, msg=msg)
-            time.sleep(0.8)
+        return self.post_json(self.send_msg2group_url, uin=groupId, msg=content)
 
     def handleRequestAddMeFriend(self, qq, rejectReason="", allow=True):
         """
