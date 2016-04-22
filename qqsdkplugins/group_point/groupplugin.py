@@ -26,6 +26,26 @@ class GroupPlugin(GroupPluginBase):
         self.wealth_level_list = [(u"一无所有",0),(u"乞丐",2000),(u"无业游民",2800),(u"失业人口",6000),(u"打工仔",9800),(u"温饱户",16000),(u"白领",50000),(u"小康家庭",118000),(u"金领",250000),(u"暴发户",800000),(u"百万富翁",1800000),(u"千万富翁",10000000),(u"中国首富",88888888),(u"亚洲首富",333333333),(u"世界首富",888888888),(u"初入神境",100000000000000000000000000000000000000000000000000000000000),(u"人阶之神",200000000000000000000000000000000000000000000000000000000000),(u"地阶之神",300000000000000000000000000000000000000000000000000000000000),(u"天阶之神",500000000000000000000000000000000000000000000000000000000000),(u"仙阶之神",900000000000000000000000000000000000000000000000000000000000),(u"登峰造极",1000000000000000000000000000000000000000000000000000000000000),(u"造物主",10000000000000000000000000000000000000000000000000000000000000)] # (level name，point num)
         self.add_point = self._add_point
 
+    def get_clear_chance(self, qq_number, nick):
+        num = self._get_clear_chance(qq_number)
+        return u"【%s】(%s)还有%d次清负机会" % (nick, qq_number, num)
+
+    def clear_point(self, my_qq_number, my_nick, aim_qq_number, aim_nick):
+        clear_chance = self._get_clear_chance(my_qq_number)
+        if clear_chance <= 0:
+            return u"【%s】(%s)清负机会次数不足，无法清负活跃度" % (my_nick, my_qq_number)
+
+        point = self._get_point(aim_qq_number)
+        if point > 0:
+            return u"【%s】(%s)的活跃度还没负呢，确定要清负？" % (aim_nick, aim_qq_number)
+
+        self._set_point(aim_qq_number, 0)
+        clear_chance -= 1
+        self._set_clear_chance(my_qq_number, clear_chance)
+
+        return u"清负成功，【%s】(%s)还有%d次清负机会" % (my_nick, my_qq_number, clear_chance)
+
+
     def add_point(self, qq_number, nick, num=1):
 
         self._add_point(qq_number,nick,num)
@@ -35,7 +55,7 @@ class GroupPlugin(GroupPluginBase):
         point = self._get_point(qq_number)
         index = self._index_of_rank(qq_number)
         level = self.get_point_level(point)
-        return u"%s (%s)的%s为%d点\n当前排名为 %d 位\n当前等级为(%s)"%(nick, qq_number, currency_name_str_g, point, index, level)
+        return u"%s (%s)的%s为%d点\n当前排名为 %d 位\n当前等级为（%s）"%(nick, qq_number, currency_name_str_g, point, index, level)
 
     def get_point_level(self,point):
         
@@ -112,6 +132,15 @@ class GroupPlugin(GroupPluginBase):
 
 if "__main__" == __name__:
 
-    test = GroupPlugin()
+    group = "3011590"
+    member = "123"
+    nick = "hi"
+    test = GroupPlugin(group)
+
+    print test.get_clear_chance(member, nick)
+
+    print test.clear_point(member, nick)
+    # print test.sign(member, nick)
+    print test.get_point(member, nick)
 
 

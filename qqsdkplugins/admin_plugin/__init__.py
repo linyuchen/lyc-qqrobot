@@ -32,6 +32,9 @@ class MyEvent(MsgEvent):
         
         self.cmdGetGroups = CMD(u"查群")
         self.cmdSetInviteMe = CMD(u"邀我进群", hasParam=True)
+
+        self.cmdGetClearChance = CMD(u"查清负次数", hasParam=True)
+        self.cmdAddClearChance = CMD(u"加清负次数", hasParam=True)
         self.groupInstances = {} # key groupQQ, value instanvc
 
         # 不同的QQ群用不同的实例， 因为每个人想要的数据都不一样
@@ -115,6 +118,18 @@ class MyEvent(MsgEvent):
                 return
             param = self.cmdSetInviteMe.getOriginalParam()
             result += admin.setInviteMeToGroup(param)
+
+        elif self.cmdGetClearChance.az(msg.msg):
+            if friendQQ not in admins:
+                return
+            param = self.cmdGetClearChance.getOriginalParam()
+            result += admin.get_clear_point_chance(param)
+
+        elif self.cmdAddClearChance.az(msg.msg):
+            if friendQQ not in admins:
+                return
+            param = self.cmdAddClearChance.getOriginalParam()
+            result += admin.add_clear_point_chance(param)
   
         if result:
             msg.reply(result)

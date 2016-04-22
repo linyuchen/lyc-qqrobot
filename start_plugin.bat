@@ -1,1 +1,1 @@
-python start_plugin.py 6666
+python start_plugin.py 3000

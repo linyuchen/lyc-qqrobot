@@ -97,6 +97,28 @@ class AdminPlugin:
         group_plugin._set_point(qq_number, point)
         return "ok"
 
+
+    def get_clear_point_chance(self, cmdStr):
+        cmdList = self.__convertCmdStr2List(cmdStr)
+        if len(cmdList) < 1:
+            return u"参数不对"
+        qq_number = cmdList[0]
+        group_plugin = grouppluginbase.GroupPluginBase("")
+        result = group_plugin._get_clear_chance(qq_number)
+        return u"%d" % result
+
+    def add_clear_point_chance(self, cmdStr):
+        cmdList = self.__convertCmdStr2List(cmdStr)
+        if len(cmdList) < 2:
+            return u"参数不对"
+
+        qq_number = cmdList[0]
+        num = cmdList[1]
+        num = int(num)
+        group_plugin = grouppluginbase.GroupPluginBase("")
+        group_plugin._add_clear_chance(qq_number, num)
+        return "ok"
+
     def get_rpg_data(self,qq_number):
 
         return self.rpg_game.get_person(qq_number).get_state()
