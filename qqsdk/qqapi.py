@@ -1,6 +1,7 @@
 # -*- coding: UTF8 -*-
 
 import json
+import time
 import math
 import urllib2
 import requests
@@ -131,6 +132,7 @@ class QQApi(object):
         for i in range(int(num)):
             msg = content[i * max_length: (i + 1) * max_length]
             self.post_json(self.send_msg2group_url, uin=groupId, msg=msg)
+            time.sleep(0.8)
 
     def handleRequestAddMeFriend(self, qq, rejectReason="", allow=True):
         """
