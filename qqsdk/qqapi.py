@@ -1,6 +1,7 @@
 # -*- coding: UTF8 -*-
 
 import json
+import math
 import urllib2
 import requests
 # import requests
@@ -125,7 +126,11 @@ class QQApi(object):
         fontStyle: entity.FontStyle
         """
         # print groupId
-        return self.post_json(self.send_msg2group_url, uin=groupId, msg=content)
+        max_length = 600
+        num = math.ceil(len(content) / float(600))
+        for i in range(int(num))
+            msg = content[i * max_length: (i + 1) * max_length]
+            self.post_json(self.send_msg2group_url, uin=groupId, msg=msg)
 
     def handleRequestAddMeFriend(self, qq, rejectReason="", allow=True):
         """
