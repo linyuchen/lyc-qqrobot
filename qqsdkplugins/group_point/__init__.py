@@ -22,6 +22,9 @@ class MyEvent(MsgEvent):
         self.cmdMyPoint = CMD(u"我的活跃度")
         self.cmdTransferPoint = CMD(u"转活跃度", hasParam=True)
         self.cmdPointRank = CMD(u"活跃度排名")
+        self.cmdClearPoint = CMD(u"清负活跃度", hasParam=False)
+        self.cmdClearOtherPoint = CMD(u"清负他人活跃度", hasParam=True)
+        self.cmdGetClearPointChance = CMD(u"清负次数")
 
         # 不同的QQ群用不同的实例， 因为每个人想要的数据都不一样
         self.groupInstances = {} # key qq, value instance
@@ -56,15 +59,25 @@ class MyEvent(MsgEvent):
 
         elif self.cmdPointRank.az(msg.msg):
             result = groupPlugin.get_point_rank()
-        """
-        elif self.nextCmd.az(msg.msg):
-            result = zhidao.getNextQuestions()
-            
-            msg.reply(result + self.note)
-            msg.destroy()
-        elif self.answerCmd.az(msg.msg):
-            result = zhidao.getAnswer(self.answerCmd.getParamList()[0])
-        """
+
+        elif self.cmdClearPoint.az(msg.msg):
+            aim_qq = my_qq = member.qq
+            aim_nick = my_nick = member.getName()
+            result = groupPlugin.clear_point(my_qq, my_nick, aim_qq, aim_nick)
+
+        elif self.cmdClearOtherPoint.az(msg.msg):
+            param = self.cmdClearOtherPoint.getParamList()
+            my_qq = member.qq
+            my_nick = member.getName()
+            aim_qq = param[0]
+            aim_nick = str(aim_qq)
+            if aim_qq.isdigit():
+                result = groupPlugin.clear_point(my_qq, my_nick, aim_qq, aim_nick)
+            else:
+                result = u"对方QQ号错误"
+        elif self.cmdGetClearPointChance.az(msg.msg):
+            result = groupPlugin.get_clear_chance(member.qq, member.getName())
+
         if result:
             msg.reply(result)
             msg.destroy()

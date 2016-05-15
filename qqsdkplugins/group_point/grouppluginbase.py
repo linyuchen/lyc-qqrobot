@@ -37,12 +37,27 @@ class GroupPluginBase(object):
         self.point_table = "t_point"
         self.sign_table = "t_sign"
         self.sign_continuous_table = "t_sign_continuous"
+        self.clear_table = "t_clear_chance" # 清负机会
         
         self.group_qq = group_qq
 
         self.__get_value = self.sqlite.get_value
         self.__set_value = self.sqlite.set_value
 
+    def _get_clear_chance(self, qq_number):
+        result = self.__get_value(self.clear_table, ["chance"], {"member_qq":qq_number})
+        if result:
+            return result[0][0]
+        else:
+            return 0
+
+    def _set_clear_chance(self, qq_number, num):
+        self.__set_value(self.clear_table, {"chance":int(num), "member_qq":qq_number}, {"member_qq": qq_number})
+
+    def _add_clear_chance(self, qq_number, num):
+        current_num = self._get_clear_chance(qq_number)
+        current_num += num
+        self._set_clear_chance(qq_number, current_num)
     
     def _get_point(self, qq_number):
         """
@@ -173,14 +188,17 @@ class GroupPluginBase(object):
 
 if "__main__" == __name__:
 
-    group_qq = 30115908
-    member_qq = 1412971608
+    group_qq = "30115908"
+    member_qq = "1412971608"
     member_name = u"name"
     test = GroupPluginBase(group_qq)
     #print test._get_point(member_qq)
 #    test._add_point(member_qq, member_name, 1)
 #    test._set_point(member_qq, 0)
-    print test.sign(member_qq)
+#    print test.sign(member_qq)
+    print test._get_clear_chance(member_qq)
+    print test._add_clear_chance(member_qq, 2)
+#    print test._set_clear_chance(member_qq, 2)
 
     
 
