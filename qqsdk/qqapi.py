@@ -14,13 +14,13 @@ class QQApi(object):
         如果是PCQQ，就是QQ号
     """
 
-    def __init__(self, port):
+    def __init__(self, port, host="localhost"):
         self.verifyCode = ""  # 验证码
         self.needVerifyCode = False
         # self.http = requests  # .session()
         self.headers = {"Content-Type": "application/json"}
         # port = 6666
-        self.host = "http://localhost:%d" % port
+        self.host = "http://%s:%d" % (host, port)
         self.login_url = "%s/login" % self.host
         self.input_vc_url = self.host + "/input_vc"
         self.get_friends_url = self.host + "/friends"
@@ -40,6 +40,11 @@ class QQApi(object):
         return res.json()
 
     def uin2number(self, uin):
+        """
+
+        :param uin:
+        :return: {data: qq}
+        """
         return self.post_json(self.uin2number_url, uin=uin)
 
     def getMyInfo(self):
@@ -68,8 +73,8 @@ class QQApi(object):
     def getFriends(self):
         """
         获取好友列表
-        {"data":{uin: {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
-        "nick": 昵称}, ...}
+        {"data":["uin号码": {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
+        "nick": 昵称}, ...]
         }
         """
         return self.post_json(self.get_friends_url)
@@ -77,8 +82,11 @@ class QQApi(object):
     def getGroups(self):
         """
         获取群列表
-        {群uin: 
-            {"uin": uin, "name": 群名, "mask": 群消息接收屏蔽设置, "members": {群成员uin:{"nick": 昵称, "isAdmin": 是否管理员, "status": 在线状态, "card": 群名片, "uin": uin, "isCreator": 是否群主},...}}, ...
+        {
+        "data":
+            {"群uin号码":
+                {"uin": uin, "name": 群名, "mask": 群消息接收屏蔽设置, "members": {群成员uin:{"nick": 昵称, "isAdmin": 是否管理员, "status": 在线状态, "card": 群名片, "uin": uin, "isCreator": 是否群主},...}}, ...
+            }
         }
         """
         return self.post_json(self.get_groups_url)
@@ -88,6 +96,7 @@ class QQApi(object):
         获取消息
         好友消息: {"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}}
         群消息: {"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}}
+        SendTime是时间戳
         """
         data = self.post_json(self.get_msgs_url)
         return data
@@ -100,7 +109,6 @@ class QQApi(object):
         fontStyle: entity.FontStyle
         """
 
-
     def inputVerifyCode(self,code):
         """
         @param code:验证码
@@ -112,7 +120,6 @@ class QQApi(object):
         return self.post_json(self.input_vc_url, vc=code)
 
     def __convertMsg(self, content):
-
 
         content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
 
@@ -136,6 +143,7 @@ class QQApi(object):
         """
         :param buddyId: 好友的id
         :param content: 要发送的内容，unicode编码
+        ?uin=buddyId&msg=content
         """
         # print u"发送消息的对象uin",buddyId
         return self.post_json(self.send_msg2buddy_url, uin=buddyId, msg=content)
@@ -147,6 +155,7 @@ class QQApi(object):
         groupId:群的id
         content: 要发送的内容, unicode编码
         fontStyle: entity.FontStyle
+        ?uin=groupId&msg=content
         """
         # print groupId
         return self.post_json(self.send_msg2group_url, uin=groupId, msg=content)
@@ -161,7 +170,6 @@ class QQApi(object):
         """
         res = self.post_json(self.handle_request_add_me_friend_url, qq=qq, reject_reason=rejectReason, allow=allow)
         return res
-
 
     def handleAddGroupMsg(self,buddyId, groupId, rejectReason="",allow = True):
         """

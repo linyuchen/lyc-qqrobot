@@ -22,10 +22,10 @@ class QQClient(threading.Thread, QQApi):
     需要自己封装获取的消息，详情见__analysisMsg
     """
 
-    def __init__(self, port):
+    def __init__(self, port, host):
 
         threading.Thread.__init__(self)
-        QQApi.__init__(self, port)
+        QQApi.__init__(self, port, host)
         self.interval = 1.0
         self.qqUser = entity.QQUser()
         self.__qq_numbers = {}
