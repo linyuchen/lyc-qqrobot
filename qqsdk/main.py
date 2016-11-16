@@ -15,8 +15,8 @@ class Main(QQClient):  #  得继承QQClient
     self.startTime: int, 程序启动的时间戳
     """
 
-    def __init__(self, port):
-        super(Main, self).__init__(port)
+    def __init__(self, port, host="localhost"):
+        super(Main, self).__init__(port, host)
         self.startTime = time.time()
 
         self.pluginsPath = cur_path + "/../qqsdkplugins"
