@@ -1,1 +1,2 @@
-python start_plugin.py 3000
+python start_plugin.py 1000 192.168.1.2
+pause

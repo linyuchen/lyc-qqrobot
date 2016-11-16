@@ -666,12 +666,13 @@ class QQClient(threading.Thread, QQApi):
         friend = self.getFriendByUin(data["Sender"])
 #            print u"好友实例", friend
         if not friend:
-            # print(u"没获取到好友")
+            print(u"没获取到好友")
             return
         msg = message.FriendMsg(friend)
         msg.time = data["SendTime"]
         msg.msg = data["Message"]
-#            print u"收到好友消息", __file__
+        # print "msg", msg.msg
+#        print u"收到好友消息", msg.msg.encode("utf8")
         msg.reply = lambda content, fontStyle=None, qq=friend.uin: self.sendMsg2Buddy(qq, content)
         self.__friendMsgs.put(msg)
 

@@ -17,6 +17,7 @@ class QQApi(object):
     def __init__(self, port, host="localhost"):
         self.verifyCode = ""  # 验证码
         self.needVerifyCode = False
+        self.port = port
         # self.http = requests  # .session()
         self.headers = {"Content-Type": "application/json"}
         # port = 6666
@@ -37,7 +38,7 @@ class QQApi(object):
         # req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
         # http.headers = self.headers
         res = requests.get(url, kwargs)
-        return res.json()
+        return json.loads(res.content)
 
     def uin2number(self, uin):
         """
@@ -120,13 +121,12 @@ class QQApi(object):
         return self.post_json(self.input_vc_url, vc=code)
 
     def __convertMsg(self, content):
-
-        content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
+        if self.port > 3000:
+            content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
 
         return content
-
     def __splitSendMsg(func):
-        def send(self, receiverId, content, fontStyle):
+        def send(self, receiverId, content, fontStyle=None):
             content = self.__convertMsg(content)
             max_length = 300
             num = math.ceil(len(content) / float(max_length))
@@ -195,10 +195,13 @@ class QQApi(object):
 
 
 if __name__ == "__main__":
-    test = QQApi(3000)
+    #test = QQApi(1000, "192.168.1.2")
+    test = QQApi(3004)
     # print test.login()["data"]
     # print test.inputVerifyCode("knke")["data"]
     # print test.getFriends()
-    # print test.sendMsg2Buddy("2725528563", u"呵呵")
+    #print test.sendMsg2Buddy("1412971608", u"呵呵")
     # import time
-    print test.getMsg()
+    msg = test.getMsg()
+    print msg
+    print msg["data"][0]["Data"]["Message"]
