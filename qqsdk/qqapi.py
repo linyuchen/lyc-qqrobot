@@ -94,8 +94,8 @@ class QQApi(object):
     def getMsg(self):
         """
         获取消息
-        好友消息: {"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}}
-        群消息: {"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}}
+        好友消息: {data: [{"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}},...]}
+        群消息: {data: [{"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}},...]}
         SendTime是时间戳
         """
         data = self.post_json(self.get_msgs_url)
