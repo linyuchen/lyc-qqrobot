@@ -123,6 +123,7 @@ class QQApi(object):
     def __convertMsg(self, content):
         if self.port > 3000:
             content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
+
         return content
     def __splitSendMsg(func):
         def send(self, receiverId, content, fontStyle=None):
