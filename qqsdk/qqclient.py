@@ -444,12 +444,9 @@ class QQClient(threading.Thread, QQApi):
         self.__listenEvent(self.__addFriendResultMsgs, self.addFriendResultEvents)
         self.__listenEvent(self.__groupMemberExitMsgs, self.groupMemberExitEvents)
 
-
     def __listenEvent(self, msgs,events):
 
         EventListener(msgs, events, self.addErrorMsg, self.interval).start()
-
-        
 
     def __analysisMsg(self, msg):
         """
@@ -457,7 +454,7 @@ class QQClient(threading.Thread, QQApi):
         """
 
 #        print u"分析消息", msg
-        for msgDic in msg["data"]:
+        for msgDic in msg.get("data", []):
             self.__handleMsg(msgDic)
 
     def __handle_friend_voice_msg(self, data):
@@ -748,10 +745,12 @@ class QQClient(threading.Thread, QQApi):
         event = dic["Event"]
 #        print "event", event, __file__
 #         print dic
-        data = dic["Data"]
+        data = dic.get("Data")
         event = self.msg_handlers.get(event)
-        if event:
+        if event and data:
             event(data)
+        else:
+            print(dic)
 
     def run(self):
 
@@ -786,6 +785,7 @@ class QQClient(threading.Thread, QQApi):
         for i in range(6):
             # self.qqUser.groups.get(uin)
             group = self.qqUser.groups.get(uin)
+            # print self.qqUser.groups, uin, type(uin), type(self.qqUser.groups.keys()[0])
             if group:
                 return group
             else:
@@ -868,6 +868,7 @@ class QQClient(threading.Thread, QQApi):
 
         group = self.getGroupByUin(groupUin)
         for i in range(6):  # 最多获取三次
+            # print groupMemberUin, group.members, type(groupMemberUin), type(group.members.keys()[0])
             member = group.getMemberByUin(groupMemberUin)
             if not member:
                 self.getGroups()

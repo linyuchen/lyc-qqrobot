@@ -38,7 +38,10 @@ class QQApi(object):
         # req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
         # http.headers = self.headers
         res = requests.get(url, kwargs)
-        return json.loads(res.content)
+        try:
+            return json.loads(res.content)
+        except:
+            return {}
 
     def uin2number(self, uin):
         """
@@ -95,9 +98,9 @@ class QQApi(object):
     def getMsg(self):
         """
         获取消息
-        好友消息: {"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}}
-        群消息: {"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}}
-        SendTime是时间戳
+        好友消息: {data: [{"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}},...]}
+        群消息: {data: [{"Event": "GroupMsg", "Data": {"GroupQQ": 群号, "ClusterNum": uin, "Sender": member_uin, "SenderQQ": member_qq, "Message": 消息内容, "SendTime": 发送时间}},...]}
+        SendTime是时间戳, uin 都是int型
         """
         data = self.post_json(self.get_msgs_url)
         return data
@@ -125,6 +128,7 @@ class QQApi(object):
             content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
 
         return content
+
     def __splitSendMsg(func):
         def send(self, receiverId, content, fontStyle=None):
             content = self.__convertMsg(content)
@@ -195,12 +199,12 @@ class QQApi(object):
 
 
 if __name__ == "__main__":
-    #test = QQApi(1000, "192.168.1.2")
+    # test = QQApi(1000, "192.168.1.2")
     test = QQApi(3004)
     # print test.login()["data"]
     # print test.inputVerifyCode("knke")["data"]
     # print test.getFriends()
-    #print test.sendMsg2Buddy("1412971608", u"呵呵")
+    # print test.sendMsg2Buddy("1412971608", u"呵呵")
     # import time
     msg = test.getMsg()
     print msg
