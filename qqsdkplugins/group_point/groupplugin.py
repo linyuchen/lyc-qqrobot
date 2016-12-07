@@ -127,9 +127,6 @@ class GroupPlugin(GroupPluginBase):
             return u"对不起，您要转账的对象不存在！"
 
 
-
-
-
 if "__main__" == __name__:
 
     group = "3011590"
