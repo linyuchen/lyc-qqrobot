@@ -9,6 +9,7 @@ class GroupGlobalSetting(models.Model):
     sign_add_percentage = models.FloatField(default=0.0001)  # 签到能得到当前活跃度 * sign_add_percentage * 连续签到次数
     sign_least_point = models.IntegerField(default=2000)  # 签到最少能得这么多活跃度
     currency = models.CharField(max_length=20, default=u"活跃度")  # 群积分名字
+    talk_point = models.IntegerField(default=1)  # 发言奖励多少积分
 
     @staticmethod
     def get_setting():

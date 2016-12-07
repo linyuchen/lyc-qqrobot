@@ -73,6 +73,14 @@ class GroupAction(object):
         return u"【%s】(%s)还有%d次清负机会" % \
                (self.group_user.nick, self.group_user.user.qq, self.group_user.user.clear_point_chance)
 
+    def clear_point(self):
+        if self.group_user.user.clear_point_chance <= 0:
+            return u"清负次数不足！"
+        if self.group_user.get_point() < 0:
+            self.group_user.point = "0"
+            self.group_user.save()
+        return u"清负成功！"
+
     def __get_point_rank(self):
         """
         :return: users
