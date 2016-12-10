@@ -1,9 +1,11 @@
-#coding=UTF8
+# coding=UTF8
 
 """
 """
 import os
 import locale
+
+
 class VisualMenu(object):
 
     def __init__(self):
@@ -24,35 +26,34 @@ class VisualMenu(object):
         self.allFileList = []
         self.groupFileList = []
         self.adminFileList = []
-        self.allMenu = {} # key 文件名（去后缀），value 文件内的东东
+        self.allMenu = {}  # key 文件名（去后缀），value 文件内的东东
         self.groupMenu = {}
         self.adminMenu = {}
         self.cmdNameList = []
-        self.getTxts(self.allPath, self.allFileList, self.allMenu)
-        self.getTxts(self.adminPath, self.adminFileList, self.adminMenu)
-        self.getTxts(self.groupPath, self.groupFileList, self.groupMenu)
+        self.get_txts(self.allPath, self.allFileList, self.allMenu)
+        self.get_txts(self.adminPath, self.adminFileList, self.adminMenu)
+        self.get_txts(self.groupPath, self.groupFileList, self.groupMenu)
 
-    def replaceValue(self, txtContent):
+    def replace_value(self, txt_content):
         """
         处理txt里面的变量
         """
         for key, value in self.replaceValueDic.items():
-            txtContent = txtContent.replace(key, value)
+            txt_content = txt_content.replace(key, value)
 
-        return txtContent
+        return txt_content
 
-    def getTxts(self, path, fileList, menu):
+    def get_txts(self, path, file_list, menu):
 
         _fileList = os.listdir(path)
-        fileList[:] = [f for f in _fileList if f.endswith(self.ext)][:]
-#        self.cmdNameList = [f[: - len(self.ext)].decode(self.encoding) for f in fileList if f.endswith(self.ext)]
-        for fileName in fileList:
-            cmdName = fileName[:- len(self.ext)].decode(self.encoding)
-            self.cmdNameList.append(cmdName)
+        file_list[:] = [f for f in _fileList if f.endswith(self.ext)][:]
+        for fileName in file_list:
+            cmd_name = fileName[:- len(self.ext)].decode(self.encoding)
+            self.cmdNameList.append(cmd_name)
             with open(path + fileName) as f:
                 data = f.read().decode("u8")
-                data = self.replaceValue(data)
-                menu[cmdName] = data
+                data = self.replace_value(data)
+                menu[cmd_name] = data
                 f.close()
 
 

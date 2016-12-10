@@ -20,13 +20,19 @@
 
 ## 启动插件程序
 
-    start_plugin.py 端口号
+    start_plugin.py 端口号 HOST
+
+HOST省略的话默认为localhost
 
 如:
 
-    start_plugin.py 6666
+    start_plugin.py 6666 192.168.1.2
 
 端口号要与主程序的对应
+
+端口号 > 3000 表示主程序是webqq
+
+端口号 < 3000 表示主程序是qqplus
 
 # 插件
 

@@ -77,8 +77,8 @@ class QQApi(object):
     def getFriends(self):
         """
         获取好友列表
-        {"data":["uin号码": {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
-        "nick": 昵称}, ...]
+        {"data":{"uin号码": {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
+        "nick": 昵称}}
         }
         """
         return self.post_json(self.get_friends_url)

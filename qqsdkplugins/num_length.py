@@ -18,9 +18,12 @@ CMD = cmdaz.CMD
 #    要有个类，类名是Plugin，且继承于QQPlugin
 class Plugin(QQPlugin):
 
+    Name = u"位数计算"
+
     def __init__(self):
 
-        self.cmd = CMD(u"位数", hasParam=True)
+        super(Plugin, self).__init__()
+        self.cmd = CMD(u"位数", param_len=1)
 
     def calc(self, msg):
         """
@@ -32,7 +35,7 @@ class Plugin(QQPlugin):
         result = ""
         if self.cmd.az(msgContent):
             
-            param = self.cmd.getOriginalParam()
+            param = self.cmd.get_original_param()
 #            print param
             param = param.replace(" ", "")
             if not param.isdigit():
@@ -58,14 +61,11 @@ class Plugin(QQPlugin):
 
         # 添加其他事件请查看开发文档
 
-        print u"插件%s被安装了"%(__file__)
+        print u"插件【%s】被安装了" % self.Name
 
     def uninstall(self):
         """
         插件被卸载时调用
         """
 
-        print u"插件%s被卸载了"%(__file__)
-
-
-
+        print u"插件【%s】被卸载了" % self.Name

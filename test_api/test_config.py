@@ -1,0 +1,4 @@
+# -*- coding: UTF8 -*-
+
+TEST_QQ = 721011692
+TEST_GROUP_QQ = 30115908

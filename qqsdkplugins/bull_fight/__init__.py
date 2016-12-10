@@ -1,57 +1,62 @@
-#coding=UTF8
+# coding=UTF8
 
 import cmdaz
 import plugin
 import bullfight
+from superplugins import GroupPointAction
 QQPlugin = plugin.QQPlugin
-webqqsdk = plugin.webqqsdk # webqqsdk模块
+webqqsdk = plugin.webqqsdk
 MsgEvent = webqqsdk.msgevent.MsgEvent
 CMD = cmdaz.CMD
-game = bullfight.BullFight
 
-#from webqqsdk import entity
 
-#新建个事件类，继承于MsgEvent
+class BullGame(GroupPointAction, bullfight.BullFight):
+
+    def __init__(self, group_qq):
+        bullfight.BullFight.__init__(self, group_qq)
+        GroupPointAction.__init__(self)
+
+
+# 新建个事件类，继承于MsgEvent
 class MyEvent(MsgEvent):
     __doc__ = u"""
     群游戏：斗牛
     """
+    
     def __init__(self):
-
+        super(MyEvent, self).__init__()
         self.name = u"group_gamble"
-        self.cmdStart = CMD(u"斗牛", hasParam=True)
-        self.groupInstances = {} # key groupQQ, value instanvc
+        self.cmdStart = CMD(u"斗牛", param_len=1)
+        self.groupInstances = {}  # key groupQQ, value instance
 
-        # 不同的QQ群用不同的实例， 因为每个人想要的数据都不一样
+        # 不同的QQ群用不同的实例， 因为一个人可以在多个群里
 
-    def getGameInstance(self, groupQQ):
+    def get_game_instance(self, group_qq):
 
-        if self.groupInstances.has_key(groupQQ):
-            groupPlugin = self.groupInstances[groupQQ]
+        if group_qq in self.groupInstances:
+            group_plugin = self.groupInstances[group_qq]
         else:
-            groupPlugin = game()
-            self.groupInstances[groupQQ] = groupPlugin
+            group_plugin = BullGame(group_qq)
+            self.groupInstances[group_qq] = group_plugin
 
-        return groupPlugin
+        return group_plugin
 
-    def main(self,msg):
+    def main(self, msg):
         """
         此方法是用于处理事件接收到的消息
         main方法必须存在,注意此方法需存在一个参数用于传入消息实例
         """
         
-        groupQQ = msg.group.qq
+        group_qq = msg.group.qq
         member = msg.groupMember
 
-        game = self.getGameInstance(groupQQ)
-
+        __game = self.get_game_instance(group_qq)
 
         result = ""
         if self.cmdStart.az(msg.msg):
-            param = self.cmdStart.getParamList()[0]
-            result += game.start_game(groupQQ, member.qq, member.getName(), msg.reply, param)
+            param = self.cmdStart.get_param_list()[0]
+            result += __game.start_game(member.qq, member.getName(), msg.reply, param)
 
- 
         if result:
             msg.reply(result)
             msg.destroy()
@@ -61,7 +66,7 @@ class MyEvent(MsgEvent):
 #    要有个类，类名是Plugin，且继承于QQPlugin
 class Plugin(QQPlugin):
 
-
+    NAME = u"斗牛群游戏"
 
     def install(self):
 
@@ -69,11 +74,11 @@ class Plugin(QQPlugin):
 
         self.qqClient.addGroupMsgEvent(event)
 
-        print u"插件%s被安装了"%(__file__)
+        print u"插件【%s】被安装了" % self.NAME
 
     def uninstall(self):
 
-        print u"插件%s被卸载了"%(__file__)
+        print u"插件【%s】被卸载了" % self.NAME
 
 
 

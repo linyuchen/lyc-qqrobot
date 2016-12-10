@@ -1,6 +1,7 @@
-#coding=UTF8
+# coding=UTF8
 import basemsg
 BaseMsg = basemsg.BaseMsg
+
 
 class FriendMsg(BaseMsg):
     """
