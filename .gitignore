@@ -13,5 +13,5 @@ webqq/ewm.jpg
 db.sqlite3
 */migrations/*
 !*/migrations/__init__.py
-group_manage.db
+group_manager.db
 rpgdata.db
