@@ -103,7 +103,7 @@ class GroupAction(object):
         """
         users = GroupUser.objects.filter(group_qq=self.group_qq)
         users = list(users)
-        users = sorted(users, lambda a, b: cmp(a.get_point(), b.get_point()))
+        users = sorted(users, lambda a, b: cmp(b.get_point(), a.get_point()))
         return users
 
     def __get_point_rank_index(self):
@@ -116,7 +116,7 @@ class GroupAction(object):
                 self.group_user.get_point(), self.__get_point_rank_index())
 
     def get_point_rank(self):
-        users = self.__get_point_rank()
+        users = self.__get_point_rank()[:10]
         result = ""
         for index, user in enumerate(users):
             result += u"第%d名：%s(%s)，%s\n" % \
