@@ -2,6 +2,7 @@
 
 import re
 import json
+import urllib
 
 import content_types
 from common import Protocol
@@ -85,7 +86,7 @@ class Analyser(object):
         """
     
         params = re.findall("([^&]+?)=([^&]*)", param)
-        params = map(lambda p: (urllib.unquote(p[0]), urllib.unquote(p1)), params)
+        params = map(lambda p: (p[0], p[1]), params)
         return dict(params)
 
 
@@ -116,7 +117,7 @@ class HeadersAnalyser(Analyser):
 
         url_object.path = url[: pos]
         param = url[pos + 1:]
-        url_object.param = self.analysis_form_params(param)
+        url_object.param = self.analysis_form_params(urllib.unquote_plus(param))
 
         return url_object
 

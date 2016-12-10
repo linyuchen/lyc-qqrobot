@@ -1,30 +1,28 @@
-#coding: utf-8
+# coding: utf-8
 import sqlite3
 
 
 class Sqlite:
 
-    def __init__(self,db_path):
+    def __init__(self, db_path):
 
-        self.sqlite = sqlite3.connect(db_path,check_same_thread = False)
+        self.sqlite = sqlite3.connect(db_path, check_same_thread = False)
 
         self.cursor = self.sqlite.cursor()
 
-    def query(self,sql_string,escape_value=None):
+    def query(self, sql_string, escape_value=None):
 
-#        self.cursor = self.sqlite.cursor()
         if not escape_value:
             return self.cursor.execute(sql_string).fetchall()
         else:
             return self.cursor.execute(sql_string,escape_value).fetchall()
 
-    def non_query(self,sql_string,escape_value=None):
+    def non_query(self, sql_string, escape_value=None):
 
-#        self.cursor = self.sqlite.cursor()
         if not escape_value:
             self.cursor.execute(sql_string)
         else:
-            self.cursor.execute(sql_string,escape_value)
+            self.cursor.execute(sql_string, escape_value)
         self.sqlite.commit()
 
     def close(self):
@@ -55,8 +53,6 @@ class Sqlite:
             sql_string = "SELECT %s FROM %s WHERE 1=1 %s"%(keySql, table_name, where_sql)
         else:
             sql_string = "SELECT %s FROM %s"%(keySql, table_name)
-#        print sql_string
-#        print param
         result = self.query(sql_string, param)
         return result
 
@@ -69,7 +65,6 @@ class Sqlite:
         set_keys = set_kw.keys()
         values = tuple(set_kw.values())
 
-        #print exists
         if self.get_value(table_name, set_keys, where_kw):
             updateSet = ",".join(["%s=?" % i for i in set_keys])
             where_values = tuple(where_kw.values())
@@ -82,17 +77,16 @@ class Sqlite:
             insertV = ",".join(list("?" * len(set_keys)))
             param = values
             sql_str = "insert into %s(%s) values(%s)" % (table_name, ",".join(set_keys), insertV)
-            #print sql_str
             self.non_query(sql_str, param)
 
 
 class Sqlite_Safe:
 
-    def __init__(self,db_path):
+    def __init__(self, db_path):
 
        self.db_path = db_path 
 
-    def query(self,sql_string,escape_value=None):
+    def query(self, sql_string, escape_value=None):
 
         sql = Sqlite(self.db_path)
         result = sql.query(sql_string,escape_value)
@@ -100,17 +94,17 @@ class Sqlite_Safe:
 
         return result
 
-    def non_query(self,sql_string,escape_value=None):
+    def non_query(self, sql_string, escape_value=None):
 
         sql = Sqlite(self.db_path)
-        sql.non_query(sql_string,escape_value)
+        sql.non_query(sql_string, escape_value)
         sql.close()
  
 
 if __name__ == "__main__": 
 
     test = Sqlite("./sqlite_sserver/rpgdata.db")
-    test.set_value("t_person", {"defensive":1000000000000}, {"tag":"499811393"})
+    test.set_value("t_person", {"defensive": 1000000000000}, {"tag": "499811393"})
 
 
 #    for i in range(100):

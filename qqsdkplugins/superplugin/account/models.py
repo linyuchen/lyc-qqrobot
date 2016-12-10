@@ -11,16 +11,16 @@ class UserManager(BaseUserManager):
     def create_user(self, name, password=None):
 
         user = self.model(
-          username=name,
+          qq=name,
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, password=None):
+    def create_superuser(self, qq, password=None):
 
-        user = self.create_user(username, password)
+        user = self.create_user(qq, password)
         user.is_admin = True
         user.save(using=self._db)
         return user
@@ -31,11 +31,11 @@ class MyUser(AbstractBaseUser):
     """
     nick = models.CharField(max_length=100, null=True)  # QQ昵称
     is_admin = models.BooleanField(default=False)
-    qq = models.CharField(max_length=15)  # QQ号
+    qq = models.CharField(max_length=15, unique=True)  # QQ号
     point = models.TextField(default="0")  # 个人积分，和群无关
     clear_point_chance = models.IntegerField(default=0)  # 清负活跃度机会
     objects = UserManager()
-    USERNAME_FIELD = "nick"
+    USERNAME_FIELD = "qq"
 
     def get_point(self):
         return int(self.point)
@@ -54,14 +54,11 @@ class MyUser(AbstractBaseUser):
         u, e = MyUser.objects.get_or_create(qq=qq)
         return u
 
-    def get_team(self):
-        return self.home_team or self.company_team
-
     def get_full_name(self):
-        return self.username
+        return self.nick
 
     def get_short_name(self):
-        return self.username
+        return self.nick
 
     @property
     def is_staff(self):
@@ -76,8 +73,8 @@ class MyUser(AbstractBaseUser):
     def __unicode__(self):
         if self.nick:
             return self.nick
-        elif self.weixin_open_id:
-            return self.weixin_open_id
+        elif self.qq:
+            return self.qq
         else:
             return u"匿名"
 

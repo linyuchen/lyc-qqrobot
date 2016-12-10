@@ -35,6 +35,7 @@ class MyEvent(MsgEvent):
 #    要有个类，类名是Plugin，且继承于QQPlugin
 class Plugin(QQPlugin):
 
+    Name = u"离线消息过滤"
 
     def install(self):
         # 类继承的方式添加事件
@@ -44,12 +45,11 @@ class Plugin(QQPlugin):
         self.qqClient.addRequestJoinGroupEvent(event)
         self.qqClient.addFriendStatusChangeEvent(event)
 
-
-        print u"插件%s被安装了"%(__file__)
+        print u"插件【%s】被安装了" % self.Name
 
     def uninstall(self):
 
-        print u"插件%s被卸载了"%(__file__)
+        print u"插件【%s】被卸载了" % self.Name
 
 
 

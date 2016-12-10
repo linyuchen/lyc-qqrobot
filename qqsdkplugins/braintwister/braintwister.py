@@ -2,6 +2,7 @@
 import os
 from sqliteclient import Sqlite_Safe
 
+
 class BrainTwister:
 
     def __init__(self):
@@ -17,7 +18,7 @@ class BrainTwister:
         braintwists_id = braintwists[0]
         braintwists_question = braintwists[1]
         braintwists_answer = braintwists[2]
-        return u"序号:%d\n"%braintwists_id + braintwists_question
+        return u"序号:%d\n" % braintwists_id + braintwists_question
 
     def getAnswer(self,braintwists_id):
 
@@ -26,7 +27,8 @@ class BrainTwister:
 
             return error
 
-        braintwists = Sqlite_Safe(self.BRAINTWISTS_DB_PATH).query("select question,answer from braintwists where id = %s"%braintwists_id)
+        braintwists = Sqlite_Safe(self.BRAINTWISTS_DB_PATH).query(
+            "select question,answer from braintwists where id = %s" % braintwists_id)
 
         if not braintwists :
 
@@ -36,4 +38,3 @@ class BrainTwister:
         braintwists_answer = braintwists[0][1]
 
         return braintwists_question + "\n\n" + braintwists_answer
-    

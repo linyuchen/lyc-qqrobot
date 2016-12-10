@@ -14,7 +14,7 @@ class HistoryToday:
 
     def __call__(self):
 
-        url="http://www.todayonhistory.com/index.htm"
+        url = "http://www.todayonhistory.com/index.htm"
         today = time.strftime("%m-%d")
         path = self.path + today + self.ext
         if not os.path.exists(path):
@@ -24,7 +24,7 @@ class HistoryToday:
         #    data.encode("gb2312")
             result=re.findall("<em>(.*?)</em> <i>(.*?)</i>",data)
         #    print result
-            tmp="";
+            tmp = "";
             for i in result:
         #        print i
                 tmp+="\n"+i[0]+i[1]

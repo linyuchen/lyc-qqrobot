@@ -1,4 +1,5 @@
-#coding=UTF8
+# coding=UTF8
+
 
 class MsgEvent(object):
     __doc__ = u"""
@@ -15,14 +16,13 @@ class MsgEvent(object):
             self.main = main
         self.qqClient = None
 
-
-    def main(self,msg):
+    def main(self, msg):
         """
         请复写此方法
         """
         raise NotImplementedError
 
-    def setupQQInstance(self,qqInstance):
+    def setupQQInstance(self, qqInstance):
         """
         传入qq实例
         此方法为系统调用， 不可私自调用

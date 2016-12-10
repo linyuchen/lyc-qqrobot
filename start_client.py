@@ -3,7 +3,7 @@
 
 import sys
 
-from jsonapi_httpsrv import main
+from test_api import main
 
 
 qq = sys.argv[1]

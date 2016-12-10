@@ -61,5 +61,5 @@ if __name__ == "__main__":
     urls = [
             (r"^/$", test)
             ]
-    app = HttpServer("127.0.0.1", 8080, urls)
-    app.run()
+    app = HttpServer("127.0.0.1", 8088, urls)
+    app.start()

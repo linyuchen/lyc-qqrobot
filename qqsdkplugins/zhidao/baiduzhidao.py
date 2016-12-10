@@ -1,11 +1,9 @@
 # -*- encoding:utf8 -*-
-
-import sys
-
 import re
 import httpclient
 
 http = httpclient.Http()
+
 
 class ZhiDao:
 
@@ -19,30 +17,25 @@ class ZhiDao:
 
     def getNextQuestions(self):
 
-
         if self.bdknow_search_word:
             self.bdknow_pn += 10        
-            return self.getQuestions(self.bdknow_search_word,pn=self.bdknow_pn)
+            return self.getQuestions(self.bdknow_search_word, pn=self.bdknow_pn)
         else:
             return u"请先搜索问题"
     
-    def getQuestions(self,word,pn=0,date=0):
+    def getQuestions(self, word, pn=0, date=0):
         
         self.bdknow_pn = pn
 
         self.bdknow_search_word = word
-        url = "http://zhidao.baidu.com/search?lm=0&date=%d&rn=10&pn=%d&fr=search&ie=gbk&word=%s"%(date,pn,http.quote(word.encode("gbk")))
-        #print url
-        html = http.connect(url,encoding="gbk")#知道答案列表页面
-        #print html
+        url = "http://zhidao.baidu.com/search?lm=0&date=%d&rn=10&pn=%d&fr=search&ie=gbk&word=%s" % \
+              (date, pn, http.quote(word.encode("gbk")))
+        html = http.connect(url,encoding="gbk")  # 知道答案列表页面
         error = u"抱歉，暂时没有找到"
         if error in http.html2txt(html):
             return error + u"您搜索的问题"
-    #    html = http.get_substring("<div class=\"list","</div>",html)
         html = re.findall("<div class=\"list\s?(.*)",html,re.S)[0]
-    #    print html
         url_list = re.findall("<a href=\"([^>]*?)\"[^>]*?>(.*?)</a>",html,re.S)#提取答案链接
-        #print url_list
         self.bdknow_question_url_list = []
         question_title_list = ""
         title_index = 1
@@ -51,14 +44,12 @@ class ZhiDao:
         for i in range(len(url_list)):
             info = url_list[i]
             if info[0].startswith("http://zhidao.baidu.com/question/"):
-                #print info[1], i
                 """
                 偶数是问题
                 奇数是答案
                 """
                 if (url_index%2):
                     title = u"%d：" % title_index + http.html2txt(info[1]) 
-    #            print i[1]
                     self.bdknow_question_url_list.append(info[0])
                     question_title_list += title
                     title_index += 1
@@ -67,17 +58,14 @@ class ZhiDao:
 
                 url_index += 1
 
-
-        
         if not self.bdknow_question_url_list:
             
-#            print "next"
             return self.getNextQuestions()
 
         else:
             return question_title_list
 
-    def getAnswer(self,index):
+    def getAnswer(self, index):
 
         index = index.strip()
         if not index.isdigit():
@@ -94,8 +82,8 @@ class ZhiDao:
 #        title += re.findall("<span class=\"ask-title\">(.*?)</span>",html)[0]
         title += http.html2txt(http.get_tag_html(html,"span",{"class": "ask-title"})[0])
 
-        best_answer = http.get_substring("<pre id=\"best-content","</pre>",html,contain_startstring=True,contain_endstring=True)
-    #    print best_answer
+        best_answer = http.get_substring("<pre id=\"best-content", "</pre>", html,
+                                         contain_startstring=True, contain_endstring=True)
         recommend_answer = http.get_substring("<pre id=\"recommend-content","</pre>",html,contain_startstring=True,contain_endstring=True)
         """
         answer = re.findall("<div class=\"line content\">(.+?)</div>",html)
@@ -112,11 +100,9 @@ class ZhiDao:
             other_answer_list = re.findall("<pre id=\"answer-content[^>]*?>([^<]*?)</pre>",html)
     #        print other_answer_list
             for i in range(len(other_answer_list)):
-                result += u"答案%d："%(i+1) + http.html2txt(other_answer_list[i]) + "\n\n"
+                result += u"答案%d：" % (i+1) + http.html2txt(other_answer_list[i]) + "\n\n"
         
-
-        return title + "\n\n" + result + u"\n原文：%s\nps：以上数据来源于百度知道"%url
-
+        return title + "\n\n" + result + u"\n原文：%s\nps：以上数据来源于百度知道" % url
 
 
 if __name__ == "__main__":
