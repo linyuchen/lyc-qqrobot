@@ -20,8 +20,13 @@ def migrate_point():
         group_qq = value[0]
         qq = value[1]
         nick = value[2]
+<<<<<<< HEAD
             if not nick:
                 nick = u"匿名"
+=======
+        if not nick:
+            nick = u"匿名"
+>>>>>>> cd04e7609aa41a427ce4bf4b29e124de6a13fa90
         point = value[3]
         point = "%d" % eval(point)
         # user = MyUser.get_user(qq)
@@ -29,7 +34,11 @@ def migrate_point():
         if point == group_user.point:
             continue
         group_user.nick = nick
+<<<<<<< HEAD
         group_user.point = point        
+=======
+        group_user.point = point
+>>>>>>> cd04e7609aa41a427ce4bf4b29e124de6a13fa90
         if not point.isdigit() and not point.startswith("-"):
             print(point, "%d" % eval(point))
         group_user.save()
@@ -58,13 +67,25 @@ def migrate_rpg():
     values = rpg_sqlite.get_value(table_name=t_name, key_list=["gold", "tag"])
     for value in values:
         gold = value[0]
+<<<<<<< HEAD
         qq = value[1]
         user = MyUser.get_user(qq)
         user.point = "%d" % eval(gold)
+=======
+        gold = "%d" % eval(gold)
+        qq = value[1]
+        user = MyUser.get_user(qq)
+        if gold == user.point:
+            continue
+        user.point = gold
+>>>>>>> cd04e7609aa41a427ce4bf4b29e124de6a13fa90
         user.save()
 
 if __name__ == "__main__":
     migrate_point()
     migrate_sign()
     migrate_rpg()
+<<<<<<< HEAD
 
+=======
+>>>>>>> cd04e7609aa41a427ce4bf4b29e124de6a13fa90
