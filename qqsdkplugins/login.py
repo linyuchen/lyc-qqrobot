@@ -20,7 +20,6 @@ class Plugin(plugin.QQPlugin):
 #        print self.qqClient.qqUser.groups[977514971].qq
     
     def msgFilter(self, msg):
-#        print msg.time
         if msg.time < self.qqClient.startTime:
             msg.destroy()
 
@@ -29,16 +28,13 @@ class Plugin(plugin.QQPlugin):
         code = raw_input(u"输入验证码:".encode("gbk"))
         self.qqClient.inputVerifyCode(code)
 
-    def loginSuccess(self,msg):
-#        print self.qqClient.qqUser.groups
-#        for i in range(10):
-#            print self.qqClient.getMsg() # 处理离线消息
+    def loginSuccess(self, msg):
         print u"登录成功"
 
-    def loginFailed(self,msg):
+    def loginFailed(self, msg):
         print u"登录失败",msg.msg
 
-    def logout(self,msg):
+    def logout(self, msg):
         print u"掉线了"
         print u"进行重新登录"
         self.qqClient.login()

@@ -13,10 +13,10 @@ reinstallplugin
 #logevent
 
 #登录模块
-login
+# login
 
 # 离线消息过滤
-offline_msg
+#offline_msg
 
 #example
 
@@ -36,7 +36,7 @@ visual_menu
 weather
 
 #历史今天
-historytoday
+# historytoday
 
 #快递查询
 express
@@ -62,11 +62,11 @@ translator
 # 中关村数码
 #digital
 
-phone_number
+#phone_number
 
-phone_imei
+#phone_imei
 
-software_download
+#software_download
 
 short_url
 
@@ -78,7 +78,8 @@ riddle
 
 dream_az
 
-nametools
+# 姓名工具
+#nametools
 
 running_time
 
