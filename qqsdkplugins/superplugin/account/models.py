@@ -38,7 +38,7 @@ class MyUser(AbstractBaseUser):
     USERNAME_FIELD = "qq"
 
     def get_point(self):
-        return int(self.point)
+        return int("%d" % self.point)
 
     def add_point(self, point):
         """
@@ -46,7 +46,7 @@ class MyUser(AbstractBaseUser):
         :return:
         """
         new_point = self.get_point() + point
-        self.point = str(new_point)
+        self.point = "%d" % new_point
         self.save()
 
     @staticmethod
