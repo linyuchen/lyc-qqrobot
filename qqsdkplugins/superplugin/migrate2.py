@@ -18,5 +18,15 @@ def migrate_sign():
         user.sign_continuous = user.total_sign
         user.save()
 
+
+def add_point():
+    group_qq = "30115908"
+    add_num = int("6" * 74)
+    users = GroupUser.objects.filter(group_qq=group_qq)
+    for user in users:
+        user.add_point(add_num)
+
 if __name__ == "__main__":
-    migrate_sign()
+    # migrate_sign()
+
+    add_point()
