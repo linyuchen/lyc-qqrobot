@@ -41,14 +41,12 @@ class GroupAction(object):
                                           user=self.group_user).first()
         result = ""
         if exist:
-            result = u"今天【%s】已经签到过了！" % self.group_user.nick
+            result += u"今天【%s】已经签到过了！" % self.group_user.nick
         else:
             reward_point = self.group_setting.sign_add_percentage * self.group_user.get_point() * \
                            self.group_user.sign_continuous
             last_record = SignRecord.objects.filter(user=self.group_user).last()
-            last_record_time = u"无"
             if last_record:
-                last_record_time = timezone.make_naive(last_record.time).strftime("%Y-%m-%d")
                 if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
 
