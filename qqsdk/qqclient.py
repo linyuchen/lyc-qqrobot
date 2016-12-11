@@ -1,4 +1,4 @@
-# coding=UTF8
+#self.pointi coding=UTF8
 
 import thread
 import threading
@@ -750,7 +750,8 @@ class QQClient(threading.Thread, QQApi):
         if event and data:
             event(data)
         else:
-            print(dic)
+            pass
+            # print(dic)
 
     def run(self):
 
