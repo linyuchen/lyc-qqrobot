@@ -49,7 +49,7 @@ class GroupAction(object):
             last_record_time = u"无"
             if last_record:
                 last_record_time = timezone.make_naive(last_record.time).strftime("%Y-%m-%d")
-                if (today - last_record.time) > timezone.timedelta(hours=24):
+                if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
 
             if reward_point < self.group_setting.sign_least_point:
