@@ -6,6 +6,7 @@ import django_setup
 import os
 django_setup.sys.path.append(os.path.dirname(django_setup.CURRENT_PATH))
 from group.models import GroupUser
+from globalconf.admin_action import AdminAction
 
 
 def migrate_sign():
@@ -24,7 +25,10 @@ def add_point():
     add_num = int("6" * 74)
     users = GroupUser.objects.filter(group_qq=group_qq)
     for user in users:
-        user.add_point(add_num)
+        if user.get_point() < 0:
+            AdminAction.set_group_point(group_qq, user.user.qq, add_num)
+        else:
+            user.add_point(add_num)
 
 if __name__ == "__main__":
     # migrate_sign()
