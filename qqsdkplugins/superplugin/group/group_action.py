@@ -18,6 +18,17 @@ class GroupAction(object):
         self.user_qq = user_qq
         self.group_user = GroupUser.get_user(group_qq, user_qq)
 
+    def __get_sign_info(self):
+
+        last_record = SignRecord.objects.filter(user=self.group_user).last()
+        last_record_time = u"无"
+        if last_record:
+            last_record_time = timezone.make_naive(last_record.time).strftime("%Y-%m-%d")
+
+        info = u"上次签到时间: %s" % last_record_time
+        info += u"\n连续签到%d次\n一共签到%d次" % (self.group_user.sign_continuous, self.group_user.total_sign)
+        return info
+
     def sign(self):
         """
         签到
@@ -28,8 +39,9 @@ class GroupAction(object):
         today = timezone.now()
         exist = SignRecord.objects.filter(time__year=today.year, time__month=today.month, time__day=today.day,
                                           user=self.group_user).first()
+        result = ""
         if exist:
-            return u"今天【%s】已经签到过了，请不要重复签到！" % self.group_user.nick
+            result = u"今天【%s】已经签到过了！" % self.group_user.nick
         else:
             reward_point = self.group_setting.sign_add_percentage * self.group_user.get_point() * \
                            self.group_user.sign_continuous
@@ -45,12 +57,11 @@ class GroupAction(object):
             SignRecord(user=self.group_user, add_point=str(reward_point)).save()
             self.group_user.total_sign += 1
             self.group_user.save()
-            all_record_count = self.group_user.total_sign
-
             self.group_user.add_point(reward_point)
-            return u"【%s】签到成功，获得%d %s\n上次签到时间：%s\n已经连续签到 %d 天\n总签到了 %d 天" % \
-                   (self.group_user.nick, reward_point, self.group_setting.currency, last_record_time,
-                    self.group_user.sign_continuous, all_record_count)
+            result = u"【%s】签到成功，获得%d %s" % (self.group_user.nick, reward_point, self.group_setting.currency)
+
+        result += "\n%s" % self.__get_sign_info()
+        return result
 
     def transfer_point(self, qq, point):
         """
