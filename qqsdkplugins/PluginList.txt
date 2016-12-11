@@ -16,9 +16,9 @@ reinstallplugin
 login
 
 # 离线消息过滤
-offline_msg
+# offline_msg
 
-#example
+# example
 
 #cmd_switch
 

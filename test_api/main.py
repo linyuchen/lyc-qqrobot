@@ -1,5 +1,8 @@
 # -*- coding:UTF-8 -*-
+import locale
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from httpserver.app import HttpServer
 from views import *
 from threading import Thread
@@ -19,13 +22,14 @@ urls = [
 
 
 def main():
-    app = HttpServer("127.0.0.1", 2999, urls)
+    app = HttpServer("127.0.0.1", 4000, urls)
     app.start()
 
 
 if __name__ == "__main__":
     main()
     Thread(target=test_get_msg).start()
+    encoding = locale.getdefaultlocale()[1]
     note = u"""
     1: 发送好友消息
     2: 发送群消息
@@ -33,13 +37,13 @@ if __name__ == "__main__":
     \n
     """
     while 1:
-        cmd_index = raw_input(note).strip()
+        cmd_index = raw_input(note.encode(encoding)).strip()
 
         if cmd_index == "1":
-            msg = raw_input(u"发送好友消息:").strip()
+            msg = raw_input(u"发送好友消息:".encode(encoding)).strip()
             test_send_friend_msg(msg)
         elif cmd_index == "2":
-            msg = raw_input(u"发送群消息:").strip()
+            msg = raw_input(u"发送群消息:".encode(encoding)).strip()
             test_send_group_msg(msg)
 
         elif cmd_index == "q":
