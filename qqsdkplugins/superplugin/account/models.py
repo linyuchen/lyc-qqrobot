@@ -38,7 +38,7 @@ class MyUser(AbstractBaseUser):
     USERNAME_FIELD = "qq"
 
     def get_point(self):
-        return int("%d" % self.point)
+        return int("%d" % eval(self.point))
 
     def add_point(self, point):
         """

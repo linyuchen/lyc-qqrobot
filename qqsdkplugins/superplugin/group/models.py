@@ -36,7 +36,7 @@ class GroupUser(models.Model):
     total_sign = models.IntegerField(default=0)  # 总共签到了多少次
 
     def get_point(self):
-        return int("%d" % self.point)
+        return int("%d" % eval(self.point))
 
     def add_point(self, point):
         """
