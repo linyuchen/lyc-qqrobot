@@ -36,7 +36,7 @@ class GroupUser(models.Model):
     total_sign = models.IntegerField(default=0)  # 总共签到了多少次
 
     def get_point(self):
-        return int(self.point)
+        return int("%d" % eval(self.point))
 
     def add_point(self, point):
         """
@@ -44,7 +44,7 @@ class GroupUser(models.Model):
         :return:
         """
         new_point = self.get_point() + point
-        self.point = str(new_point)
+        self.point = "%d" % new_point
         self.save()
 
     @staticmethod

@@ -25,7 +25,7 @@ class Lottery:
         award_list = [4, 3, 2, 1, 0, 0, 0, 0, 0, 0]
 
         result = random.choice(award_list)
-        self.add_point(str(group_qq), sender_info_dic["qq_number"], sender_info_dic["nick"], -gold)
+        self.add_point(str(group_qq), sender_info_dic["qq_number"], -gold)
         award = result * gold
         if result == 1:
             note = u"哼哼人品有限，不过本喵心情好，给你个安慰奖吧，奖励%d" % award
@@ -34,6 +34,6 @@ class Lottery:
         else:
             note = u"真是倒霉到家了，什么奖都没中！"
 
-        self.add_point(str(group_qq), sender_info_dic["qq_number"], sender_info_dic["nick"], award)
+        self.add_point(str(group_qq), sender_info_dic["qq_number"], award)
 
         return u"【%s】消耗%d %s\n" % (sender_info_dic["nick"], gold, self.currency) + note
