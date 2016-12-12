@@ -54,3 +54,20 @@ class AdminAction(object):
             result = u"无数据"
         return result
 
+    @staticmethod
+    def get_clear_chance(qq):
+        user = MyUser.objects.filter(qq=qq).first()
+        if not user:
+            return u"QQ号有误"
+        return u"%s的清负次数：%d" % (qq, user.clear_point_chance)
+
+    @staticmethod
+    def add_clear_chance(qq, num):
+        num = int(num)
+        user = MyUser.objects.filter(qq=qq).first()
+        if not user:
+            return u"QQ号有误"
+
+        user.clear_point_chance += num
+        user.save()
+        return u"ok"

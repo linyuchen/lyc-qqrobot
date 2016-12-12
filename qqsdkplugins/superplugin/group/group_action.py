@@ -20,7 +20,9 @@ class GroupAction(object):
 
     def __get_sign_info(self):
 
-        last_record = SignRecord.objects.filter(user=self.group_user).last()
+        today = timezone.now()
+        last_record = SignRecord.objects.filter(user=self.group_user).\
+            exclude(time__year=today.year, time__month=today.month, time__day=today.day).last()
         last_record_time = u"无"
         if last_record:
             last_record_time = timezone.make_naive(last_record.time).strftime("%Y-%m-%d")
