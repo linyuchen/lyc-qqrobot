@@ -68,7 +68,6 @@ class Main(QQClient):  #  得继承QQClient
 
     def installPlugins(self):
 
-#        print self.pluginModules
         for plugin in self.pluginModules:
             try:
                 p = plugin.Plugin()

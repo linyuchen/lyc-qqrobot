@@ -21,7 +21,6 @@ class Plugin(QQPlugin):
         msg 是接收到的消息实例
         """
 
-        print u"实例化方式的event"
         print msg
         print dir(msg)
 

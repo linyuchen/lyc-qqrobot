@@ -66,8 +66,21 @@ def migrate_rpg():
         user.point = gold
         user.save()
 
-if __name__ == "__main__":
-    migrate_point()
-    migrate_sign()
-    migrate_rpg()
 
+def migrate_clear_chance():
+    t_name = "t_clear_chance"
+    values = sqlite.get_value(table_name=t_name, key_list=["member_qq", "chance"])
+    for value in values:
+        qq = value[0]
+        chance = value[1]
+        print(qq, chance)
+        user = MyUser.get_user(qq)
+        user.clear_point_chance = chance
+        user.save()
+
+
+if __name__ == "__main__":
+    # migrate_point()
+    # migrate_sign()
+    # migrate_rpg()
+    migrate_clear_chance()

@@ -136,8 +136,11 @@ class QQClient(threading.Thread, QQApi):
         threading.Thread(target=self.__startSendMsgFuncPool).start()
         self.__startListenEventsBeforLogin()
         self.__startListenEventsAfterLogin()
-        self.getFriends()
-        self.getGroups()
+        try:
+            self.getFriends()
+            self.getGroups()
+        except:
+            traceback.print_exc()
 
     def addErrorMsg(self, data):
         """
