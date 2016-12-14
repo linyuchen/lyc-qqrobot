@@ -92,8 +92,11 @@ class GroupAction(object):
         if self.group_user.get_point() < 0:
             self.group_user.point = "0"
             self.group_user.user.clear_point_chance -= 1
+            self.group_user.user.save()
             self.group_user.save()
-        return u"清负成功！"
+            return u"清负成功！"
+        else:
+            return u"无效操作，不需要清负"
 
     def clear_other_point(self, other_qq):
         if self.group_user.user.clear_point_chance <= 0:
@@ -103,9 +106,11 @@ class GroupAction(object):
             other_user.point = "0"
             other_user.save()
             self.group_user.user.clear_point_chance -= 1
+            self.group_user.user.save()
             self.group_user.save()
-
-        return u"清负成功"
+            return u"清负成功"
+        else:
+            return u"无效操作，不需要清负"
 
     def __get_point_rank(self):
         """
