@@ -71,7 +71,11 @@ class AdminMsgEvent(plugin.webqqsdk.msgevent.MsgEvent):
                      CMD(u"加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
                          int_param_index=[2]),
                      CMD(u"设活跃度", handle_func=AdminAction.set_group_point, param_len=3,
-                         int_param_index=[2])
+                         int_param_index=[2]),
+                     CMD(u"查清负次数", handle_func=AdminAction.get_clear_chance, param_len=1,
+                         int_param_index=[0]),
+                     CMD(u"加清负次数", handle_func=AdminAction.add_clear_chance, param_len=2,
+                         int_param_index=[1])
                      ]
 
     def main(self, msg):
@@ -105,4 +109,3 @@ class Plugin(plugin.QQPlugin):
     def uninstall(self):
 
         print u"插件【%s】被卸载了" % self.NAME
-		
