@@ -447,9 +447,10 @@ class QQClient(threading.Thread, QQApi):
         self.__listenEvent(self.__addFriendResultMsgs, self.addFriendResultEvents)
         self.__listenEvent(self.__groupMemberExitMsgs, self.groupMemberExitEvents)
 
-    def __listenEvent(self, msgs,events):
+    def __listenEvent(self, msgs, events):
 
-        EventListener(msgs, events, self.addErrorMsg, self.interval).start()
+        e = EventListener(msgs, events, self.addErrorMsg, self.interval, qq_client=self)
+        e.start()
 
     def __analysisMsg(self, msg):
         """
@@ -801,10 +802,8 @@ class QQClient(threading.Thread, QQApi):
         @rtype: entity.Friend实例
         """
         
-#        print self.qqUser.friends
         for i in range(1):
             if self.qqUser.friends.has_key(uin):
-#                print u"有好友"
                 friend = self.qqUser.friends[uin]
                 if friend:
                     return friend
@@ -864,6 +863,14 @@ class QQClient(threading.Thread, QQApi):
                 # pass
                 self.addErrorMsg(traceback.format_exc())
             # time.sleep(self.interval)
+
+    def putFunc(self, func):
+        """
+        处理函数加入队列
+        :param func:
+        :return:
+        """
+        self.sendMsgFuncPool.put(func)
 
     def getGroupMemberByUin(self, groupUin, groupMemberUin):
         """
