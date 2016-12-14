@@ -77,5 +77,3 @@ class MyUser(AbstractBaseUser):
             return self.qq
         else:
             return u"匿名"
-
-
