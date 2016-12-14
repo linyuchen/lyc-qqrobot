@@ -12,9 +12,10 @@ Game21 = game21point.Game
 
 
 class Game(GroupPointAction, Game21):
-    def __init__(self):
-        super(Game, self).__init__()
-    
+    def __init__(self, qq_client):
+        GroupPointAction.__init__(self)
+        Game21.__init__(self, qq_client)
+
 
 # 新建个事件类，继承于MsgEvent
 class MyEvent(MsgEvent):
@@ -37,7 +38,7 @@ class MyEvent(MsgEvent):
         if group_qq in self.groupInstances:
             group_plugin = self.groupInstances[group_qq]
         else:
-            group_plugin = Game()
+            group_plugin = Game(self.qqClient)
             self.groupInstances[group_qq] = group_plugin
 
         return group_plugin

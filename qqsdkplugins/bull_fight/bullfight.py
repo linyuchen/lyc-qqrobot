@@ -7,7 +7,7 @@ import bullfight_base
 
 class BullFight(bullfight_base.BullFightBase):
 
-    def __init__(self, group_qq):
+    def __init__(self, group_qq, qq_client):
         """
 
         :param group_qq: 群号，str
@@ -17,6 +17,7 @@ class BullFight(bullfight_base.BullFightBase):
 
         super(BullFight, self).__init__()
 
+        self.qq_client = qq_client
         self.group_qq = group_qq
         self.currency = ""
         self.robot_name = ""
@@ -269,7 +270,7 @@ class BullFight(bullfight_base.BullFightBase):
         while self.running:
             self.current_second += 1
             if self.current_second > self.limit_second:
-                self.over_game()
+                self.qq_client.putFunc(self.over_game)
                 break
             time.sleep(1)
 

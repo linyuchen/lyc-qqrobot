@@ -10,7 +10,7 @@ Thread = threading.Thread
 
 class EventListener(Thread):
 
-    def __init__(self, msgs, events, errorHandler, interval):
+    def __init__(self, msgs, events, errorHandler, interval, qq_client):
 
         super(EventListener, self).__init__()
 
@@ -19,6 +19,7 @@ class EventListener(Thread):
         self.errorHandler = errorHandler
         self.interval = interval
         self.running = True
+        self.qq_client = qq_client
 
     def pause(self):
 
@@ -46,7 +47,7 @@ class EventListener(Thread):
                     break
                 try:
                     # s = time.clock()
-                    event.main(msg)
+                    self.qq_client.putFunc(lambda m=msg, e=event: e.main(m))
                     # print u"处理完了消息", event, time.clock() - s
                 except Exception, e:
                     error_msg = traceback.format_exc()

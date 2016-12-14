@@ -12,8 +12,8 @@ CMD = cmdaz.CMD
 
 class BullGame(GroupPointAction, bullfight.BullFight):
 
-    def __init__(self, group_qq):
-        bullfight.BullFight.__init__(self, group_qq)
+    def __init__(self, group_qq, qq_client):
+        bullfight.BullFight.__init__(self, group_qq, qq_client)
         GroupPointAction.__init__(self)
 
 
@@ -36,7 +36,7 @@ class MyEvent(MsgEvent):
         if group_qq in self.groupInstances:
             group_plugin = self.groupInstances[group_qq]
         else:
-            group_plugin = BullGame(group_qq)
+            group_plugin = BullGame(group_qq, self.qqClient)
             self.groupInstances[group_qq] = group_plugin
 
         return group_plugin
