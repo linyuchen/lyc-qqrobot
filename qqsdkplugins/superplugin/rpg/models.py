@@ -16,6 +16,14 @@ class RpgGlobalSetting(models.Model):
     level_up_defensive = models.IntegerField(default=3)  # 每级加的防御力
     level_up_health = models.IntegerField(default=3)  # 每级加的防御力
     leveling_today_count = models.IntegerField(default=10)  # 每天练级的次数
+    level_map_step = models.IntegerField(default=10)  # 每级加最大走路步数
+
+    # 地图x轴
+    map_x_start = models.IntegerField(default=-1000)
+    map_x_end = models.IntegerField(default=1000)
+    # 地图y轴
+    map_y_start = models.IntegerField(default=-1000)
+    map_y_end = models.IntegerField(default=1000)
 
     @staticmethod
     def get_setting():
@@ -25,6 +33,26 @@ class RpgGlobalSetting(models.Model):
             setting.save()
 
         return setting
+
+
+class RpgMap(models.Model):
+    name = models.CharField(max_length=120)  # 地名
+    x_start = models.IntegerField()  # X轴起点
+    x_end = models.IntegerField()  # X轴终点
+    y_start = models.IntegerField()  # Y轴起点
+    y_end = models.IntegerField()  # Y轴终点
+
+    def add_map(self, name, x_start, x_end, y_start, y_end):
+
+        # exist = RpgMap.objects.filter(x_start__lte=x_start, x_end__lte=x_end,
+        #                               y_start__lte=y_start, y_end__lte=y_end).first()
+        # if exist:
+        #     return False
+
+        RpgMap(name=name, x_start=x_start, x_end=x_end, y_start=y_start, y_end=y_end).save()
+
+    def __unicode__(self):
+        return u"%s, X:%d~%d, Y:%d~%d" % (self.name, self.x_start, self.x_end, self.y_start, self.y_end)
 
 
 class RpgThingBase(models.Model):
@@ -69,11 +97,17 @@ class RpgGoodsUseRecord(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
 
+class RpgProfession(models.Model):
+    name = models.CharField(max_length=30)
+
+
 class RpgPerson(RpgThingBase):
     user = models.ForeignKey(MyUser, null=True, blank=True)
     experience = models.IntegerField(default=0)  # 当前拥有的经验值
     goods_use_records = models.ManyToManyField(RpgGoodsUseRecord, blank=True)
     says = models.ManyToManyField(RpgSay, blank=True)  # 动作台词
+    position_x = models.IntegerField(default=0)
+    position_y = models.IntegerField(default=0)
 
     @staticmethod
     def get_person(qq):
