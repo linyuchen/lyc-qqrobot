@@ -15,3 +15,4 @@ db.sqlite3
 !*/migrations/__init__.py
 group_manager.db
 rpgdata.db
+venv/

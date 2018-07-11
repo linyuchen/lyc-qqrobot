@@ -72,7 +72,6 @@ class RpgGoodsUseRecord(models.Model):
 class RpgPerson(RpgThingBase):
     user = models.ForeignKey(MyUser, null=True, blank=True)
     experience = models.IntegerField(default=0)  # 当前拥有的经验值
-    health = models.IntegerField(default=10)  # 生命值
     goods_use_records = models.ManyToManyField(RpgGoodsUseRecord, blank=True)
     says = models.ManyToManyField(RpgSay, blank=True)  # 动作台词
 

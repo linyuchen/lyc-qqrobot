@@ -1,5 +1,6 @@
 # -*- coding: UTF8 -*-
 
+import traceback
 import json
 import time
 import math
@@ -38,8 +39,10 @@ class QQApi(object):
         # req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
         # http.headers = self.headers
         res = requests.get(url, kwargs)
+        #print(res.json())
+        res = res.content
         try:
-            return json.loads(res.content)
+            return json.loads(res)
         except:
             return {}
 
@@ -124,7 +127,7 @@ class QQApi(object):
         return self.post_json(self.input_vc_url, vc=code)
 
     def __convertMsg(self, content):
-        if self.port > 3000:
+        if self.port >= 3000:
             content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
 
         return content
@@ -199,13 +202,14 @@ class QQApi(object):
 
 
 if __name__ == "__main__":
-    # test = QQApi(1000, "192.168.1.2")
-    test = QQApi(3004)
+    test = QQApi(1000, "localhost")
+    # test = QQApi(3004)
     # print test.login()["data"]
     # print test.inputVerifyCode("knke")["data"]
-    # print test.getFriends()
-    # print test.sendMsg2Buddy("1412971608", u"呵呵")
+    print test.getFriends()
+    # print test.getGroups()
+    print test.sendMsg2Buddy("1412971608", u"1\n\t" * 200)
     # import time
-    msg = test.getMsg()
-    print msg
-    print msg["data"][0]["Data"]["Message"]
+    # msg = test.getMsg()
+    # print msg
+    # print msg["data"][0]["Data"]["Message"]

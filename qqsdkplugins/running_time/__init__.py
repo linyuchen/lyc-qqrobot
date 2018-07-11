@@ -30,7 +30,6 @@ class MyEvent(MsgEvent):
         此方法是用于处理事件接收到的消息
         main方法必须存在,注意此方法需存在一个参数用于传入消息实例
         """
-
         if self.cmd.az(msg.msg):
             result = mod(self.qqClient.startTime)
             msg.reply(result)

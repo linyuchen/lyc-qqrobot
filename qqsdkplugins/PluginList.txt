@@ -53,9 +53,9 @@ lunar
 # 百度工具
 baike
 
-zhidao
+#zhidao
 
-lyrics
+#lyrics
 
 translator
 
