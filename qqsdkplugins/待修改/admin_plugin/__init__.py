@@ -60,13 +60,13 @@ class MyEvent(MsgEvent):
             if friendQQ not in admins:
                 return
             param = self.cmdSendMsg.get_original_param()
-            result += admin.sendMsg2Buddy(param)
+            result += admin.send_buddy_msg(param)
 
         elif self.cmdSendGroupMsg.az(msg.msg):
             if friendQQ not in admins:
                 return
             param = self.cmdSendGroupMsg.get_original_param()
-            result += admin.sendMsg2Group(param)
+            result += admin.send_group_msg(param)
 
         elif self.cmdGetPoint.az(msg.msg):
             if friendQQ not in admins:
@@ -113,7 +113,7 @@ class MyEvent(MsgEvent):
         elif self.cmdGetGroups.az(msg.msg):
             if friendQQ not in admins:
                 return
-            result += admin.getGroups()
+            result += admin.get_groups()
 
         elif self.cmdSetInviteMe.az(msg.msg):
             if friendQQ not in admins:
@@ -220,13 +220,13 @@ class MyEvent(MsgEvent):
             if friendQQ not in admins:
                 return
             param = self.cmdSendMsg.get_original_param()
-            result += admin.sendMsg2Buddy(param)
+            result += admin.send_buddy_msg(param)
 
         elif self.cmdSendGroupMsg.az(msg.msg):
             if friendQQ not in admins:
                 return
             param = self.cmdSendGroupMsg.get_original_param()
-            result += admin.sendMsg2Group(param)
+            result += admin.send_group_msg(param)
 
         elif self.cmdGetPoint.az(msg.msg):
             if friendQQ not in admins:
@@ -273,7 +273,7 @@ class MyEvent(MsgEvent):
         elif self.cmdGetGroups.az(msg.msg):
             if friendQQ not in admins:
                 return
-            result += admin.getGroups()
+            result += admin.get_groups()
 
         elif self.cmdSetInviteMe.az(msg.msg):
             if friendQQ not in admins:

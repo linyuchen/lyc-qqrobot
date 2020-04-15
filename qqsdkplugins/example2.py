@@ -25,7 +25,7 @@ class MyEvent(MsgEvent):
 
         print msg
         print dir(msg)
-        self.qqClient.sendMsg2Buddy(msg.friend.uin, msg.msg)
+        self.qqClient.send_buddy_msg(msg.friend.uin, msg.msg)
 
 # 必须：
 #    要有个类，类名是Plugin，且继承于QQPlugin
@@ -40,7 +40,7 @@ class Plugin(QQPlugin):
     def inputVerifyCode(self,msg):
         # 输入验证码
         code = raw_input("input verify code:")
-        self.qqClient.inputVerifyCode(code)
+        self.qqClient.input_verify_code(code)
 
     def loginSuccess(self,msg):
         print u"登录成功"

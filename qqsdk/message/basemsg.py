@@ -8,6 +8,10 @@ class BaseMsg(object):
     self.originalMsg : list, 原始的消息，没有过滤表情和图片
     self.time : int, 发送时间
     """
+    msg: str = ""
+    time: int = 0  # 发送时的时间戳
+    is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
+    paused: bool = False
 
     def __init__(self):
 

@@ -1,7 +1,12 @@
 #coding=UTF8
+from dataclasses import dataclass
+from typing import List
+from qqsdk.entity.fontstyle import FontStyle
+from qqsdk.entity.friend import Friend
+from qqsdk.entity.group import Group
 
-import fontstyle
 
+@dataclass
 class QQUser:
     """
     self.fontStyle: entity.FontStyle,字体实例
@@ -11,15 +16,9 @@ class QQUser:
     self.gtk: string,
     self.nick: string
     """
-    
-    def __init__(self):
-
-        self.fontStyle = fontstyle.FontStyle()
-        self.qq = 0
-        self.nick = ""
-        self.friends = {}
-        self.groups = {}
-        self.gtk = ""
-
-
-
+    frineds: List[Friend]
+    groups: List[Group]
+    fontstyle: FontStyle = None
+    qq: str = ""
+    nick: str = ""
+    gtk: str = ""  # 用来直接打开腾讯相关网页的密钥

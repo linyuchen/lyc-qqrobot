@@ -51,7 +51,7 @@ class Plugin(QQPlugin):
             group = msg.group
             groupMember = msg.groupMember
             memberQQ = groupMember.qq
-            msg.reply(u"O(∩_∩)O谢谢 %s 的祝福~， 很开心， 虽然今天没有蛋糕， 但是已经习惯了" % groupMember.getName())
+            msg.reply(u"O(∩_∩)O谢谢 %s 的祝福~， 很开心， 虽然今天没有蛋糕， 但是已经习惯了" % groupMember.get_name())
             if memberQQ not in self.qqlist:
                 self.qqlist.append(memberQQ)
                 self.writeQQList()

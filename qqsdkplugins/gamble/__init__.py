@@ -43,7 +43,7 @@ class MyEvent(MsgEvent):
         result = ""
         if self.cmdGamble.az(msg.msg):
             param = self.cmdGamble.get_param_list()[0]
-            result += self.game.gamble(group_qq, member.qq, member.getName(), param)
+            result += self.game.gamble(group_qq, member.qq, member.get_name(), param)
 
         if result:
             msg.reply(result)

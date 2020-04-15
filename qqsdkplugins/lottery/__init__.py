@@ -44,7 +44,7 @@ class MyEvent(MsgEvent):
         result = ""
         if self.cmdLottery.az(msg.msg):
             param = self.cmdLottery.get_param_list()[0]
-            result += lottery.lottery(group_qq, member.qq, member.getName(), param)
+            result += lottery.lottery(group_qq, member.qq, member.get_name(), param)
 
         if result:
             msg.reply(result)

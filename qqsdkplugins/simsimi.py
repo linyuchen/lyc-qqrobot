@@ -77,7 +77,7 @@ class GroupTalkEvent(TalkEvent):
 
         talkResult = ""
         msgContent = msg.msg
-        myGroupCard = msg.group.getMemberByUin(self.qqClient.qqUser.qq).getName()
+        myGroupCard = msg.group.getMemberByUin(self.qqClient.qqUser.qq).get_name()
         myGroupCard = u"@" + myGroupCard
 #        print myGroupCard
         chating = False

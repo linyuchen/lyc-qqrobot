@@ -119,7 +119,7 @@ class QQClient(qqapi.qqsdk.QQClient, QQApi):
                 friendObj.groupName = self.__getValueFromDic(groupId, data["categories"], "index", "name")
                 friendObj.markName = self.__getValueFromDic(uin, data["marknames"], "uin", "markname")
                 friendObj.nick = self.__getValueFromDic(uin, data["info"], "uin", "nick")
-                friendObj.getQQ = self.uin2number
+                friendObj.get_qq = self.uin2number
 
                 self.qqUser.friends[uin] = friendObj
 #                print self.qqUser.friends
@@ -203,7 +203,7 @@ class QQClient(qqapi.qqsdk.QQClient, QQApi):
                 member.status = self.__getValueFromDic(uin,data["stats"],"uin","stat")
                 member.card = self.__getValueFromDic(uin,cards,"muin","card")
                 member.uin = uin
-                member.getQQ = self.uin2number
+                member.get_qq = self.uin2number
                 members[uin] = member
 
         group.members = members

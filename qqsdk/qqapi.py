@@ -1,12 +1,9 @@
 # -*- coding: UTF8 -*-
 
-import traceback
 import json
 import time
 import math
-import urllib2
 import requests
-# import requests
 
 
 class QQApi(object):
@@ -35,18 +32,16 @@ class QQApi(object):
         self.handle_request_add_me_friend_url = self.host + "/handle_request_add_me_friend"
         self.handle_request_join_group_url = self.host + "/handle_request_join_group"
 
-    def post_json(self, url, **kwargs):
-        # req = urllib2.Request(url, data=json.dumps(kwargs), headers=self.headers)
-        # http.headers = self.headers
+    @staticmethod
+    def post_json(self, url: str, **kwargs) -> dict:
         res = requests.get(url, kwargs)
-        #print(res.json())
         res = res.content
         try:
             return json.loads(res)
         except:
             return {}
 
-    def uin2number(self, uin):
+    def uin2number(self, uin: str) -> str:
         """
 
         :param uin:
@@ -54,7 +49,7 @@ class QQApi(object):
         """
         return self.post_json(self.uin2number_url, uin=uin)
 
-    def getMyInfo(self):
+    def get_my_info(self):
 
         pass
 
@@ -64,20 +59,13 @@ class QQApi(object):
         data = self.post_json(self.login_url)
         return data
 
-    def inputVerifyCode(self, code):
-        """
-        @param code:验证码
-        """
-        data = self.post_json(self.input_vc_url, vc=code)
-        return data
-
     def logout(self):
         """
         @return: 是否登出成功
         @rtype: bool
         """
 
-    def getFriends(self):
+    def get_friends(self):
         """
         获取好友列表
         {"data":{"uin号码": {"uin": QQ临时号码, "groupId": 分组ID, "groupName": 分组名, "markName": 备注,
@@ -86,7 +74,7 @@ class QQApi(object):
         """
         return self.post_json(self.get_friends_url)
 
-    def getGroups(self):
+    def get_groups(self):
         """
         获取群列表
         {
@@ -98,7 +86,7 @@ class QQApi(object):
         """
         return self.post_json(self.get_groups_url)
 
-    def getMsg(self):
+    def get_msg(self):
         """
         获取消息
         好友消息: {data: [{"Event": "FriendMsg", "Data": {"Sender": uin, "SendTime": 消息时间, "Message": 消息内容}},...]}
@@ -108,7 +96,7 @@ class QQApi(object):
         data = self.post_json(self.get_msgs_url)
         return data
 
-    def sendTempMsgFromGroup(self, groupId, buddyId, content, fontStyle=None):
+    def send_temp_msg_from_group(self, groupId: str, buddyId: str, content: str, fontStyle=None):
         """
         groupId: 群id
         buddyId: 对方id
@@ -116,7 +104,7 @@ class QQApi(object):
         fontStyle: entity.FontStyle
         """
 
-    def inputVerifyCode(self,code):
+    def input_verify_code(self, code: str):
         """
         @param code:验证码
         验证码在当前目录下
@@ -126,13 +114,13 @@ class QQApi(object):
         self.needVerifyCode = False
         return self.post_json(self.input_vc_url, vc=code)
 
-    def __convertMsg(self, content):
+    def __convertMsg(self, content: str) -> str:
         if self.port >= 3000:
             content = content.replace("\\","\\\\").replace("\r\n","\n").replace("\n","\\n").replace("\"","\\\"").replace("\t","\\t")
 
         return content
 
-    def __splitSendMsg(func):
+    def __split_send_msg(func):
         def send(self, receiverId, content, fontStyle=None):
             content = self.__convertMsg(content)
             max_length = 300
@@ -145,8 +133,8 @@ class QQApi(object):
         return send
 
 
-    @__splitSendMsg
-    def sendMsg2Buddy(self, buddyId, content, fontStyle=None):
+    @__split_send_msg
+    def send_buddy_msg(self, buddyId: str, content: str, fontStyle=None) -> dict:
         """
         :param buddyId: 好友的id
         :param content: 要发送的内容，unicode编码
@@ -156,8 +144,8 @@ class QQApi(object):
         return self.post_json(self.send_msg2buddy_url, uin=buddyId, msg=content)
 
 
-    @__splitSendMsg
-    def sendMsg2Group(self, groupId, content, fontStyle=None):
+    @__split_send_msg
+    def send_group_msg(self, groupId: str, content: str, fontStyle=None) -> dict:
         """
         groupId:群的id
         content: 要发送的内容, unicode编码
@@ -167,7 +155,7 @@ class QQApi(object):
         # print groupId
         return self.post_json(self.send_msg2group_url, uin=groupId, msg=content)
 
-    def handleRequestAddMeFriend(self, qq, rejectReason="", allow=True):
+    def handle_request_new_friend(self, qq:str, rejectReason:str= "", allow:bool=True) -> dict:
         """
         处理别人加我为好友消息
         :param qq: 申请加我好友的人的QQ
@@ -178,8 +166,9 @@ class QQApi(object):
         res = self.post_json(self.handle_request_add_me_friend_url, qq=qq, reject_reason=rejectReason, allow=allow)
         return res
 
-    def handleAddGroupMsg(self,buddyId, groupId, rejectReason="",allow = True):
+    def handle_add_group_msg(self, buddyId, groupId, rejectReason="", allow = True):
         """
+        处理加群消息
         :param buddyId:
         :param groupId:
         :param rejectReason: 拒绝的理由, unicode编码
@@ -189,9 +178,9 @@ class QQApi(object):
                              member=buddyId, group=groupId, reject_reason=rejectReason, allow=allow)
         return res
 
-    def deleteGroupMember(self, group_number, qq_number):
+    def delete_group_member(self, group_number: str, qq_number: str):
         """
-        @return 
+        @return
             成功
             成员不存在
             权限不足
@@ -206,9 +195,9 @@ if __name__ == "__main__":
     # test = QQApi(3004)
     # print test.login()["data"]
     # print test.inputVerifyCode("knke")["data"]
-    print test.getFriends()
+    print(test.get_friends())
     # print test.getGroups()
-    print test.sendMsg2Buddy("1412971608", u"1\n\t" * 200)
+    print(test.send_buddy_msg("1412971608", u"1\n\t" * 200))
     # import time
     # msg = test.getMsg()
     # print msg

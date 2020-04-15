@@ -30,8 +30,8 @@ class Plugin(QQPlugin):
         """
         if self.cmd.az(msg.msg):
             friend = msg.friend
-            result = u"%s(%d): %s" % (friend.getName(), friend.qq, self.cmd.get_original_param())
-            self.qqClient.sendMsg2Buddy(self.adminQQ, result)
+            result = u"%s(%d): %s" % (friend.get_name(), friend.qq, self.cmd.get_original_param())
+            self.qqClient.send_buddy_msg(self.adminQQ, result)
             msg.reply(self.feedbackNote)
             msg.destroy()
 
@@ -42,9 +42,9 @@ class Plugin(QQPlugin):
             groupMember = msg.groupMember
 
             result = u"群 %s(%d)：%s(%d): %s" % (group.name, group.qq,
-                    groupMember.getName(), groupMember.qq, self.cmd.get_original_param())
+                                               groupMember.get_name(), groupMember.qq, self.cmd.get_original_param())
             
-            self.qqClient.sendMsg2Buddy(self.adminQQ, result)
+            self.qqClient.send_buddy_msg(self.adminQQ, result)
             msg.reply(self.feedbackNote)
             msg.destroy()
 

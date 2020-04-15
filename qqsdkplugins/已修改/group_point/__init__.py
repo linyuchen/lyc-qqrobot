@@ -47,30 +47,30 @@ class MyEvent(MsgEvent):
             groupPlugin = groupplugin.GroupPlugin(groupQQ)
             self.groupInstances[groupQQ] = groupPlugin
 
-        groupPlugin.add_point(member.qq, member.getName())
+        groupPlugin.add_point(member.qq, member.get_name())
         result = ""
         if self.cmdSign.az(msg.msg):
-            result = groupPlugin.sign(member.qq, member.getName())
+            result = groupPlugin.sign(member.qq, member.get_name())
 
         elif self.cmdMyPoint.az(msg.msg):
-            result = groupPlugin.get_point(member.qq, member.getName())
+            result = groupPlugin.get_point(member.qq, member.get_name())
 
         elif self.cmdTransferPoint.az(msg.msg):
             param = self.cmdTransferPoint.get_original_param()
-            result = groupPlugin.transfer_point(member.qq, member.getName(), param)
+            result = groupPlugin.transfer_point(member.qq, member.get_name(), param)
 
         elif self.cmdPointRank.az(msg.msg):
             result = groupPlugin.get_point_rank()
 
         elif self.cmdClearPoint.az(msg.msg):
             aim_qq = my_qq = member.qq
-            aim_nick = my_nick = member.getName()
+            aim_nick = my_nick = member.get_name()
             result = groupPlugin.clear_point(my_qq, my_nick, aim_qq, aim_nick)
 
         elif self.cmdClearOtherPoint.az(msg.msg):
             param = self.cmdClearOtherPoint.get_param_list()
             my_qq = member.qq
-            my_nick = member.getName()
+            my_nick = member.get_name()
             aim_qq = param[0]
             aim_nick = str(aim_qq)
             if aim_qq.isdigit():
@@ -78,7 +78,7 @@ class MyEvent(MsgEvent):
             else:
                 result = u"对方QQ号错误"
         elif self.cmdGetClearPointChance.az(msg.msg):
-            result = groupPlugin.get_clear_chance(member.qq, member.getName())
+            result = groupPlugin.get_clear_chance(member.qq, member.get_name())
 
         if result:
             msg.reply(result)
@@ -154,30 +154,30 @@ class MyEvent(MsgEvent):
             groupPlugin = groupplugin.GroupPlugin(groupQQ)
             self.groupInstances[groupQQ] = groupPlugin
 
-        groupPlugin.add_point(member.qq, member.getName())
+        groupPlugin.add_point(member.qq, member.get_name())
         result = ""
         if self.cmdSign.az(msg.msg):
-            result = groupPlugin.sign(member.qq, member.getName())
+            result = groupPlugin.sign(member.qq, member.get_name())
 
         elif self.cmdMyPoint.az(msg.msg):
-            result = groupPlugin.get_point(member.qq, member.getName())
+            result = groupPlugin.get_point(member.qq, member.get_name())
 
         elif self.cmdTransferPoint.az(msg.msg):
             param = self.cmdTransferPoint.get_original_param()
-            result = groupPlugin.transfer_point(member.qq, member.getName(), param)
+            result = groupPlugin.transfer_point(member.qq, member.get_name(), param)
 
         elif self.cmdPointRank.az(msg.msg):
             result = groupPlugin.get_point_rank()
 
         elif self.cmdClearPoint.az(msg.msg):
             aim_qq = my_qq = member.qq
-            aim_nick = my_nick = member.getName()
+            aim_nick = my_nick = member.get_name()
             result = groupPlugin.clear_point(my_qq, my_nick, aim_qq, aim_nick)
 
         elif self.cmdClearOtherPoint.az(msg.msg):
             param = self.cmdClearOtherPoint.get_param_list()
             my_qq = member.qq
-            my_nick = member.getName()
+            my_nick = member.get_name()
             aim_qq = param[0]
             aim_nick = str(aim_qq)
             if aim_qq.isdigit():
@@ -185,7 +185,7 @@ class MyEvent(MsgEvent):
             else:
                 result = u"对方QQ号错误"
         elif self.cmdGetClearPointChance.az(msg.msg):
-            result = groupPlugin.get_clear_chance(member.qq, member.getName())
+            result = groupPlugin.get_clear_chance(member.qq, member.get_name())
 
         if result:
             msg.reply(result)

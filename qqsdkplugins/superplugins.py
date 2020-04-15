@@ -33,7 +33,7 @@ class GroupMsgEvent(plugin.webqqsdk.msgevent.MsgEvent):
         user_action = UserAction(msg.groupMember.qq)
         group_action = GroupAction(msg.group.qq, msg.groupMember.qq)
         group_action.group_user.add_point(group_action.group_setting.talk_point)
-        group_action.group_user.nick = msg.groupMember.getName()
+        group_action.group_user.nick = msg.groupMember.get_name()
         group_action.group_user.save()
         cmds = [
             CMD(u"签到", handle_func=group_action.sign),

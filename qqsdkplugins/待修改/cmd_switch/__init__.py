@@ -59,7 +59,7 @@ class MyEvent(MsgEvent):
                     result += u"%s 命令已经关闭\n" % (p)
                     groupPlugin.addClosedCmd(p)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdOpen.az(msg.msg):
             if member.isAdmin:
@@ -68,7 +68,7 @@ class MyEvent(MsgEvent):
                     result += u"%s 命令已经开启\n" % (p)
                     groupPlugin.delClosedCmd(p)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdGetClosed.az(msg.msg):
 
@@ -101,14 +101,14 @@ class MyEvent(MsgEvent):
                 result += u"关机了。。。小的告退了，拜拜\n"
                 groupPlugin.setShutdownSwitch(1)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdStartup.az(msg.msg):
             if member.isAdmin:
                 result += u"噢耶！开机咯~~~\n"
                 groupPlugin.setShutdownSwitch(0)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
 
         # 检测命令
@@ -222,7 +222,7 @@ class MyEvent(MsgEvent):
                     result += u"%s 命令已经关闭\n" % (p)
                     groupPlugin.addClosedCmd(p)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdOpen.az(msg.msg):
             if member.isAdmin:
@@ -231,7 +231,7 @@ class MyEvent(MsgEvent):
                     result += u"%s 命令已经开启\n" % (p)
                     groupPlugin.delClosedCmd(p)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdGetClosed.az(msg.msg):
 
@@ -264,14 +264,14 @@ class MyEvent(MsgEvent):
                 result += u"关机了。。。小的告退了，拜拜\n"
                 groupPlugin.setShutdownSwitch(1)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
         elif self.cmdStartup.az(msg.msg):
             if member.isAdmin:
                 result += u"噢耶！开机咯~~~\n"
                 groupPlugin.setShutdownSwitch(0)
             else:
-                result += u"%s 您不是管理员，无权操作 \n" % member.getName()
+                result += u"%s 您不是管理员，无权操作 \n" % member.get_name()
 
 
         # 检测命令

@@ -55,7 +55,7 @@ class MyEvent(MsgEvent):
         result = ""
         if self.cmdStart.az(msg.msg):
             param = self.cmdStart.get_param_list()[0]
-            result += __game.start_game(member.qq, member.getName(), msg.reply, param)
+            result += __game.start_game(member.qq, member.get_name(), msg.reply, param)
 
         if result:
             msg.reply(result)

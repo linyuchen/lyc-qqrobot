@@ -1,16 +1,15 @@
-#self.pointi coding=UTF8
+# -*- coding=UTF8
 
-import thread
 import threading
 import time
 import traceback
-import Queue
+from queue import Queue
 
-import entity
-import message
-import eventlistener
-import events
-from qqapi import QQApi
+from qqsdk import entity
+from qqsdk import message
+from qqsdk import eventlistener
+from qqsdk import events
+from qqsdk.qqapi import QQApi
 
 EventListener = eventlistener.EventListener
 
@@ -457,7 +456,6 @@ class QQClient(threading.Thread, QQApi):
         分析消息，把消息压入消息池
         """
 
-#        print u"分析消息", msg
         for msgDic in msg.get("data", []):
             self.__handleMsg(msgDic)
 
@@ -665,15 +663,12 @@ class QQClient(threading.Thread, QQApi):
         """
         # print data
         friend = self.getFriendByUin(data["Sender"])
-#            print u"好友实例", friend
         if not friend:
-            print(u"没获取到好友")
             return
         msg = message.FriendMsg(friend)
         msg.time = data["SendTime"]
         msg.msg = data["Message"]
         # print "msg", msg.msg
-#        print u"收到好友消息", msg.msg.encode("utf8")
         msg.reply = lambda content, fontStyle=None, qq=friend.uin: self.sendMsg2Buddy(qq, content)
         self.__friendMsgs.put(msg)
 
@@ -686,7 +681,6 @@ class QQClient(threading.Thread, QQApi):
         groupQQ = data["ClusterNum"]  # uin
         group = self.getGroupByUin(groupQQ)
         if not group:
-            # print(u"没获取到群")
             return
 #            print group.qq
         group.qq = data["GroupQQ"]
@@ -702,7 +696,6 @@ class QQClient(threading.Thread, QQApi):
         有人退群
         """
 
-#            print u"有人退群"
         groupQQ = data["ClusterNum"]
         group = self.getGroupByUin(groupQQ)
         if not group:
@@ -744,7 +737,7 @@ class QQClient(threading.Thread, QQApi):
             SendTime
             Event            
         """
-        logMsg = u"收到消息(全), " + unicode(msg)
+        logMsg = "收到消息(全), " + msg
         # self.addLogMsg(logMsg)
         event = dic["Event"]
 #        print "event", event, __file__
@@ -764,17 +757,10 @@ class QQClient(threading.Thread, QQApi):
             # print self.online
             if self.online:
                 try:
-                    # print __file__, u"获取消息"
-                    # s = time.clock()
-                    # print s
                     msg = self.getMsg()
-                    # print u"接收消息", time.clock() - s
-                    # print __file__, msg
-                    # s = time.clock()
                     self.__analysisMsg(msg)
-                    # print u"处理消息", time.clock() - s
 
-                except Exception, e:
+                except Exception:
                     msg = traceback.format_exc()
                     # print msg
                     self.addErrorMsg(msg)
@@ -818,7 +804,7 @@ class QQClient(threading.Thread, QQApi):
         msg.time = time.time()
         msg.content = content
         self.__sendBuddyMsgs.put(msg)
-        logMsg = u"发送消息给QQ:%d：%s"%(msg.qq,content)
+        logMsg = "发送消息给QQ:%d：%s"%(msg.qq,content)
         self.addLogMsg(logMsg)
 
     def __addSendGroupMsg(self, uin, fontStyle, content):
@@ -832,7 +818,7 @@ class QQClient(threading.Thread, QQApi):
         msg.time = time.time()
         msg.content = content
         self.__sendGroupMsgs.put(msg)
-        logMsg = u"发送消息给群:%d：%s"%(msg.group.qq,content)
+        logMsg = "发送消息给群:%d：%s"%(msg.group.qq,content)
         self.addLogMsg(logMsg)
 
     def sendMsgFilter(self, msgContent):
@@ -858,8 +844,7 @@ class QQClient(threading.Thread, QQApi):
             try:
                 # print sendFunc
                 sendFunc()
-                # print u"发送消息", time.clock() - st
-            except Exception, e:
+            except Exception:
                 # pass
                 self.addErrorMsg(traceback.format_exc())
             # time.sleep(self.interval)
@@ -903,7 +888,7 @@ class QQClient(threading.Thread, QQApi):
 
         self.__addSendBuddyMsg(buddyId, fontStyle, content)
 
-        self.sendMsgFuncPool.put(lambda qq=buddyId, c=content, f=fontStyle: QQApi.sendMsg2Buddy(self, qq, c, f))
+        self.sendMsgFuncPool.put(lambda qq=buddyId, c=content, f=fontStyle: QQApi.send_buddy_msg(self, qq, c, f))
 
     def sendMsg2Group(self, groupId, content, fontStyle=None):
         """
@@ -919,7 +904,7 @@ class QQClient(threading.Thread, QQApi):
         # print groupId, content
         self.__addSendGroupMsg(groupId, fontStyle, content)
 
-        self.sendMsgFuncPool.put(lambda qq=groupId, c=content, f=fontStyle: QQApi.sendMsg2Group(self, qq, c, f))
+        self.sendMsgFuncPool.put(lambda qq=groupId, c=content, f=fontStyle: QQApi.send_group_msg(self, qq, c, f))
 
     # def api_sendMsg2Buddy(self, qq, content, fontstyle):
     #     QQApi.sendMsg2Buddy(self, qq, content)
@@ -950,7 +935,7 @@ class QQClient(threading.Thread, QQApi):
         # print data
         for fuin, fobject_dict in data["data"].items():
             fobject = entity.Friend()
-            fobject.getQQ = self.uin2number
+            fobject.get_qq = self.uin2number
             for fo_key, fo_value in fobject_dict.items():
                 setattr(fobject, fo_key, fo_value)
             self.qqUser.friends[int(fuin)] = fobject
@@ -960,7 +945,6 @@ class QQClient(threading.Thread, QQApi):
         """
         结果保存在 self.qqUser.groups，self.qqUser.groups是个dict，key uin，value entity.Group实例
         """
-        # print u"get groups"
         data = super(QQClient, self).getGroups()
         for guin, gobject_dict in data["data"].items():
             group_object = entity.Group()
@@ -970,7 +954,7 @@ class QQClient(threading.Thread, QQApi):
             for muin, m_dict in gobject_dict["members"].items():
                 # print m_dict
                 member = entity.GroupMember()
-                member.getQQ = self.uin2number
+                member.get_qq = self.uin2number
                 for m_key, m_value in m_dict.items():
                     setattr(member, m_key, m_value)
                 group_object.members[member.uin] = member
@@ -982,5 +966,3 @@ class QQClient(threading.Thread, QQApi):
 if __name__ == "__main__":
 
     test = QQClient()
-#    print test.sendMsg2Buddy(1412971608, u"你好")
-#    print test.getFriends()[1412971608]

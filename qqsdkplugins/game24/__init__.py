@@ -60,7 +60,7 @@ class MyEvent(MsgEvent):
         elif self.cmdAnswer.az(msg.msg):
 
             param = self.cmdAnswer.get_original_param()
-            result += game.judge(group_qq, member.qq, member.getName(), param)
+            result += game.judge(group_qq, member.qq, member.get_name(), param)
  
         if result:
             msg.reply(result)

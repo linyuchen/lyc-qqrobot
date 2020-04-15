@@ -47,7 +47,7 @@ class MyEvent(MsgEvent):
             result = group_plugin.start_game(group_qq, msg.reply)
 
         elif self.cmdJoin.az(msg.msg):
-            result = group_plugin.judge_idiom(group_qq, member.qq, member.getName(), self.cmdJoin.get_original_param())
+            result = group_plugin.judge_idiom(group_qq, member.qq, member.get_name(), self.cmdJoin.get_original_param())
 
         if result:
             msg.reply(result)
@@ -123,7 +123,7 @@ class MyEvent(MsgEvent):
             result = group_plugin.start_game(group_qq, msg.reply)
 
         elif self.cmdJoin.az(msg.msg):
-            result = group_plugin.judge_idiom(group_qq, member.qq, member.getName(), self.cmdJoin.get_original_param())
+            result = group_plugin.judge_idiom(group_qq, member.qq, member.get_name(), self.cmdJoin.get_original_param())
 
         if result:
             msg.reply(result)

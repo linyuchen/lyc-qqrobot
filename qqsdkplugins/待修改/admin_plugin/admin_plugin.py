@@ -35,11 +35,11 @@ class AdminPlugin:
 
     def sendMsg2Buddy(self, cmdStr):
 
-        return self.__sendMsg(cmdStr, self.qqClient.sendMsg2Buddy)
+        return self.__sendMsg(cmdStr, self.qqClient.send_buddy_msg)
 
     def sendMsg2Group(self, cmdStr):
 
-        return self.__sendMsg(cmdStr, self.qqClient.sendMsg2Group)
+        return self.__sendMsg(cmdStr, self.qqClient.send_group_msg)
 
     def __convertCmdStr2List(self, cmdStr):
         
@@ -267,11 +267,11 @@ class AdminPlugin:
 
     def sendMsg2Buddy(self, cmdStr):
 
-        return self.__sendMsg(cmdStr, self.qqClient.sendMsg2Buddy)
+        return self.__sendMsg(cmdStr, self.qqClient.send_buddy_msg)
 
     def sendMsg2Group(self, cmdStr):
 
-        return self.__sendMsg(cmdStr, self.qqClient.sendMsg2Group)
+        return self.__sendMsg(cmdStr, self.qqClient.send_group_msg)
 
     def __convertCmdStr2List(self, cmdStr):
         

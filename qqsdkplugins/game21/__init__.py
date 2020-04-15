@@ -57,11 +57,11 @@ class MyEvent(MsgEvent):
         result = ""
         if self.cmdStart.az(msg.msg):
             param = self.cmdStart.get_param_list()[0]
-            result += game.start_game(group_qq, member.qq, member.getName(), param, msg.reply)
+            result += game.start_game(group_qq, member.qq, member.get_name(), param, msg.reply)
             result += u"\n\n发送“21点换牌”可以换牌，换牌需要下注的十分之一费用\n"
         elif self.cmdUpdate.az(msg.msg):
 
-            result += game.update_poker_list(group_qq, member.qq, member.getName())
+            result += game.update_poker_list(group_qq, member.qq, member.get_name())
  
         if result:
             msg.reply(result)

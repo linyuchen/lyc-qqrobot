@@ -43,7 +43,7 @@ class MyEvent(MsgEvent):
         result = ""
         if self.cmdRob.az(msg.msg):
             param = self.cmdRob.get_param_list()[0]
-            result += rob.rob(group_qq, member.qq, member.getName(), param)
+            result += rob.rob(group_qq, member.qq, member.get_name(), param)
 
         if result:
             msg.reply(result)

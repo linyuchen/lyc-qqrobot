@@ -66,8 +66,8 @@ class MyEvent(MsgEvent):
         groupPlugin = self.getGroupPlugin(group.qq)
         note = groupPlugin.joinNote
         if groupPlugin.joinNoteSwitch:
-            note = note.replace("{name}", member.getName()).replace("{qq}", str(member.qq))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = note.replace("{name}", member.get_name()).replace("{qq}", str(member.qq))
+            self.qqClient.send_group_msg(group.qq, note)
     
     def sendExitNote(self, msg):
 
@@ -77,7 +77,7 @@ class MyEvent(MsgEvent):
         note = groupPlugin.exitNote
         if groupPlugin.exitNoteSwitch:
             note = note.replace("{name}", msg.memberName).replace("{qq}", str(msg.memberQQ))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            self.qqClient.send_group_msg(group.qq, note)
 
     def sendAdminChangeNote(self, msg):
 
@@ -88,8 +88,8 @@ class MyEvent(MsgEvent):
         #note = groupPlugin.
         if groupPlugin.adminChangeNoteSwitch:
             #note = note.replace("{name}", member.getName()).replace("{qq}", str(member.qq))
-            note = u"%s(%d)被%s了管理员" % (member.getName(), member.qq, u"设置成" if member.isAdmin else u"取消")
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = u"%s(%d)被%s了管理员" % (member.get_name(), member.qq, u"设置成" if member.isAdmin else u"取消")
+            self.qqClient.send_group_msg(group.qq, note)
 
     def sendKickNote(self, msg):
 
@@ -100,8 +100,8 @@ class MyEvent(MsgEvent):
         note = groupPlugin.kickNote
         if groupPlugin.kickNoteSwitch:
             note = note.replace("{name}", msg.memberName).replace("{qq}", str(msg.memberQQ))
-            note = note.replace("{admin_name}", admin.getName()).replace("{admin_qq}", str(admin.qq))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = note.replace("{admin_name}", admin.get_name()).replace("{admin_qq}", str(admin.qq))
+            self.qqClient.send_group_msg(group.qq, note)
 
 
     def main(self, msg):
@@ -125,14 +125,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setJoinNoteSwitch(groupQQ, 1)
                 result += u"新人入群提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseJoinNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setJoinNoteSwitch(groupQQ, 0)
                 result += u"新人入群提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetJoinNote.az(msg.msg):
             if member.isAdmin:
@@ -140,7 +140,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setJoinNote(groupQQ, param)
                 result += u"新人入群语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 退群
         if self.cmdGetExitNote.az(msg.msg):
@@ -152,14 +152,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setExitNoteSwitch(groupQQ, 1)
                 result += u"成员退群提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseExitNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setExitNoteSwitch(groupQQ, 0)
                 result += u"成员退群提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetExitNote.az(msg.msg):
             if member.isAdmin:
@@ -167,7 +167,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setExitNote(groupQQ, param)
                 result += u"成员退群语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 踢人
         if self.cmdGetKickNote.az(msg.msg):
@@ -179,14 +179,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setKickNoteSwitch(groupQQ, 1)
                 result += u"踢人提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseKickNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setKickNoteSwitch(groupQQ, 0)
                 result += u"踢人提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetKickNote.az(msg.msg):
             if member.isAdmin:
@@ -194,7 +194,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setKickNote(groupQQ, param)
                 result += u"踢人提示语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 管理变成提醒
         if self.cmdGetAdminChangeNote.az(msg.msg):
@@ -205,14 +205,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setAdminChangeNoteSwitch(groupQQ, 1)
                 result += u"管理变更提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseAdminChangeNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setAdminChangeNoteSwitch(groupQQ, 0)
                 result += u"管理变更提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
 
         if result:
@@ -312,8 +312,8 @@ class MyEvent(MsgEvent):
         groupPlugin = self.getGroupPlugin(group.qq)
         note = groupPlugin.joinNote
         if groupPlugin.joinNoteSwitch:
-            note = note.replace("{name}", member.getName()).replace("{qq}", str(member.qq))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = note.replace("{name}", member.get_name()).replace("{qq}", str(member.qq))
+            self.qqClient.send_group_msg(group.qq, note)
     
     def sendExitNote(self, msg):
 
@@ -323,7 +323,7 @@ class MyEvent(MsgEvent):
         note = groupPlugin.exitNote
         if groupPlugin.exitNoteSwitch:
             note = note.replace("{name}", msg.memberName).replace("{qq}", str(msg.memberQQ))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            self.qqClient.send_group_msg(group.qq, note)
 
     def sendAdminChangeNote(self, msg):
 
@@ -334,8 +334,8 @@ class MyEvent(MsgEvent):
         #note = groupPlugin.
         if groupPlugin.adminChangeNoteSwitch:
             #note = note.replace("{name}", member.getName()).replace("{qq}", str(member.qq))
-            note = u"%s(%d)被%s了管理员" % (member.getName(), member.qq, u"设置成" if member.isAdmin else u"取消")
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = u"%s(%d)被%s了管理员" % (member.get_name(), member.qq, u"设置成" if member.isAdmin else u"取消")
+            self.qqClient.send_group_msg(group.qq, note)
 
     def sendKickNote(self, msg):
 
@@ -346,8 +346,8 @@ class MyEvent(MsgEvent):
         note = groupPlugin.kickNote
         if groupPlugin.kickNoteSwitch:
             note = note.replace("{name}", msg.memberName).replace("{qq}", str(msg.memberQQ))
-            note = note.replace("{admin_name}", admin.getName()).replace("{admin_qq}", str(admin.qq))
-            self.qqClient.sendMsg2Group(group.qq, note)
+            note = note.replace("{admin_name}", admin.get_name()).replace("{admin_qq}", str(admin.qq))
+            self.qqClient.send_group_msg(group.qq, note)
 
 
     def main(self, msg):
@@ -371,14 +371,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setJoinNoteSwitch(groupQQ, 1)
                 result += u"新人入群提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseJoinNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setJoinNoteSwitch(groupQQ, 0)
                 result += u"新人入群提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetJoinNote.az(msg.msg):
             if member.isAdmin:
@@ -386,7 +386,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setJoinNote(groupQQ, param)
                 result += u"新人入群语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 退群
         if self.cmdGetExitNote.az(msg.msg):
@@ -398,14 +398,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setExitNoteSwitch(groupQQ, 1)
                 result += u"成员退群提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseExitNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setExitNoteSwitch(groupQQ, 0)
                 result += u"成员退群提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetExitNote.az(msg.msg):
             if member.isAdmin:
@@ -413,7 +413,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setExitNote(groupQQ, param)
                 result += u"成员退群语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 踢人
         if self.cmdGetKickNote.az(msg.msg):
@@ -425,14 +425,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setKickNoteSwitch(groupQQ, 1)
                 result += u"踢人提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseKickNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setKickNoteSwitch(groupQQ, 0)
                 result += u"踢人提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdSetKickNote.az(msg.msg):
             if member.isAdmin:
@@ -440,7 +440,7 @@ class MyEvent(MsgEvent):
                 groupPlugin.setKickNote(groupQQ, param)
                 result += u"踢人提示语设置完成"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         # 管理变成提醒
         if self.cmdGetAdminChangeNote.az(msg.msg):
@@ -451,14 +451,14 @@ class MyEvent(MsgEvent):
                 groupPlugin.setAdminChangeNoteSwitch(groupQQ, 1)
                 result += u"管理变更提醒已开启！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
         elif self.cmdCloseAdminChangeNote.az(msg.msg):
             if member.isAdmin:
                 groupPlugin.setAdminChangeNoteSwitch(groupQQ, 0)
                 result += u"管理变更提醒已关闭！"
             else:
-                result += u"%s 您不是管理员，无权设置" % (member.getName())
+                result += u"%s 您不是管理员，无权设置" % (member.get_name())
 
 
         if result:

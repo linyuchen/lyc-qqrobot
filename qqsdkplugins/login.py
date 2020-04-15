@@ -26,7 +26,7 @@ class Plugin(plugin.QQPlugin):
     def inputVerifyCode(self):
         # 输入验证码
         code = raw_input(u"输入验证码:".encode("gbk"))
-        self.qqClient.inputVerifyCode(code)
+        self.qqClient.input_verify_code(code)
 
     def loginSuccess(self, msg):
         print u"登录成功"

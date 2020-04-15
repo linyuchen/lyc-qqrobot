@@ -65,8 +65,8 @@ class MyEvent(MsgEvent):
         result = ""
         count = groupManager.getMemberWarningCount(groupQQ, member.qq)
         if count >= self.maxWarningCount:
-            result += u"%s 超过警告次数%d次, 正在执行裁决......\n" % (member.getName(), self.maxWarningCount)
-            result += self.qqClient.deleteGroupMember(groupQQ, member.qq)
+            result += u"%s 超过警告次数%d次, 正在执行裁决......\n" % (member.get_name(), self.maxWarningCount)
+            result += self.qqClient.delete_group_member(groupQQ, member.qq)
             result += "\n"
 
         return result
@@ -88,7 +88,7 @@ class MyEvent(MsgEvent):
         groupManager = self.getGroupManger(groupQQ)
         if str(memberQQ) in groupManager.blackQQ and groupManager.balckSwitch:
             msg.reject(u"你在本群黑名单之上，禁止加入")
-            self.qqClient.sendMsg2Group(groupQQ, u"%s(%s)企图加入本群，但由于此人乃黑名单上之物，已拒绝之！" % (memberName, memberQQ))
+            self.qqClient.send_group_msg(groupQQ, u"%s(%s)企图加入本群，但由于此人乃黑名单上之物，已拒绝之！" % (memberName, memberQQ))
         else:
             if groupManager.autoVerify == 1:
                 msg.allow()
@@ -117,42 +117,42 @@ class MyEvent(MsgEvent):
         result = ""
 
         if groupManager.checkShuabing(member.qq, msg.msg) and groupManager.shuabingDetect and not member.isAdmin:
-            result += u"%s 刷屏， 警告一次！警告超过%d次将被踢出本群\n" % (member.getName(), self.maxWarningCount)
+            result += u"%s 刷屏， 警告一次！警告超过%d次将被踢出本群\n" % (member.get_name(), self.maxWarningCount)
             groupManager.setMemberWarningCount(groupQQ, member.qq, 1, True)
             result += self.checkWarningCount(groupManager, groupQQ, member)
 
         if groupManager.checkSensitiveWord(groupQQ, msg.msg) and not member.isAdmin:
-            result += u"%s 发言有敏感词， 警告一次！警告超过%d次将被踢出本群\n" % (member.getName(), self.maxWarningCount)
+            result += u"%s 发言有敏感词， 警告一次！警告超过%d次将被踢出本群\n" % (member.get_name(), self.maxWarningCount)
             groupManager.setMemberWarningCount(groupQQ, member.qq, 1, True)
             result += self.checkWarningCount(groupManager, groupQQ, member)
 
         if groupManager.checkProhibitedWord(groupQQ, msg.msg) and not member.isAdmin:
-            result += u"%s 发言有违禁词，正在执行裁决......\n " % member.getName()
-            result += self.qqClient.deleteGroupMember(groupQQ, member.qq)
+            result += u"%s 发言有违禁词，正在执行裁决......\n " % member.get_name()
+            result += self.qqClient.delete_group_member(groupQQ, member.qq)
         
         #命令判断
         if self.cmdClrScreen.az(msg.msg):
             if member.isAdmin:
                 result += u"- \t\n\n\t -"*800 + u"清屏完毕~\n"
             else:
-                result += u"%s 您不是管理员，无权操作！\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作！\n" % (member.get_name())
         elif self.cmdKick.az(msg.msg):
             if member.isAdmin:
                 param = self.cmdKick.get_param_list()[0]
                 if param.isdigit():
-                    result += self.qqClient.deleteGroupMember(groupQQ, int(param))
+                    result += self.qqClient.delete_group_member(groupQQ, int(param))
                     #print result
                 else:
                     result += u"QQ号不正确，踢人失败!\n"
             else:
-                result += u"%s 您不是管理员，无法踢人！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法踢人！\n" % (member.get_name())
         elif self.cmdMyWarningCount.az(msg.msg):
             count = groupManager.getMemberWarningCount(groupQQ, member.qq)
             if count == None:
                 warningCount = 0
             else:
                 warningCount = count
-            result += u"%s (%d)的警告次数为 %d\n" % (member.getName(), member.qq, warningCount)
+            result += u"%s (%d)的警告次数为 %d\n" % (member.get_name(), member.qq, warningCount)
 
         elif self.cmdGetSensitiveWords.az(msg.msg):
             result += u"当前敏感词：\n"
@@ -173,7 +173,7 @@ class MyEvent(MsgEvent):
                     groupManager.addSensitiveWord(groupQQ, word)
                 result += u"敏感词添加完成\n"
             else:
-                result += u"%s 您不是管理员，无法添加敏感词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法添加敏感词！\n" % (member.get_name())
 
         elif self.cmdDelSensitiveWords.az(msg.msg):
             if member.isAdmin:
@@ -182,7 +182,7 @@ class MyEvent(MsgEvent):
                     groupManager.delSensitiveWord(groupQQ, word)
                 result += u"敏感词删除完成\n"
             else:
-                result += u"%s 您不是管理员，无法删除敏感词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法删除敏感词！\n" % (member.get_name())
 
         elif self.cmdAddProhibitedWords.az(msg.msg):
             if member.isAdmin:
@@ -191,7 +191,7 @@ class MyEvent(MsgEvent):
                     groupManager.addProhibitedWord(groupQQ, word)
                 result += u"违禁词添加完成\n"
             else:
-                result += u"%s 您不是管理员，无法添加违禁词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法添加违禁词！\n" % (member.get_name())
 
         elif self.cmdDelProhibitedWords.az(msg.msg):
             if member.isAdmin:
@@ -200,7 +200,7 @@ class MyEvent(MsgEvent):
                     groupManager.delProhibitedWord(groupQQ, word)
                 result += u"违禁词删除完成\n"
             else:
-                result += u"%s 您不是管理员，无法删除违禁词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法删除违禁词！\n" % (member.get_name())
 
         elif self.cmdOtherWarningCount.az(msg.msg):
             if member.isAdmin:
@@ -208,7 +208,7 @@ class MyEvent(MsgEvent):
                 warningCount = groupManager.getMemberWarningCount(groupQQ, param)
                 result += u"%s 的警告次数为 %d\n" % (param, warningCount)
             else:
-                result += u"%s 您不是管理员，无权查看!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权查看!\n" % (member.get_name())
 
         elif self.cmdClearWarningCount.az(msg.msg):
             if member.isAdmin:
@@ -219,20 +219,20 @@ class MyEvent(MsgEvent):
                     groupManager.setMemberWarningCount(groupQQ, param, 0, False)
                 result += u"%s的警告次数已经清零\n" % (param)
             else:
-                result += u"%s 您不是管理员，无权清零警告次数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权清零警告次数!\n" % (member.get_name())
 
         elif self.cmdOpenShuabingDetect.az(msg.msg):
             if member.isAdmin:
                 groupManager.setShuabingDetect(groupQQ, 1)
                 result += u"刷屏检测已开启\n"
             else:
-                result += u"%s 您不是管理员，无权开启刷屏检测!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权开启刷屏检测!\n" % (member.get_name())
         elif self.cmdCloseShuabingDetect.az(msg.msg):
             if member.isAdmin:
                 groupManager.setShuabingDetect(groupQQ, 0)
                 result += u"刷屏检测已关闭\n"
             else:
-                result += u"%s 您不是管理员，无权关闭刷屏检测!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权关闭刷屏检测!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxRows.az(msg.msg):
 
@@ -245,7 +245,7 @@ class MyEvent(MsgEvent):
                     result += u"刷屏行数设置成功!\n"
 
             else:
-                result += u"%s 您不是管理员，无权设置刷屏行数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏行数!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxWords.az(msg.msg):
 
@@ -258,7 +258,7 @@ class MyEvent(MsgEvent):
                     result += u"刷屏字数设置成功!"
 
             else:
-                result += u"%s 您不是管理员，无权设置刷屏字数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏字数!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxContinuous.az(msg.msg):
 
@@ -270,14 +270,14 @@ class MyEvent(MsgEvent):
                     groupManager.setShuabingMaxContinuous(groupQQ, int(param))
                     result += u"刷屏连续次数设置成功!"
             else:
-                result += u"%s 您不是管理员，无权设置刷屏连续次数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏连续次数!\n" % (member.get_name())
 
         elif self.cmdShuabingStatus.az(msg.msg):
             if member.isAdmin:
                 status = u"开启" if groupManager.shuabingDetect else u"关闭"
                 result += u"刷屏检测状态：%s \n发言行数达到%d行视为刷屏\n发言字数达到%d字视为刷屏\n同一人连续发言相同内容%d次视为刷屏\n" % (status, groupManager.shuabingMaxRows, groupManager.shuabingMaxWords, groupManager.shuabingMaxContinuous)
             else:
-                result += u"%s 您不是管理员，无权查看刷屏检测状态!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权查看刷屏检测状态!\n" % (member.get_name())
 
         # 黑名单
         elif self.cmdAddBlackQQ.az(msg.msg):
@@ -290,7 +290,7 @@ class MyEvent(MsgEvent):
                     groupManager.addBlackQQ(groupQQ, param)
                     result += u"加黑QQ%s成功!" % param
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
                 
         elif self.cmdDelBlackQQ.az(msg.msg):
 
@@ -302,7 +302,7 @@ class MyEvent(MsgEvent):
                     groupManager.delBlackQQ(groupQQ, param)
                     result += u"解黑QQ%s成功!" % param
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdGetBlackQQ.az(msg.msg):
 
@@ -311,7 +311,7 @@ class MyEvent(MsgEvent):
 
                 result += u"当前黑名单：\n" + "\n".join(blackList)
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
         
         # 加群审核
         elif self.cmdAutoAllow.az(msg.msg):
@@ -320,7 +320,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 1)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdAutoReject.az(msg.msg):
 
@@ -328,7 +328,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 0)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdAutoIgnore.az(msg.msg):
 
@@ -336,7 +336,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 2)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdGetVerifyType.az(msg.msg):
 
@@ -349,7 +349,7 @@ class MyEvent(MsgEvent):
                 elif groupManager.autoVerify == 2:
                     result += u"自动忽略"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdOpenBlackQQ.az(msg.msg):
 
@@ -357,7 +357,7 @@ class MyEvent(MsgEvent):
                 groupManager.setBlackSwitch(groupQQ, 1)
                 result += u"黑名单已开启"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdCloseBlackQQ.az(msg.msg):
 
@@ -365,7 +365,7 @@ class MyEvent(MsgEvent):
                 groupManager.setBlackSwitch(groupQQ, 0)
                 result += u"黑名单已关闭"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
 
 
@@ -463,8 +463,8 @@ class MyEvent(MsgEvent):
         result = ""
         count = groupManager.getMemberWarningCount(groupQQ, member.qq)
         if count >= self.maxWarningCount:
-            result += u"%s 超过警告次数%d次, 正在执行裁决......\n" % (member.getName(), self.maxWarningCount)
-            result += self.qqClient.deleteGroupMember(groupQQ, member.qq)
+            result += u"%s 超过警告次数%d次, 正在执行裁决......\n" % (member.get_name(), self.maxWarningCount)
+            result += self.qqClient.delete_group_member(groupQQ, member.qq)
             result += "\n"
 
         return result
@@ -486,7 +486,7 @@ class MyEvent(MsgEvent):
         groupManager = self.getGroupManger(groupQQ)
         if str(memberQQ) in groupManager.blackQQ and groupManager.balckSwitch:
             msg.reject(u"你在本群黑名单之上，禁止加入")
-            self.qqClient.sendMsg2Group(groupQQ, u"%s(%s)企图加入本群，但由于此人乃黑名单上之物，已拒绝之！" % (memberName, memberQQ))
+            self.qqClient.send_group_msg(groupQQ, u"%s(%s)企图加入本群，但由于此人乃黑名单上之物，已拒绝之！" % (memberName, memberQQ))
         else:
             if groupManager.autoVerify == 1:
                 msg.allow()
@@ -515,42 +515,42 @@ class MyEvent(MsgEvent):
         result = ""
 
         if groupManager.checkShuabing(member.qq, msg.msg) and groupManager.shuabingDetect and not member.isAdmin:
-            result += u"%s 刷屏， 警告一次！警告超过%d次将被踢出本群\n" % (member.getName(), self.maxWarningCount)
+            result += u"%s 刷屏， 警告一次！警告超过%d次将被踢出本群\n" % (member.get_name(), self.maxWarningCount)
             groupManager.setMemberWarningCount(groupQQ, member.qq, 1, True)
             result += self.checkWarningCount(groupManager, groupQQ, member)
 
         if groupManager.checkSensitiveWord(groupQQ, msg.msg) and not member.isAdmin:
-            result += u"%s 发言有敏感词， 警告一次！警告超过%d次将被踢出本群\n" % (member.getName(), self.maxWarningCount)
+            result += u"%s 发言有敏感词， 警告一次！警告超过%d次将被踢出本群\n" % (member.get_name(), self.maxWarningCount)
             groupManager.setMemberWarningCount(groupQQ, member.qq, 1, True)
             result += self.checkWarningCount(groupManager, groupQQ, member)
 
         if groupManager.checkProhibitedWord(groupQQ, msg.msg) and not member.isAdmin:
-            result += u"%s 发言有违禁词，正在执行裁决......\n " % member.getName()
-            result += self.qqClient.deleteGroupMember(groupQQ, member.qq)
+            result += u"%s 发言有违禁词，正在执行裁决......\n " % member.get_name()
+            result += self.qqClient.delete_group_member(groupQQ, member.qq)
         
         #命令判断
         if self.cmdClrScreen.az(msg.msg):
             if member.isAdmin:
                 result += u"- \t\n\n\t -"*800 + u"清屏完毕~\n"
             else:
-                result += u"%s 您不是管理员，无权操作！\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作！\n" % (member.get_name())
         elif self.cmdKick.az(msg.msg):
             if member.isAdmin:
                 param = self.cmdKick.get_param_list()[0]
                 if param.isdigit():
-                    result += self.qqClient.deleteGroupMember(groupQQ, int(param))
+                    result += self.qqClient.delete_group_member(groupQQ, int(param))
                     #print result
                 else:
                     result += u"QQ号不正确，踢人失败!\n"
             else:
-                result += u"%s 您不是管理员，无法踢人！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法踢人！\n" % (member.get_name())
         elif self.cmdMyWarningCount.az(msg.msg):
             count = groupManager.getMemberWarningCount(groupQQ, member.qq)
             if count == None:
                 warningCount = 0
             else:
                 warningCount = count
-            result += u"%s (%d)的警告次数为 %d\n" % (member.getName(), member.qq, warningCount)
+            result += u"%s (%d)的警告次数为 %d\n" % (member.get_name(), member.qq, warningCount)
 
         elif self.cmdGetSensitiveWords.az(msg.msg):
             result += u"当前敏感词：\n"
@@ -571,7 +571,7 @@ class MyEvent(MsgEvent):
                     groupManager.addSensitiveWord(groupQQ, word)
                 result += u"敏感词添加完成\n"
             else:
-                result += u"%s 您不是管理员，无法添加敏感词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法添加敏感词！\n" % (member.get_name())
 
         elif self.cmdDelSensitiveWords.az(msg.msg):
             if member.isAdmin:
@@ -580,7 +580,7 @@ class MyEvent(MsgEvent):
                     groupManager.delSensitiveWord(groupQQ, word)
                 result += u"敏感词删除完成\n"
             else:
-                result += u"%s 您不是管理员，无法删除敏感词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法删除敏感词！\n" % (member.get_name())
 
         elif self.cmdAddProhibitedWords.az(msg.msg):
             if member.isAdmin:
@@ -589,7 +589,7 @@ class MyEvent(MsgEvent):
                     groupManager.addProhibitedWord(groupQQ, word)
                 result += u"违禁词添加完成\n"
             else:
-                result += u"%s 您不是管理员，无法添加违禁词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法添加违禁词！\n" % (member.get_name())
 
         elif self.cmdDelProhibitedWords.az(msg.msg):
             if member.isAdmin:
@@ -598,7 +598,7 @@ class MyEvent(MsgEvent):
                     groupManager.delProhibitedWord(groupQQ, word)
                 result += u"违禁词删除完成\n"
             else:
-                result += u"%s 您不是管理员，无法删除违禁词！\n" % (member.getName())
+                result += u"%s 您不是管理员，无法删除违禁词！\n" % (member.get_name())
 
         elif self.cmdOtherWarningCount.az(msg.msg):
             if member.isAdmin:
@@ -606,7 +606,7 @@ class MyEvent(MsgEvent):
                 warningCount = groupManager.getMemberWarningCount(groupQQ, param)
                 result += u"%s 的警告次数为 %d\n" % (param, warningCount)
             else:
-                result += u"%s 您不是管理员，无权查看!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权查看!\n" % (member.get_name())
 
         elif self.cmdClearWarningCount.az(msg.msg):
             if member.isAdmin:
@@ -617,20 +617,20 @@ class MyEvent(MsgEvent):
                     groupManager.setMemberWarningCount(groupQQ, param, 0, False)
                 result += u"%s的警告次数已经清零\n" % (param)
             else:
-                result += u"%s 您不是管理员，无权清零警告次数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权清零警告次数!\n" % (member.get_name())
 
         elif self.cmdOpenShuabingDetect.az(msg.msg):
             if member.isAdmin:
                 groupManager.setShuabingDetect(groupQQ, 1)
                 result += u"刷屏检测已开启\n"
             else:
-                result += u"%s 您不是管理员，无权开启刷屏检测!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权开启刷屏检测!\n" % (member.get_name())
         elif self.cmdCloseShuabingDetect.az(msg.msg):
             if member.isAdmin:
                 groupManager.setShuabingDetect(groupQQ, 0)
                 result += u"刷屏检测已关闭\n"
             else:
-                result += u"%s 您不是管理员，无权关闭刷屏检测!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权关闭刷屏检测!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxRows.az(msg.msg):
 
@@ -643,7 +643,7 @@ class MyEvent(MsgEvent):
                     result += u"刷屏行数设置成功!\n"
 
             else:
-                result += u"%s 您不是管理员，无权设置刷屏行数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏行数!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxWords.az(msg.msg):
 
@@ -656,7 +656,7 @@ class MyEvent(MsgEvent):
                     result += u"刷屏字数设置成功!"
 
             else:
-                result += u"%s 您不是管理员，无权设置刷屏字数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏字数!\n" % (member.get_name())
 
         elif self.cmdSetShuabingMaxContinuous.az(msg.msg):
 
@@ -668,14 +668,14 @@ class MyEvent(MsgEvent):
                     groupManager.setShuabingMaxContinuous(groupQQ, int(param))
                     result += u"刷屏连续次数设置成功!"
             else:
-                result += u"%s 您不是管理员，无权设置刷屏连续次数!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权设置刷屏连续次数!\n" % (member.get_name())
 
         elif self.cmdShuabingStatus.az(msg.msg):
             if member.isAdmin:
                 status = u"开启" if groupManager.shuabingDetect else u"关闭"
                 result += u"刷屏检测状态：%s \n发言行数达到%d行视为刷屏\n发言字数达到%d字视为刷屏\n同一人连续发言相同内容%d次视为刷屏\n" % (status, groupManager.shuabingMaxRows, groupManager.shuabingMaxWords, groupManager.shuabingMaxContinuous)
             else:
-                result += u"%s 您不是管理员，无权查看刷屏检测状态!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权查看刷屏检测状态!\n" % (member.get_name())
 
         # 黑名单
         elif self.cmdAddBlackQQ.az(msg.msg):
@@ -688,7 +688,7 @@ class MyEvent(MsgEvent):
                     groupManager.addBlackQQ(groupQQ, param)
                     result += u"加黑QQ%s成功!" % param
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
                 
         elif self.cmdDelBlackQQ.az(msg.msg):
 
@@ -700,7 +700,7 @@ class MyEvent(MsgEvent):
                     groupManager.delBlackQQ(groupQQ, param)
                     result += u"解黑QQ%s成功!" % param
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdGetBlackQQ.az(msg.msg):
 
@@ -709,7 +709,7 @@ class MyEvent(MsgEvent):
 
                 result += u"当前黑名单：\n" + "\n".join(blackList)
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
         
         # 加群审核
         elif self.cmdAutoAllow.az(msg.msg):
@@ -718,7 +718,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 1)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdAutoReject.az(msg.msg):
 
@@ -726,7 +726,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 0)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdAutoIgnore.az(msg.msg):
 
@@ -734,7 +734,7 @@ class MyEvent(MsgEvent):
                 groupManager.setAutoVerify(groupQQ, 2)
                 result += u"设置成功!"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdGetVerifyType.az(msg.msg):
 
@@ -747,7 +747,7 @@ class MyEvent(MsgEvent):
                 elif groupManager.autoVerify == 2:
                     result += u"自动忽略"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdOpenBlackQQ.az(msg.msg):
 
@@ -755,7 +755,7 @@ class MyEvent(MsgEvent):
                 groupManager.setBlackSwitch(groupQQ, 1)
                 result += u"黑名单已开启"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
         elif self.cmdCloseBlackQQ.az(msg.msg):
 
@@ -763,7 +763,7 @@ class MyEvent(MsgEvent):
                 groupManager.setBlackSwitch(groupQQ, 0)
                 result += u"黑名单已关闭"
             else:
-                result += u"%s 您不是管理员，无权操作!\n" % (member.getName())
+                result += u"%s 您不是管理员，无权操作!\n" % (member.get_name())
 
 
 
