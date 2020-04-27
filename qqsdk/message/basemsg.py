@@ -12,18 +12,19 @@ class BaseMsg(object):
     time: int = 0  # 发送时的时间戳
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
     paused: bool = False
+    original_msg: list = []  # 这个已经没用了
+    MSG_TYPE: str = ""
 
     def __init__(self):
 
         self.msg = ""
-        self.originalMsg = []
         self.time = 0
-        self.isOver = False
-        self.paused = False
 
-    def reply(self, content, fontStyle=None):
+    def reply(self, content: str, fontStyle=None):
         """
-        回复消息，content Unicode编码
+        :param content:恢复内容
+        :param fontStyle: 已弃用
+        :return:
         """
 
     def pause(self):
@@ -44,7 +45,7 @@ class BaseMsg(object):
         """
         销毁此消息，不再让其他event处理
         """
-        self.isOver = True
+        self.is_over = True
 
     # def __str__(self):
     #
