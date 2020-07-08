@@ -1,6 +1,5 @@
-#coding=UTF8
+# coding=UTF8
 
-import locale
 
 class BaseMsg(object):
     """
@@ -20,7 +19,7 @@ class BaseMsg(object):
         self.msg = ""
         self.time = 0
 
-    def reply(self, content: str, fontStyle=None):
+    def reply(self, content: str):
         """
         :param content:恢复内容
         :param fontStyle: 已弃用
@@ -47,16 +46,3 @@ class BaseMsg(object):
         """
         self.is_over = True
 
-    # def __str__(self):
-    #
-    #     result = ""
-    #     for i in dir(self):
-    #         if not i.startswith("__"):
-    #             i_value = eval("self.%s"%i)
-    #             if isinstance(i_value,unicode):
-    #                 i_value = i_value.encode(locale.getpreferredencoding())
-    #             else:
-    #                 i_value = str(i_value)
-    #
-    #             result = "%s: %s\n" % (i, i_value)
-    #     return result

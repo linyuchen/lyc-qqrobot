@@ -1,4 +1,4 @@
-#coding=UTF8
+# -*- encoding:UTF8 -*-
 from dataclasses import dataclass
 from qqsdk.message.basemsg import BaseMsg
 from qqsdk.entity.group import Group, GroupMember
@@ -10,7 +10,7 @@ class GroupMsg(BaseMsg):
     """
     """
     MSG_TYPE = MessageTypes.GROUP
-    group:Group
+    group: Group
     group_member: GroupMember
 
 
@@ -43,7 +43,6 @@ class RequestJoinGroupMsg(BaseMsg):
     request_qq: str
     request_name: str
 
-
     def allow(self):
         """
         同意入群
@@ -73,6 +72,7 @@ class MeJoinedGroupMsg(GroupMsg):
     """
     MSG_TYPE = MessageTypes.GROUP_JOINED
 
+
 @dataclass
 class InviteMeToGroupMsg(BaseMsg):
     """
@@ -83,7 +83,6 @@ class InviteMeToGroupMsg(BaseMsg):
     group_name: str
     group_member_qq: str
     group_member_name: str
-
 
     def allow(self):
         """

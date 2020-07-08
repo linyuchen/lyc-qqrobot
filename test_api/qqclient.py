@@ -6,7 +6,7 @@ import Queue
 import threading
 
 import webqq.qqapi
-from qqsdk import events
+from qqsdk.归档 import events
 from qqsdk import message
 from status_codes import *
 from qqsdk import entity

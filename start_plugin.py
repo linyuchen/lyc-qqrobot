@@ -2,7 +2,7 @@
 
 import sys
 
-from qqsdk.main import Main
+from qqsdk.归档.main import Main
 
 host = "localhost"
 if len(sys.argv) > 1:

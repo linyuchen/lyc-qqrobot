@@ -54,6 +54,7 @@ class TempMsg(BaseMsg):
 
         super(TempMsg, self).__init__()
 
+
 @dataclass
 class AddedMeFriendMsg(FriendMsg):
     """
@@ -79,7 +80,6 @@ class RequestAddMeFriend(BaseMsg):
     """
     MSG_TYPE = MessageTypes.REQUEST_ADD_ME_FRIEND
     request_qq: str
-
 
     def allow(self):
         """
