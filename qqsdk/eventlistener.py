@@ -1,58 +1,47 @@
-#coding=UTF8
+# coding=UTF8
 
 import threading
 import time
-import traceback
-import message
+from dataclasses import dataclass
+from typing import List
+from qqsdk.message.msghandler import MsgHandler
+from queue import Queue
+from qqsdk.message.friendmsg import FriendMsg, BaseMsg
+from qqsdk.message.groupmsg import GroupMsg
+from qqsdk.qqclient import QQClientBase
 
 Thread = threading.Thread
 
 
 class EventListener(Thread):
+    MESSAGE_CLASSES = (FriendMsg, GroupMsg)
+    interval = 0.5
+    msgs = Queue()
+    running = True
 
-    def __init__(self, msgs, events, errorHandler, interval, qq_client):
-
+    def __init__(self, qq_client: QQClientBase, msg_handlers: List[MsgHandler]):
+        self.qq_client = qq_client
+        self.msg_handlers = msg_handlers
         super(EventListener, self).__init__()
 
-        self.msgs = msgs
-        self.events = events
-        self.errorHandler = errorHandler
-        self.interval = interval
-        self.running = True
-        self.qq_client = qq_client
+    def add_msg(self, msg: BaseMsg):
+        self.msgs.put(msg)
 
     def pause(self):
-
         self.running = False
 
     def restore(self):
-
         self.running = True
     
     def run(self):
-
         while True:
-            """
-            if not self.running:
-                time.sleep(self.interval)
-                continue
-            """
-            msg = self.msgs.get()
-            # print u"收到了消息", msg
-            for event in self.events:
-                while msg.paused:
-                    # print u"等待中"
-                    pass
-                if msg.isOver:
+            msg: BaseMsg = self.msgs.get()
+            while msg.paused:
+                pass
+            for handler in self.msg_handlers:
+                if msg.is_over:
                     break
-                try:
-                    # s = time.clock()
-                    self.qq_client.putFunc(lambda m=msg, e=event: e.main(m))
-                    # print u"处理完了消息", event, time.clock() - s
-                except Exception, e:
-                    error_msg = traceback.format_exc()
-                    self.errorHandler(error_msg)
-                    msg.resume()
-                    msg.destroy()
+                handler: MsgHandler
+                if handler.check_type(msg):
+                    handler.handle(msg)
             time.sleep(self.interval)
-

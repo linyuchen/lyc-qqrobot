@@ -10,8 +10,8 @@ class GroupMsg(BaseMsg):
     """
     """
     MSG_TYPE = MessageTypes.GROUP
-    group: Group
-    group_member: GroupMember
+    group: Group = None
+    group_member: GroupMember = None
 
 
 @dataclass
@@ -28,8 +28,8 @@ class GroupAdminChangeMsg(GroupMsg):
 class GroupMemberCardChangedMsg(BaseMsg):
     """
     """
+    old_name: str = ""  # 群成员之前的群名片
     MSG_TYPE = MessageTypes.GROUP_MEMBER_CARD_CHANGE
-    old_name: str  # 群成员之前的群名片
 
 
 @dataclass
@@ -39,9 +39,9 @@ class RequestJoinGroupMsg(BaseMsg):
     msg: 验证消息
     """
     MSG_TYPE = MessageTypes.GROUP_REQUEST_JOIN
-    group: Group
-    request_qq: str
-    request_name: str
+    group: Group = None
+    request_qq: str = ""
+    request_name: str = ""
 
     def allow(self):
         """
@@ -79,10 +79,10 @@ class InviteMeToGroupMsg(BaseMsg):
     """
 
     # 邀请者相关信息
-    group_qq: str
-    group_name: str
-    group_member_qq: str
-    group_member_name: str
+    group_qq: str = ""
+    group_name: str = ""
+    group_member_qq: str = ""
+    group_member_name: str = ""
 
     def allow(self):
         """
@@ -106,9 +106,9 @@ class GroupRemoveMeMsg(BaseMsg):
     self.adminUin：踢我的管理员uin
     self.adminName：踢我的管理员昵称
     """
-    group_qq: str
-    admin_qq: str
-    admin_name: str
+    group_qq: str = ""
+    admin_qq: str = ""
+    admin_name: str = ""
 
 
 @dataclass
@@ -117,17 +117,17 @@ class GroupRemoveMemberMsg(GroupMsg):
     group_member: 踢人的管理员
     """
 
-    member_name: str
-    member_qq: str
+    member_name: str = ""
+    member_qq: str = ""
 
 
 @dataclass
 class GroupMemberExitMsg(BaseMsg):
     """
     """
-    group: Group
-    member_name: str
-    member_qq: str
+    group: Group = None
+    member_name: str = ""
+    member_qq: str = ""
 
 
 @dataclass
@@ -135,9 +135,9 @@ class DiscussionGroupMsg(BaseMsg):
     """
     讨论组消息
     """
-    qq: str  # 发送者qq
-    name: str  # 发送者名字
-    discussion_id: str
+    qq: str = ""  # 发送者qq
+    name: str = ""  # 发送者名字
+    discussion_id: str = ""
 
 
 @dataclass
@@ -145,5 +145,5 @@ class SendGroupMsg(BaseMsg):
     """
     发送给群的消息
     """
-    group: Group
+    group: Group = None
 

@@ -9,9 +9,8 @@ from qqsdk.message.types import MessageTypes
 @dataclass
 class FriendMsg(BaseMsg):
     """
-    self.friend : Friend实例
     """
-    friend: Friend
+    friend: Friend = None
     MSG_TYPE = MessageTypes.FRIEND
 
 
@@ -34,8 +33,8 @@ class FriendStatusChangeMsg(FriendMsg):
 @dataclass
 class FriendVoiceMsg(FriendMsg):
 
-    url: str  # 语音的url
-    MSG_TYPE = MessageTypes.Friend_VOICE
+    MSG_TYPE = MessageTypes.FRIEND_VOICE
+    url: str = ""  # 语音的url
 
 
 @dataclass
@@ -47,8 +46,8 @@ class TempMsg(BaseMsg):
     """
     MSG_TYPE = MessageTypes.TEMP
 
-    qq:str
-    group:Group = None
+    qq: str = ""
+    group: Group = None
 
     def __init__(self):
 
@@ -79,7 +78,7 @@ class RequestAddMeFriend(BaseMsg):
     对方请求添加我为好友
     """
     MSG_TYPE = MessageTypes.REQUEST_ADD_ME_FRIEND
-    request_qq: str
+    request_qq: str = ""
 
     def allow(self):
         """
@@ -93,6 +92,7 @@ class RequestAddMeFriend(BaseMsg):
         :return:
         """
 
+
 @dataclass
 class AddFriendResultMsg(BaseMsg):
     """
@@ -103,5 +103,5 @@ class AddFriendResultMsg(BaseMsg):
     """
     MSG_TYPE = MessageTypes.ADD_ME_FRIEND_RESULT
 
-    qq: str
-    name: str
+    qq: str = ""
+    name: str = ""

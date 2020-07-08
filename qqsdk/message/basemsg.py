@@ -1,7 +1,9 @@
 # coding=UTF8
+from dataclasses import dataclass
 
 
-class BaseMsg(object):
+@dataclass
+class BaseMsg:
     """
     self.msg : string, 消息内容（过滤掉了表情和图片的）
     self.originalMsg : list, 原始的消息，没有过滤表情和图片
@@ -11,13 +13,7 @@ class BaseMsg(object):
     time: int = 0  # 发送时的时间戳
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
     paused: bool = False
-    original_msg: list = []  # 这个已经没用了
     MSG_TYPE: str = ""
-
-    def __init__(self):
-
-        self.msg = ""
-        self.time = 0
 
     def reply(self, content: str):
         """

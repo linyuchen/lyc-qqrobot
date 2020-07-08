@@ -8,7 +8,7 @@ log_helper/*.log.*
 .DS_Store
 err.txt
 verifycode.jpg
-webqq/ewm.jpg
+归档/webqq/ewm.jpg
 
 db.sqlite3
 */migrations/*

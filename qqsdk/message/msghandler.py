@@ -1,15 +1,15 @@
 # coding=utf8
 from typing import Tuple
 from qqsdk.message.basemsg import BaseMsg
-from qqsdk.归档.qqclient import QQClient
+from qqsdk.qqclient import QQClientBase
 
 
 class MsgHandler:
 
-    qq_client: QQClient
+    qq_client: QQClientBase
     bind_msg_types: Tuple[BaseMsg] = ()
 
-    def __init__(self, qq_client: QQClient=None):
+    def __init__(self, qq_client: QQClientBase = None):
         self.qq_client = qq_client
 
     def check_type(self, msg: BaseMsg):

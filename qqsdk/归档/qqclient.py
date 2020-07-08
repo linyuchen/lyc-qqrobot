@@ -1,4 +1,5 @@
-# -*- coding=UTF8
+# -*-coding: UTF8-*-
+
 
 import threading
 import time
