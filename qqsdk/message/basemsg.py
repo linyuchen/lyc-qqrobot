@@ -22,7 +22,6 @@ class BaseMsg(object):
     def reply(self, content: str):
         """
         :param content:恢复内容
-        :param fontStyle: 已弃用
         :return:
         """
 
