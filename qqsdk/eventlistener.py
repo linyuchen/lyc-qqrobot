@@ -1,5 +1,6 @@
 # coding=UTF8
 
+import traceback
 import threading
 import time
 from typing import List
@@ -38,5 +39,9 @@ class EventListener(Thread):
                     break
                 handler: MsgHandler
                 if handler.check_type(msg):
-                    handler.handle(msg)
+                    try:
+                        handler.handle(msg)
+                    except:
+                        traceback.print_exc()
+
             time.sleep(self.interval)

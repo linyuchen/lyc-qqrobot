@@ -26,8 +26,8 @@ class GroupAction(object):
         last_record = SignRecord.objects.filter(user=self.group_user).\
             exclude(time__year=today.year, time__month=today.month, time__day=today.day).last()
         last_record_time = u"无"
-        if last_record:
-            last_record_time = timezone.make_naive(last_record.time).strftime("%Y-%m-%d")
+        if last_record and last_record.time:
+            last_record_time = last_record.time.strftime("%Y-%m-%d")
 
         info = u"上次签到时间: %s" % last_record_time
         info += u"\n连续签到%d次\n一共签到%d次" % (self.group_user.sign_continuous, self.group_user.total_sign)
@@ -40,8 +40,7 @@ class GroupAction(object):
         :param group_qq:
         :return:
         """
-        # today = timezone.now()
-        today = datetime.datetime.now()
+        today = timezone.now()
         exist = SignRecord.objects.filter(time__year=today.year, time__month=today.month, time__day=today.day,
                                           user=self.group_user).first()
         result = ""
@@ -51,7 +50,7 @@ class GroupAction(object):
             reward_point = self.group_setting.sign_add_percentage * self.group_user.get_point() * \
                            self.group_user.sign_continuous
             last_record = SignRecord.objects.filter(user=self.group_user).last()
-            if last_record:
+            if last_record and last_record.time:
                 if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
 
@@ -122,7 +121,7 @@ class GroupAction(object):
         """
         users = GroupUser.objects.filter(group_qq=self.group_qq)
         users = list(users)
-        users = sorted(users, key=lambda a: a.get_point())
+        users = sorted(users, key=lambda a: -a.get_point())
         return users
 
     def __get_point_rank_index(self):
