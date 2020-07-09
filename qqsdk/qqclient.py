@@ -23,14 +23,14 @@ class QQClientBase(EventListener):
         plugins_path = os.path.join(plugins_path, "msgplugins")
         # sys.path.append(plugins_path)
         # b = importlib.import_module(os.path.join(plugins_path, "baike"))
-        b = importlib.import_module(".baike", "msgplugins")
-        b = importlib.import_module(".superplugins", "msgplugins")
-        for v in dir(b):
-            if v == "MsgHandler":
-                continue
-            class_ = getattr(b, v)
-            if type(class_) == type(type) and issubclass(class_, MsgHandler):
-                handlers_class.append(class_(self))
+        for m_name in ["baike", "superplugins"]:
+            b = importlib.import_module(f".{m_name}", "msgplugins")
+            for v in dir(b):
+                if v == "MsgHandler":
+                    continue
+                class_ = getattr(b, v)
+                if type(class_) == type(type) and issubclass(class_, MsgHandler):
+                    handlers_class.append(class_(self))
 
         return handlers_class
 
