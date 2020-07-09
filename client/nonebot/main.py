@@ -1,11 +1,15 @@
 # coding=UTF8
 
+import sys
 import math
 import time
 import os
 import nonebot
 import asyncio
 from typing import List
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+
 from qqsdk import entity
 from client.nonebot import config
 from qqsdk.qqclient import QQClientBase
