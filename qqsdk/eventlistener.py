@@ -2,26 +2,21 @@
 
 import threading
 import time
-from dataclasses import dataclass
 from typing import List
 from qqsdk.message.msghandler import MsgHandler
 from queue import Queue
-from qqsdk.message.friendmsg import FriendMsg, BaseMsg
-from qqsdk.message.groupmsg import GroupMsg
-from qqsdk.qqclient import QQClientBase
+from qqsdk.message.friendmsg import BaseMsg
 
 Thread = threading.Thread
 
 
 class EventListener(Thread):
-    MESSAGE_CLASSES = (FriendMsg, GroupMsg)
     interval = 0.5
-    msgs = Queue()
     running = True
+    msg_handlers: List[MsgHandler]
 
-    def __init__(self, qq_client: QQClientBase, msg_handlers: List[MsgHandler]):
-        self.qq_client = qq_client
-        self.msg_handlers = msg_handlers
+    def __init__(self):
+        self.msgs = Queue()
         super(EventListener, self).__init__()
 
     def add_msg(self, msg: BaseMsg):
@@ -34,11 +29,11 @@ class EventListener(Thread):
         self.running = True
     
     def run(self):
-        while True:
+        while self.running:
             msg: BaseMsg = self.msgs.get()
-            while msg.paused:
-                pass
             for handler in self.msg_handlers:
+                while msg.paused:
+                    pass
                 if msg.is_over:
                     break
                 handler: MsgHandler

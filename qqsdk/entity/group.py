@@ -44,8 +44,12 @@ class Group(object):
     level: int =0 # 群等级
     description: str = "" # 群简介
     notice: str = ""  # 当前显示的群公告
-    markName: str  = ""  # 群备注
+    markName: str = ""  # 群备注
     # 以下字段已弃用
     uin: str = ""
     code: str = ""
 
+    def get_member(self, qq: str):
+        for member in self.members:
+            if member.qq == qq:
+                return member

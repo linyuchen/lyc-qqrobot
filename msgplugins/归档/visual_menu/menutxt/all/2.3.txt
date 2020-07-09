@@ -1,0 +1,1 @@
+发送“短网址+空格+网址”生成或还原新浪短网址 (网址必须以http://开头)，如：短网址 http://www.neverlike.net 或者 短网址 http://t.cn/8FfOc2S

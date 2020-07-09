@@ -1,30 +1,35 @@
 # coding=UTF8
 
+import asyncio
 from qqsdk.eventlistener import EventListener
 from client.nonebot.main import QQClient
 from qqsdk.message.msghandler import MsgHandler, BaseMsg
 from qqsdk.message.friendmsg import FriendMsg
+from qqsdk.message.groupmsg import GroupMsg
 from nonebot import on_natural_language, NLPSession
+from aiocqhttp import Event
 
 
-class MsgHandlerTest(MsgHandler):
-    bind_msg_types = (FriendMsg,)
-
-    def handle(self, msg: BaseMsg):
-        print("ok", msg.msg)
+# 全局唯一
+qq_client = QQClient()
+qq_client.start()
 
 
-event_listener = EventListener(qq_client=QQClient(), msg_handlers=[MsgHandlerTest()])
-event_listener.start()
-
-
-@on_natural_language
-async def test(session: NLPSession):
-    print(session.msg_text)
-    sub_type = session.event.sub_type
-    msg = session.msg_text
+@qq_client.bot.on_message
+async def msg_handle(event: Event):
+    sub_type = event.sub_type
+    msg = event.raw_message
+    loop = asyncio.get_event_loop()
     if sub_type == "friend":
-        event_listener.add_msg(FriendMsg(friend=None, msg=msg))
+        friend = qq_client.get_friend(str(event.user_id))
+        msg = FriendMsg(friend=friend, msg=msg)
+        msg.reply = lambda text: asyncio.run_coroutine_threadsafe(qq_client.send_msg(friend.qq, text), loop)
+        qq_client.add_msg(msg)
 
+    elif sub_type == "normal" or sub_type == "anonymous":
+        group = qq_client.get_group(str(event.group_id))
+        msg = GroupMsg(group=group, msg=msg, group_member=group.get_member(str(event.user_id)))
+        msg.reply = lambda text: asyncio.run_coroutine_threadsafe(qq_client.send_msg(group.qq, text, is_group=True),
+                                                                  loop)
 
-
+        qq_client.add_msg(msg)

@@ -3,16 +3,12 @@
 qqsdkplugins/sqlite_sserver/*.db
 log_helper/*.log
 log_helper/*.log.*
-
 .idea/
 .DS_Store
-err.txt
-verifycode.jpg
-归档/webqq/ewm.jpg
-
 db.sqlite3
 */migrations/*
 !*/migrations/__init__.py
 group_manager.db
 rpgdata.db
 venv/
+CoolQAir/

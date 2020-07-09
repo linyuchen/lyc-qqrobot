@@ -19,7 +19,7 @@ class Main(QQClient):  #  得继承QQClient
         super(Main, self).__init__(port, host)
         self.startTime = time.time()
 
-        self.pluginsPath = cur_path + "/../qqsdkplugins"
+        self.pluginsPath = cur_path + "/../msgplugins"
         self.pluginListPath = self.pluginsPath + "/PluginList.txt"
         sys.path.append(self.pluginsPath)
 

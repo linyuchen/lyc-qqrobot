@@ -17,9 +17,10 @@ class BaseMsg:
 
     def reply(self, content: str):
         """
-        :param content:恢复内容
+        :param content:回复内容
         :return:
         """
+        raise NotImplementedError
 
     def pause(self):
         """

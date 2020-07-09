@@ -1,0 +1,116 @@
+# “#”为注释，在行首才有效
+# 要启用的插件需在这里填写好插件文件名（不包含后缀）
+# 一行一个，注意先后顺序
+# 每次修改此文件建议用reinstallplugin来刷新，不需要重新启动程序
+#
+#重装插件
+reinstallplugin
+
+#邮箱输入验证码
+#emailverify
+
+#日志记录
+#logevent
+
+#登录模块
+# login
+
+# 离线消息过滤
+#offline_msg
+
+# example
+
+#cmd_switch
+
+#可视化菜单
+visual_menu
+
+#消息过滤器
+#msgfilter
+
+# 群插件
+#group_manager
+#group_note
+
+#天气查询
+weather
+
+#历史今天
+# historytoday
+
+#快递查询
+express
+
+#身份证号码查询
+ID
+
+#邮编查询
+zipcode
+
+#当前时间查询（包含农历）
+lunar
+
+# 百度工具
+baike
+
+#zhidao
+
+#lyrics
+
+translator
+
+# 中关村数码
+#digital
+
+#phone_number
+
+#phone_imei
+
+#software_download
+
+short_url
+
+joke
+
+braintwister
+
+riddle
+
+dream_az
+
+# 姓名工具
+#nametools
+
+running_time
+
+feedback
+
+#idioms_solitaire
+
+gamble
+
+rob
+
+lottery
+
+num_length
+
+game21
+
+game24
+
+bull_fight
+
+#RPG
+
+#admin_plugin
+
+#menucmd
+
+#simsimi
+
+errorevent
+
+#happybirthday
+
+superplugins

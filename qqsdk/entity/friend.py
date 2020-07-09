@@ -16,20 +16,17 @@ class Friend(object):
         self.clientType: int,客户端类型
         self.gender: string, 性别
     """
-    uin: str  # 已弃用
     qq: str
     nick: str
-    markName: str
-    ip: int  # 已弃用
-    status: any  # 登录状态，类型未知
-    groupId: int  # 所在分组id
-    groupName: str  # 所在分组名
-    clinetType: int  # 客户端类型，有哪些值暂时未知
-    gender: int  # 性别
+    mark_name: str
+    status: any = None  # 登录状态，类型未知
+    group_id: int = 0  # 所在分组id
+    group_name: str = ""  # 所在分组名
+    gender: int = 0  # 性别
 
     def get_name(self):
         """
         有备注则返回备注，无则返回昵称
         """
 
-        return self.markName or self.nick
+        return self.mar_name or self.nick
