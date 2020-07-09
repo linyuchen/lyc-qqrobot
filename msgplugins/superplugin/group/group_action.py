@@ -122,7 +122,7 @@ class GroupAction(object):
         """
         users = GroupUser.objects.filter(group_qq=self.group_qq)
         users = list(users)
-        users = sorted(users, key=lambda a: a.get_point())
+        users = sorted(users, key=lambda a: -a.get_point())
         return users
 
     def __get_point_rank_index(self):
