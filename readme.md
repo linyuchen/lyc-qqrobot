@@ -51,3 +51,6 @@
 # api文档
 
 制作中...
+
+# 备份
+只需要备份`msgplugins/superplugin/db.sqlite3`
