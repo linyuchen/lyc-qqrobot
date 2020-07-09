@@ -41,7 +41,7 @@ class EventListener(Thread):
                 if handler.check_type(msg):
                     try:
                         handler.handle(msg)
-                    except:
+                    except Exception:
                         traceback.print_exc()
 
             time.sleep(self.interval)

@@ -54,7 +54,8 @@ class Baike:
         else:
             content = self.get_para(html)
         result = html_helper.html2txt(content)
-        return title + "\n\n" + result + "\n\n原文：%s\n以上数据来源于百度百科" % url
+        return result
+        # return title + "\n\n" + result + "\n\n原文：%s\n以上数据来源于百度百科" % url
 
 
 if __name__ == "__main__":
