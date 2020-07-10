@@ -282,14 +282,14 @@ if "__main__" == __name__:
 #    无牛
     poker_list = [(u"红心", "7"), (u"红心", "3"), (u"红心", "2"), (u"红心", "6"), (u"黑桃", "3")]
     result_dic = test.get_poker_type(poker_list)
-    print result_dic
-    print result_dic["max_poker"][0]
+    print(result_dic)
+    print(result_dic["max_poker"][0])
 #    print test.compare_color(u"红心",u"黑桃")
     poker_list1 = [test.get_random_poker() for i in range(5)]
     poker_list1 = [(u"黑桃", "J"), (u"梅花", "A"), (u"方块", "7"), (u"梅花", "8"), (u"红心", "9")]
-    print ",".join([poker[0]+poker[1] for poker in poker_list1])
+    print(",".join([poker[0]+poker[1] for poker in poker_list1]))
     poker_list2 = [test.get_random_poker() for i in range(5)]
     poker_list2 = [(u"梅花", "7"), (u"梅花", "10"), (u"黑桃", "6"), (u"黑桃", "3"), (u"方块", "A")]
-    print ",".join([poker[0]+poker[1] for poker in poker_list2])
-    print test.compare_poker_list(poker_list1, poker_list2)
+    print(",".join([poker[0]+poker[1] for poker in poker_list2]))
+    print(test.compare_poker_list(poker_list1, poker_list2))
 #    print test.compare_poker((u"黑桃","2"),(u"红心","2"))
