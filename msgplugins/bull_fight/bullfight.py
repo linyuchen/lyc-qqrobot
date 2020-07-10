@@ -2,7 +2,7 @@
 
 import time
 import threading
-import bullfight_base
+from msgplugins.bull_fight import bullfight_base
 
 
 class BullFight(bullfight_base.BullFightBase):
@@ -270,7 +270,7 @@ class BullFight(bullfight_base.BullFightBase):
         while self.running:
             self.current_second += 1
             if self.current_second > self.limit_second:
-                self.qq_client.putFunc(self.over_game)
+                self.over_game()
                 break
             time.sleep(1)
 
@@ -292,7 +292,7 @@ if "__main__" == __name__:
     old_time = time.time()
 
     def send_func(text):
-        print text
+        print(text)
 
 
     print(test.start_game("123", "123", send_func, "1"))
