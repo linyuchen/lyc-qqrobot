@@ -26,7 +26,7 @@ class QQClient(QQClientBase):
 
     async def send_msg(self, qq: str, content: str, is_group=False):
 
-        max_length = 150
+        max_length = 1500
         num = math.ceil(len(content) / float(max_length))
         for i in range(int(num)):
             msg = content[i * max_length: (i + 1) * max_length]
