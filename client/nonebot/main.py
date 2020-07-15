@@ -7,6 +7,8 @@ import os
 import nonebot
 import asyncio
 from typing import List
+from nonebot.message import MessageSegment
+from nonebot.typing import Message_T
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
@@ -24,14 +26,16 @@ class QQClient(QQClientBase):
         self.loop.run_until_complete(self.get_friends())
         self.loop.run_until_complete(self.get_groups())
 
-    async def send_msg(self, qq: str, content: str, is_group=False):
+    async def send_msg(self, qq: str, content: Message_T, is_group=False):
 
         max_length = 1500
         num = math.ceil(len(content) / float(max_length))
         for i in range(int(num)):
             msg = content[i * max_length: (i + 1) * max_length]
             if is_group:
-                await self.bot.send_group_msg(group_id=qq, message=msg)
+                await self.bot.send_group_msg(group_id=qq, message=MessageSegment.image('file://G:\\randomimg\\QQ图片20190718000007.jpg'))
+                # await self.bot.send_group_msg(group_id=qq, message=content)
+                # await self.bot.send_group_msg(group_id=qq, message=MessageSegment.text(content))
             else:
                 await self.bot.send_private_msg(user_id=qq, message=msg)
             time.sleep(0.3)
