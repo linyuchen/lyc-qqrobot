@@ -48,11 +48,11 @@ class VisualMenu(object):
         _fileList = os.listdir(path)
         file_list[:] = [f for f in _fileList if f.endswith(self.ext)][:]
         for fileName in file_list:
-            cmd_name = fileName[:- len(self.ext)].decode(self.encoding)
+            cmd_name = fileName[:- len(self.ext)]
             self.cmdNameList.append(cmd_name)
-            with open(path + fileName) as f:
-                data = f.read().decode("u8")
-                data = self.replace_value(data)
+            with open(path + fileName, "rb") as f:
+                data = f.read()
+                data = self.replace_value(data.decode("utf8"))
                 menu[cmd_name] = data
                 f.close()
 
@@ -61,5 +61,3 @@ if __name__ == "__main__":
 
     test = VisualMenu()
     name = test.allMenu.keys()[0]
-    print test.allMenu[u"1.2"]
-    print test.cmdNameList

@@ -33,8 +33,8 @@ class QQClient(QQClientBase):
         for i in range(int(num)):
             msg = content[i * max_length: (i + 1) * max_length]
             if is_group:
-                await self.bot.send_group_msg(group_id=qq, message=MessageSegment.image('file://G:\\randomimg\\QQ图片20190718000007.jpg'))
-                # await self.bot.send_group_msg(group_id=qq, message=content)
+                # await self.bot.send_group_msg(group_id=qq, message=MessageSegment.image('file://G:\\randomimg\\QQ图片20190718000007.jpg'))
+                await self.bot.send_group_msg(group_id=qq, message=content)
                 # await self.bot.send_group_msg(group_id=qq, message=MessageSegment.text(content))
             else:
                 await self.bot.send_private_msg(user_id=qq, message=msg)

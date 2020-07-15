@@ -30,7 +30,7 @@ class Baike:
 
             url = "http://baike.baidu.com/search/word?word=%s&pic=2&sug=1&enc=gbk" % html_helper.quote(
                 word.encode("gbk"))
-            html = requests.get(url, encoding="u8").text
+            html = requests.get(url).text
             error = "抱歉，没有找到与“%s”相关的百科结果。" % word
             url = "http://baike.baidu.com"
             # 新的链接提取方式
