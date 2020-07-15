@@ -6,6 +6,6 @@ from nonebot.message import MessageSegment
 
 @on_command("冲", aliases=["冲冲冲"], only_to_me=False, shell_like=True)
 async def random_img(session: CommandSession):
-    IMG_ROOT_PATH = "d:\\randomimg"
+    IMG_ROOT_PATH = "F:\\randomimg"
     file_name = random.choice(os.listdir(IMG_ROOT_PATH))
     await session.send(MessageSegment.image("file://" + os.path.join(IMG_ROOT_PATH, file_name)))
