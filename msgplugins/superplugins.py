@@ -58,6 +58,8 @@ class GroupMsgEvent(MsgHandler):
 
 class AdminMsgEvent(MsgHandler):
 
+    bind_msg_types = (FriendMsg, )
+
     def __init__(self, qq_client):
         super(AdminMsgEvent, self).__init__(qq_client)
         self.cmds = [CMD(u"查活跃度", handle_func=AdminAction.get_point, param_len=1),
