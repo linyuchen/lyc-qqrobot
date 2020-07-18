@@ -7,7 +7,7 @@ from nonebot.message import MessageSegment
 
 @on_command("冲", aliases=["冲冲冲", "来点涩图"], only_to_me=False, shell_like=True)
 async def random_img(session: CommandSession):
-    IMG_ROOT_PATH = "f:\\randomimg"
+    IMG_ROOT_PATH = "F:\\randomimg"
     file_name = random.choice(os.listdir(IMG_ROOT_PATH))
     await session.send(MessageSegment.image("file://" + os.path.join(IMG_ROOT_PATH, file_name)))
     res = requests.get("https://api.lolicon.app/setu/?apikey=733165695f1284f958d480").json()
