@@ -14,7 +14,7 @@ async def setu(session: CommandSession):
         img_info = res["data"][0]
         pid = img_info["pid"]
         url = img_info["url"]
-        file_path = "f:\\p\\" + os.path.basename(url)
+        file_path = "F:\\randomimg\\" + os.path.basename(url)
         if not os.path.exists(file_path):
             open(file_path, "wb").write(requests.get(url).content)
     # print(res)
