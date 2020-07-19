@@ -10,14 +10,14 @@ async def random_img(session: CommandSession):
     IMG_ROOT_PATH = "F:\\randomimg"
     file_name = random.choice(os.listdir(IMG_ROOT_PATH))
     await session.send(MessageSegment.image("file://" + os.path.join(IMG_ROOT_PATH, file_name)))
-    try:
-        res = requests.get("https://api.lolicon.app/setu/?apikey=733165695f1284f958d480").json()
-        if res["code"] == 0:
-            img_info = res["data"][0]
-            pid = img_info["pid"]
-            url = img_info["url"]
-            file_path = os.path.join(IMG_ROOT_PATH, os.path.basename(url))
-            if not os.path.exists(file_path):
-                open(file_path, "wb").write(requests.get(url).content)
-            await session.send(MessageSegment.image("file://" + file_path))
-    except:pass
+    # try:
+    #     res = requests.get("https://api.lolicon.app/setu/?apikey=733165695f1284f958d480").json()
+    #     if res["code"] == 0:
+    #         img_info = res["data"][0]
+    #         pid = img_info["pid"]
+    #         url = img_info["url"]
+    #         file_path = os.path.join(IMG_ROOT_PATH, os.path.basename(url))
+    #         if not os.path.exists(file_path):
+    #             open(file_path, "wb").write(requests.get(url).content)
+    #         await session.send(MessageSegment.image("file://" + file_path))
+    # except:pass
