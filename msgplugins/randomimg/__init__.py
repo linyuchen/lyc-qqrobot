@@ -2,6 +2,7 @@ from nonebot.message import MessageSegment
 from qqsdk.message import MsgHandler, GroupMsg
 from .randomimg import random_img
 from ..cmdaz import CMD
+from ..superplugins import GroupPointAction
 
 
 class RandomImg(MsgHandler):
@@ -9,12 +10,15 @@ class RandomImg(MsgHandler):
 
     def __init__(self, qq_client):
         super(RandomImg, self).__init__(qq_client)
+        self.once_point = 20  # 调用一次所需活跃度
+        self.group_point_action = GroupPointAction()
 
     def handle(self, msg: GroupMsg):
-        print(msg)
-        if CMD("冲").az(msg.msg):
-            img_path = random_img()
-            print(img_path)
-            reply_msg = MessageSegment.image("file://" + img_path)
-            print(self.qq_client)
-            msg.reply(reply_msg)
+        if self.group_point_action.get_point(msg.group.qq, msg.group_member.qq) < self.once_point:
+            return msg.reply(f"【{msg.group_member.get_name()}】的活跃度不足{self.once_point}")
+        for cmd_name in ["冲", "冲冲冲", "来点色图", "来点涩图"]:
+            if CMD(cmd_name).az(msg.msg):
+                img_path = random_img()
+                reply_msg = MessageSegment.image("file://" + img_path)
+                msg.reply(reply_msg)
+                self.group_point_action.add_point(msg.group.qq, msg.group_member.qq, -self.once_point)

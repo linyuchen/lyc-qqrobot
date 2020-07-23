@@ -23,7 +23,7 @@ class QQClientBase(EventListener):
         plugins_path = os.path.join(plugins_path, "msgplugins")
         # sys.path.append(plugins_path)
         # b = importlib.import_module(os.path.join(plugins_path, "baike"))
-        for m_name in ["baike", "superplugins", "bull_fight", "visual_menu", "running_time"]:
+        for m_name in ["baike", "superplugins", "bull_fight", "visual_menu", "running_time", "randomimg"]:
             b = importlib.import_module(f".{m_name}", "msgplugins")
             for v in dir(b):
                 if v == "MsgHandler":

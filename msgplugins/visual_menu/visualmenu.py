@@ -23,6 +23,11 @@ class VisualMenu(object):
         self.allPath = self.curPath + "all/"
         self.groupPath = self.curPath + "group/"
         self.adminPath = self.curPath + "admin/"
+        if not os.path.exists(self.allPath):
+            os.mkdir(self.allPath)
+        if not os.path.exists(self.adminPath):
+            os.mkdir(self.adminPath)
+
         self.allFileList = []
         self.groupFileList = []
         self.adminFileList = []

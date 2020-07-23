@@ -12,7 +12,7 @@ Thread = threading.Thread
 
 
 class EventListener(Thread):
-    interval = 0.5
+    interval = 0.1
     running = True
     msg_handlers: List[MsgHandler]
 

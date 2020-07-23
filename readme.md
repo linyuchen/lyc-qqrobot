@@ -49,8 +49,15 @@
 
 
 # api文档
+继承`qqsdk\qqclient`，复写`get_friends`、`get_groups`, `send_msg`
 
-制作中...
+当收到消息时，调用`qqclient.add_msg`
+
+# supserplugin插件文档
+
+有活跃度功能，和群管理功能
+
+活跃度相当于群里面游戏的货币（积分）
 
 # 备份
 只需要备份`msgplugins/superplugin/db.sqlite3`
