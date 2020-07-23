@@ -1,26 +1,26 @@
-#coding=UTF8
+# coding=UTF8
+from dataclasses import dataclass
 
-import locale
 
-class BaseMsg(object):
+@dataclass
+class BaseMsg:
     """
     self.msg : string, 消息内容（过滤掉了表情和图片的）
     self.originalMsg : list, 原始的消息，没有过滤表情和图片
     self.time : int, 发送时间
     """
+    msg: str = ""
+    time: int = 0  # 发送时的时间戳
+    is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
+    paused: bool = False
+    MSG_TYPE: str = ""
 
-    def __init__(self):
-
-        self.msg = ""
-        self.originalMsg = []
-        self.time = 0
-        self.isOver = False
-        self.paused = False
-
-    def reply(self, content, fontStyle=None):
+    def reply(self, content: str):
         """
-        回复消息，content Unicode编码
+        :param content:回复内容
+        :return:
         """
+        raise NotImplementedError
 
     def pause(self):
         """
@@ -40,18 +40,5 @@ class BaseMsg(object):
         """
         销毁此消息，不再让其他event处理
         """
-        self.isOver = True
+        self.is_over = True
 
-    # def __str__(self):
-    #
-    #     result = ""
-    #     for i in dir(self):
-    #         if not i.startswith("__"):
-    #             i_value = eval("self.%s"%i)
-    #             if isinstance(i_value,unicode):
-    #                 i_value = i_value.encode(locale.getpreferredencoding())
-    #             else:
-    #                 i_value = str(i_value)
-    #
-    #             result = "%s: %s\n" % (i, i_value)
-    #     return result

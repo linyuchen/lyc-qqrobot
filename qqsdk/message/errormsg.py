@@ -1,9 +1,9 @@
 # -*- encoding:UTF8 -*-
-import basemsg
-BaseMsg = basemsg.BaseMsg
+from dataclasses import dataclass
+from qqsdk.message.basemsg import BaseMsg
 
+
+@dataclass
 class ErrorMsg(BaseMsg):
+    pass
 
-    def __init__(self):
-        super(ErrorMsg, self).__init__()
-        self.summary = ""

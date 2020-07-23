@@ -1,43 +1,56 @@
-# 第三方依赖库
+# 环境
 
-**PyV8**
+## Python版本
 
-**requests**
+采用Python3.7，并配置virtual env，文件夹为**venv**
+
+## 酷Q
+
+下载酷Q，[安装cqhttp插件](https://github.com/richardchien/coolq-http-api)
+
+配置与nonebot对接，修改`data\app\io.github.richardchien.coolqhttpapi\config`下的{qq}.json
+
+```json
+{
+    "$schema": "https://cqhttp.cc/config-schema.json",
+    "host": "0.0.0.0",
+    "port": 57000,
+    "use_http": true,
+    "ws_host": "0.0.0.0",
+    "ws_port": 6700,
+    "use_ws": true,
+    "ws_reverse_url": "ws://127.0.0.1:19081/ws/",
+    "use_ws_reverse": true,
+    "enable_heartbeat": true,
+    "ws_reverse_reconnect_interval": 3000,
+    "ws_reverse_reconnect_on_code_1000": true,
+    "post_url": "",
+    "access_token": "",
+    "secret": "",
+    "post_message_format": "string",
+    "serve_data_files": false,
+    "update_source": "global",
+    "update_channel": "stable",
+    "auto_check_update": false,
+    "auto_perform_update": false,
+    "show_log_console": true,
+    "log_level": "info"
+}
+```
+
+
+## 第三方依赖库
+
+`pip install -r pip-pkgs.txt`
 
 # 程序启动
 
-## 启动主程序
+`start.bat`
 
-命令行下执行
-
-    start_clinet.py qq号 密码 端口号
-
-如：
-    
-    start_clinet.py 1234567 passwd 6666
-
-端口是供插件程序调用QQ API用的，要与插件程序对应
-
-## 启动插件程序
-
-    start_plugin.py 端口号 HOST
-
-HOST省略的话默认为localhost
-
-如:
-
-    start_plugin.py 6666 192.168.1.2
-
-端口号要与主程序的对应
-
-端口号 > 3000 表示主程序是webqq
-
-端口号 < 3000 表示主程序是qqplus
-
-# 插件
-
-所有插件都放在qqsdkplugins里面，插件编写方法参考`qqsdkplugins/example.py`和`qqsdkplugins/example2.py`
 
 # api文档
 
 制作中...
+
+# 备份
+只需要备份`msgplugins/superplugin/db.sqlite3`

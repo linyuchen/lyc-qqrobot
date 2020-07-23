@@ -1,6 +1,8 @@
 # coding=UTF8
+from dataclasses import dataclass
 
 
+@dataclass
 class Friend(object):
     """
         self.uin: int, 好友临时号码
@@ -14,32 +16,17 @@ class Friend(object):
         self.clientType: int,客户端类型
         self.gender: string, 性别
     """
-    def __init__(self):
+    qq: str
+    nick: str
+    mark_name: str
+    status: any = None  # 登录状态，类型未知
+    group_id: int = 0  # 所在分组id
+    group_name: str = ""  # 所在分组名
+    gender: int = 0  # 性别
 
-        self.uin = 0
-        self.nick = ""
-        self.markName = ""
-        self.ip = 0
-        self.status = None
-        self.groupId = 0
-        self.groupName = ""
-        self.clientType = None
-        self.gender = ""
-
-    def __getattr__(self, name):
-
-        if "qq" == name:
-            return self.getQQ(self.uin)
-
-    def getQQ(self, uin):
-        """
-        返回QQ号(int)
-        """
-        return self.qq
-
-    def getName(self):
+    def get_name(self):
         """
         有备注则返回备注，无则返回昵称
         """
 
-        return self.markName or self.nick
+        return self.mar_name or self.nick
