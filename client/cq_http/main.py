@@ -1,11 +1,16 @@
 # -*- coding: UTF8 -*-
+import os
+import sys
 import requests
 from flask import Flask, request, Response, json
+from aiocqhttp.message import MessageSegment
+from typing import List, Union, Sequence
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from qqsdk.qqclient import QQClientBase
 from qqsdk import entity
 from qqsdk.message import FriendMsg, GroupMsg
-from typing import List, Union, Sequence
-from aiocqhttp.message import MessageSegment
+
 
 
 class QQClient(QQClientBase):
