@@ -10,7 +10,7 @@ class RandomImg(MsgHandler):
 
     def __init__(self, qq_client):
         super(RandomImg, self).__init__(qq_client)
-        self.once_point = 20  # 调用一次所需活跃度
+        self.once_point = 50  # 调用一次所需活跃度
         self.group_point_action = GroupPointAction()
 
     def handle(self, msg: GroupMsg):
