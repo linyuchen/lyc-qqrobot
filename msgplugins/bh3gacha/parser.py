@@ -38,14 +38,14 @@ class TextParser:
         raise NotImplementedError
 
 
-class EquipmentProbabilityParser(TextParser):
+class EquipmentParser(TextParser):
 
     def __init__(self, path: str):
         self.current_star = 0
         self.current_type = None
         self.current_probability = 0
         self.equipments = []
-        super(EquipmentProbabilityParser, self).__init__(path)
+        super(EquipmentParser, self).__init__(path)
 
     def parse_category(self, line: str):
         line = line[1: -1]  # 去掉头部!号和尾部%号
@@ -60,5 +60,5 @@ class EquipmentProbabilityParser(TextParser):
         self.equipments.append(_e)
 
 
-p = EquipmentProbabilityParser(PATH_扩充装备概率)
+p = EquipmentParser(PATH_扩充装备概率)
 print(p.equipments)

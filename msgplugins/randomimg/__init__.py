@@ -14,9 +14,9 @@ class RandomImg(MsgHandler):
         self.group_point_action = GroupPointAction()
 
     def handle(self, msg: GroupMsg):
-        if self.group_point_action.get_point(msg.group.qq, msg.group_member.qq) < self.once_point:
-            return msg.reply(f"【{msg.group_member.get_name()}】的活跃度不足{self.once_point}")
         for cmd_name in ["冲", "冲冲冲", "来点色图", "来点涩图"]:
+            if self.group_point_action.get_point(msg.group.qq, msg.group_member.qq) < self.once_point:
+                return msg.reply(f"【{msg.group_member.get_name()}】的活跃度不足{self.once_point}")
             if CMD(cmd_name).az(msg.msg):
                 img_path = random_img()
                 reply_msg = MessageSegment.image("file://" + img_path)
