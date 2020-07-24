@@ -10,9 +10,7 @@ async def random_img(session: CommandSession):
     IMG_ROOT_PATH = "F:\\randomimg"
     if random.random() >= 0.5:
         IMG_ROOT_PATH += "2"
-        print(IMG_ROOT_PATH)
     file_name = random.choice(os.listdir(IMG_ROOT_PATH))
-    print(file_name)
     img_path = os.path.join(IMG_ROOT_PATH, file_name)
     await session.send(MessageSegment.image("file://" + img_path))
     # try:

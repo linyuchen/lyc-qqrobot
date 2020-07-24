@@ -30,6 +30,7 @@ class QQClient(QQClientBase):
         for f in friends:
             friend = entity.Friend(qq=str(f["user_id"]), nick=f["nickname"], mark_name=f["remark"])
             self.qq_user.friends.append(friend)
+        return self.qq_user.friends
 
     def get_groups(self) -> List[entity.Group]:
         groups = requests.get(self.api_url + "/get_group_list").json().get("data", [])
@@ -41,6 +42,7 @@ class QQClient(QQClientBase):
                                                   card=member_data["card"])
                 group.members.append(group_member)
             self.qq_user.groups.append(group)
+        return self.qq_user.groups
 
 
 qq_client = QQClient()
@@ -58,11 +60,12 @@ def get_msg():
         friend = qq_client.get_friend(str(data["sender"]["user_id"]))
         msg = FriendMsg(friend=friend, msg=msg)
         msg.reply = lambda _msg: qq_client.send_msg(friend.qq, _msg)
+        qq_client.add_msg(msg)
     elif message_type == "group":
         group = qq_client.get_group(str(data.get("group_id")))
         msg = GroupMsg(group=group, msg=msg, group_member=group.get_member(str(data["sender"]["user_id"])))
         msg.reply = lambda _msg: qq_client.send_msg(group.qq, _msg, is_group=True)
-    qq_client.add_msg(msg)
+        qq_client.add_msg(msg)
     return {}
 
 

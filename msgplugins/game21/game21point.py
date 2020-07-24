@@ -3,7 +3,7 @@
 import random
 import threading
 import time
-import game21pointbase
+from .import game21pointbase
 
 
 class Game(game21pointbase.Game):
@@ -12,10 +12,9 @@ class Game(game21pointbase.Game):
     每个人拿3张牌，参与游戏时只显示2张牌，当游戏结束时显示全部牌，并计算点数（J, Q, k都作为 10点，A作为1点），点数为所有牌之和，点数少于22点时，最大点数者胜利；点数大于21点时，最小者胜利;相同点数庄家为大 
     """
 
-    def __init__(self, qq_client):
+    def __init__(self):
 
         super(Game, self).__init__()
-        self.qq_client = qq_client
         self.qq_group_plugin = None
         self.add_handle_func = None
         self.flower_color_list = [u"黑桃", u"红心", u"梅花", u"方块"]
@@ -243,7 +242,7 @@ class Game(game21pointbase.Game):
         while True:
             self.current_second += 1
             if self.current_second > self.limit_second:
-                self.qq_client.putFunc(self.over_game)
+                self.over_game()
                 break
             time.sleep(1)
 

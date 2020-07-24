@@ -30,13 +30,8 @@ class MyEvent(MsgHandler):
 
     def get_game_instance(self, group_qq):
 
-        if group_qq in self.groupInstances:
-            group_plugin = self.groupInstances[group_qq]
-        else:
-            group_plugin = BullGame(group_qq, self.qq_client)
-            self.groupInstances[group_qq] = group_plugin
-
-        return group_plugin
+        group_plugin = BullGame(group_qq, self.qq_client)
+        return self.groupInstances.setdefault(group_qq, group_plugin)
 
     def handle(self, msg: GroupMsg):
         """

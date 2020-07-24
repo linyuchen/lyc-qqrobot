@@ -1,7 +1,7 @@
 import os
 import random
 
-IMG_ROOT_PATH = "d:\\randomimg2"
+IMG_ROOT_PATH = "f:\\randomimg2"
 
 
 def random_img():
