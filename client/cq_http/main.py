@@ -68,7 +68,12 @@ def get_msg():
         qq_client.add_msg(msg)
     elif message_type == "group":
         group = qq_client.get_group(str(data.get("group_id")))
-        msg = GroupMsg(group=group, msg=msg, group_member=group.get_member(str(data["sender"]["user_id"])))
+        group_member = group.get_member(str(data["sender"]["user_id"]))
+        if not group or not group_member:
+            qq_client.get_groups()
+            group = qq_client.get_group(str(data.get("group_id")))
+            group_member = group.get_member(str(data["sender"]["user_id"]))
+        msg = GroupMsg(group=group, msg=msg, group_member=group_member)
         msg.reply = lambda _msg: qq_client.send_msg(group.qq, _msg, is_group=True)
         qq_client.add_msg(msg)
     return {}

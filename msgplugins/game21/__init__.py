@@ -12,6 +12,7 @@ class Game(GroupPointAction, Game21):
     def __init__(self):
         GroupPointAction.__init__(self)
         Game21.__init__(self)
+        self.currency = "活跃度"
 
 
 # 新建个事件类，继承于MsgEvent

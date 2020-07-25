@@ -26,7 +26,7 @@ class Game(game21pointbase.Game):
 
         self.send_func = None
         self.currency = ""  # 复写
-        self.robot_name = u""  # 复写
+        self.robot_name = ""  # 复写
         self.game_start = False
         self.limit_second = 15
         self.max_player_num = 9
