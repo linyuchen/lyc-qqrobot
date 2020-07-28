@@ -102,6 +102,7 @@ class Game(game21pointbase.Game):
         poker_list = self.get_random_poker_list()
         self.rest_poker_list += self.player_dic[qq_number]["poker_list"]
         self.player_dic[qq_number]["poker_list"] = poker_list
+        self.reset_timer()
 
         return u"【%s】花费了下注金额的1/%d（%d）换成了新的牌：%s" % \
                (nick, self.chg_poker_list_pcg, gold, self.get_poker_list_final_str(poker_list))
