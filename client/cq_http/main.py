@@ -38,6 +38,7 @@ class QQClient(QQClientBase):
         return self.qq_user.friends
 
     def get_groups(self) -> List[entity.Group]:
+        self.qq_user.groups = []
         groups = requests.get(self.api_url + "/get_group_list").json().get("data", [])
         for g in groups:
             group = entity.Group(qq=str(g["group_id"]), name=g["group_name"], members=[])
@@ -58,7 +59,7 @@ app = Flask(__name__)
 def get_msg():
     data = request.get_data()
     data = json.loads(data)
-    print(data)
+    # print(data)
     message_type = data.get("message_type")
     msg = data.get("message")
     if message_type == "private":
@@ -69,7 +70,7 @@ def get_msg():
     elif message_type == "group":
         group = qq_client.get_group(str(data.get("group_id")))
         group_member = group.get_member(str(data["sender"]["user_id"]))
-        if not group or not group_member:
+        if not group_member or not group:
             qq_client.get_groups()
             group = qq_client.get_group(str(data.get("group_id")))
             group_member = group.get_member(str(data["sender"]["user_id"]))
