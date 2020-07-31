@@ -12,7 +12,6 @@ from qqsdk import entity
 from qqsdk.message import FriendMsg, GroupMsg
 
 
-
 class QQClient(QQClientBase):
     api_url = "http://localhost:5700"
 

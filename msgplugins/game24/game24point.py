@@ -45,8 +45,12 @@ class Game(game24point_base.Game24PointBase):
         super(Game, self).start_game()
         return "当前题目：%s\n游戏时间为%d秒\n" % (u",".join([str(i) for i in self.now_num_list]), self.second_limit)
 
-    def judge(self, group_qq, member_qq, member_name, arithmetic_string):
+    def judge(self, group_qq: str, member_qq: str, member_name: str, arithmetic_string: str):
 
+        arithmetic_string = arithmetic_string.lower()
+        arithmetic_string = arithmetic_string.replace(" ", "").replace("（", "(").replace("x", "*").replace("）", ")")
+        arithmetic_string = arithmetic_string.replace("—", "-")
+        now_num_list = self.now_num_list[:]
         if not self.now_num_list:
             return "24点游戏还未开始,请先发起"
 
@@ -56,27 +60,26 @@ class Game(game24point_base.Game24PointBase):
         retcode = super(Game, self).judge(arithmetic_string,self.now_num_list)
 
         cur_point = self.get_point(str(group_qq), __sender_info_dic["qq_number"])
-        if cur_point < 0:
-            return "啊哦~ 【%s】的%s已经用光光了，没办法参加游戏╮(╯﹏╰）╭" % (__sender_info_dic["nick"], self.currency)
+        # if cur_point < 0:
+        #     return "啊哦~ 【%s】的%s已经用光光了，没办法参加游戏╮(╯﹏╰）╭" % (__sender_info_dic["nick"], self.currency)
         percentage = self.win_percentage
         win_point = int(percentage * cur_point)
         if win_point < 100:
             win_point = 100
 
-        failed_note = "扣掉%d %s" % (win_point, self.currency)
+        failed_note = ""
 
         if -1 == retcode:
 
-            result = "【%s】的答案错误，%s，你这家伙没看题目吗？好好看清楚题目再来回答吧\n" % \
-                     (__sender_info_dic["nick"], failed_note)
+            result = "【%s】的答案错误，你这家伙没看题目吗？好好看清楚题目再来回答吧\n" % __sender_info_dic["nick"]
 
         elif 1 == retcode:
 
-            result = "【%s】的答案不正确哦，%s， 重新再算一次吧\n" % (__sender_info_dic["nick"], failed_note)
+            result = "【%s】的答案不正确哦，重新再算一次吧\n" % __sender_info_dic["nick"]
 
         elif 2 == retcode:
 
-            result = "【%s】的命令有误，%s，去看看规则再来回答吧\n" % (__sender_info_dic["nick"], failed_note)
+            result = "【%s】的命令有误，去看看规则再来回答吧\n" % __sender_info_dic["nick"]
 
         if retcode == 0:
             
@@ -84,10 +87,9 @@ class Game(game24point_base.Game24PointBase):
             self.over_game()
             result = "bingo！恭喜【%s】答对本题，奖励%s %s" % \
                      (__sender_info_dic["nick"], win_point, self.currency)
+            self.add_point(str(group_qq), __sender_info_dic["qq_number"], win_point)
         else:
-            win_point = - win_point
-
-        self.add_point(str(group_qq), __sender_info_dic["qq_number"], win_point)
+            self.now_num_list = now_num_list[:]
 
         return result
 
