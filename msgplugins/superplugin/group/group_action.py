@@ -61,8 +61,8 @@ class GroupAction(object):
             if reward_point < self.group_setting.sign_least_point:
                 reward_point = self.group_setting.sign_least_point
             SignRecord(user=self.group_user, add_point=str(reward_point), time=timezone.now()).save()
-            if self.group_user.point < 0:
-                reward_point += -self.group_user.point
+            if int(self.group_user.point) < 0:
+                reward_point += -int(self.group_user.point)
             self.group_user.total_sign += 1
             self.group_user.save()
             self.group_user.add_point(reward_point)
