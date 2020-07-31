@@ -49,7 +49,7 @@ class Game(game24point_base.Game24PointBase):
 
         arithmetic_string = arithmetic_string.lower()
         arithmetic_string = arithmetic_string.replace(" ", "").replace("（", "(").replace("x", "*").replace("）", ")")
-        arithmetic_string = arithmetic_string.replace("—", "-")
+        arithmetic_string = arithmetic_string.replace("—", "-").replace("×", "*").replace("÷", "/")
         now_num_list = self.now_num_list[:]
         if not self.now_num_list:
             return "24点游戏还未开始,请先发起"
