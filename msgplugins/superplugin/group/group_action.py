@@ -83,7 +83,7 @@ class GroupAction(object):
 
         if point > self.group_user.get_point():
             return u"对不起，您的余额不够要转的额度！"
-        if other_user.user.qq == str(qq):
+        if other_user.user.qq == self.group_user.user.qq:
             return u"自己转给自己闲得慌吗"
 
         self.group_user.add_point(-point)
