@@ -51,7 +51,6 @@ class GroupAction(object):
             #                self.group_user.sign_continuous
             reward_point = self.group_setting.sign_least_point + 100 * self.group_user.sign_continuous
             last_record = SignRecord.objects.filter(user=self.group_user).last()
-            print(last_record.time)
             if last_record and last_record.time:
                 if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
@@ -84,6 +83,8 @@ class GroupAction(object):
 
         if point > self.group_user.get_point():
             return u"对不起，您的余额不够要转的额度！"
+        if other_user.qq == str(qq):
+            return u"自己转给自己闲得慌吗"
 
         self.group_user.add_point(-point)
         other_user.add_point(point)
