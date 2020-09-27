@@ -1,1 +1,1 @@
-"venv/scripts/activate" && python "client/nonebot/main.py"
+"venv/scripts/activate" && python "client/cq_http/main.py"

@@ -30,8 +30,8 @@ class GroupMsgEvent(MsgHandler):
         group_action.group_user.save()
         cmds = [
             CMD("签到", handle_func=group_action.sign),
-            CMD("我的活跃度", handle_func=group_action.get_point),
-            CMD("活跃度排名", handle_func=group_action.get_point_rank),
+            CMD("我的活跃度", alias=["活跃度查询", "积分", "查询活跃度"], handle_func=group_action.get_point),
+            CMD("活跃度排名", alias=["活跃度排行", "排行", "排名"], handle_func=group_action.get_point_rank),
             CMD("清负活跃度", handle_func=group_action.clear_point),
             CMD("清负次数", handle_func=group_action.get_clear_chance),
             CMD("我的状态", handle_func=user_action.get_point),
@@ -62,14 +62,14 @@ class AdminMsgEvent(MsgHandler):
 
     def __init__(self, qq_client):
         super(AdminMsgEvent, self).__init__(qq_client)
-        self.cmds = [CMD(u"查活跃度", handle_func=AdminAction.get_point, param_len=1),
-                     CMD(u"加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
+        self.cmds = [CMD("查活跃度", handle_func=AdminAction.get_point, param_len=1),
+                     CMD("加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
                          int_param_index=[2]),
-                     CMD(u"设活跃度", handle_func=AdminAction.set_group_point, param_len=3,
+                     CMD("设活跃度", handle_func=AdminAction.set_group_point, param_len=3,
                          int_param_index=[2]),
-                     CMD(u"查清负次数", handle_func=AdminAction.get_clear_chance, param_len=1,
+                     CMD("查清负次数", handle_func=AdminAction.get_clear_chance, param_len=1,
                          int_param_index=[0]),
-                     CMD(u"加清负次数", handle_func=AdminAction.add_clear_chance, param_len=2,
+                     CMD("加清负次数", handle_func=AdminAction.add_clear_chance, param_len=2,
                          int_param_index=[1])
                      ]
 

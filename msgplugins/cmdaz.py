@@ -1,4 +1,5 @@
 # coding=UTF8
+from typing import List
 
 """
 命令解析模块
@@ -7,7 +8,7 @@
 
 class CMD(object):
 
-    def __init__(self, cmd_name, sep=" ", int_param_index=[], param_len=0, handle_func=None):
+    def __init__(self, cmd_name, sep=" ", int_param_index=[], param_len=0, handle_func=None, alias: List[str]=[]):
         """
         paramSep: 命令与参数的分隔符，同时也是多个参数之间的分隔符
             如果为None 或者 False则不分割
@@ -18,6 +19,7 @@ class CMD(object):
         """
 
         self.cmd_name = cmd_name
+        self.alias = alias
         self.param_sep = sep
         self.int_param_index = int_param_index
         self.handle_func = handle_func
@@ -59,11 +61,8 @@ class CMD(object):
                 self.original_param = self.paramList[0]
         else:
             cmd_name = original_cmd
-            
-        if cmd_name != self.cmd_name:
-            return False
 
-        return True
+        return cmd_name in self.alias or cmd_name == self.cmd_name
 
     def handle(self, cmd_content):
         """

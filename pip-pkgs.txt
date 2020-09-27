@@ -1,3 +1,4 @@
+aiocqhttp==1.2.5
 Django==3.0.8
-nonebot==1.6.0
+Flask==1.1.2
 requests==2.24.0

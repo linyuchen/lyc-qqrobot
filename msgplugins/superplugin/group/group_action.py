@@ -25,12 +25,12 @@ class GroupAction(object):
         today = timezone.now()
         last_record = SignRecord.objects.filter(user=self.group_user).\
             exclude(time__year=today.year, time__month=today.month, time__day=today.day).last()
-        last_record_time = u"无"
+        last_record_time = "无"
         if last_record and last_record.time:
             last_record_time = last_record.time.strftime("%Y-%m-%d")
 
-        info = u"上次签到时间: %s" % last_record_time
-        info += u"\n连续签到%d次\n一共签到%d次" % (self.group_user.sign_continuous, self.group_user.total_sign)
+        info = "上次签到时间: %s" % last_record_time
+        info += "\n连续签到%d次\n一共签到%d次" % (self.group_user.sign_continuous, self.group_user.total_sign)
         return info
 
     def sign(self):
@@ -47,20 +47,25 @@ class GroupAction(object):
         if exist:
             result += u"今天【%s】已经签到过了！" % self.group_user.nick
         else:
-            reward_point = self.group_setting.sign_add_percentage * self.group_user.get_point() * \
-                           self.group_user.sign_continuous
+            # reward_point = self.group_setting.sign_add_percentage * self.group_user.get_point() * \
+            #                self.group_user.sign_continuous
+            reward_point = self.group_setting.sign_least_point + 100 * self.group_user.sign_continuous
             last_record = SignRecord.objects.filter(user=self.group_user).last()
             if last_record and last_record.time:
                 if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
+                else:
+                    self.group_user.sign_continuous += 1
 
             if reward_point < self.group_setting.sign_least_point:
                 reward_point = self.group_setting.sign_least_point
-            SignRecord(user=self.group_user, add_point=str(reward_point)).save()
+            SignRecord(user=self.group_user, add_point=str(reward_point), time=timezone.now()).save()
+            if int(self.group_user.point) < 0:
+                reward_point += -int(self.group_user.point)
             self.group_user.total_sign += 1
             self.group_user.save()
             self.group_user.add_point(reward_point)
-            result = u"【%s】签到成功，获得%d %s" % (self.group_user.nick, reward_point, self.group_setting.currency)
+            result = "【%s】签到成功，获得%d %s" % (self.group_user.nick, reward_point, self.group_setting.currency)
 
         result += "\n%s" % self.__get_sign_info()
         return result
@@ -78,6 +83,8 @@ class GroupAction(object):
 
         if point > self.group_user.get_point():
             return u"对不起，您的余额不够要转的额度！"
+        if other_user.user.qq == self.group_user.user.qq:
+            return u"自己转给自己闲得慌吗"
 
         self.group_user.add_point(-point)
         other_user.add_point(point)
