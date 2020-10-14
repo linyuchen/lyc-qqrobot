@@ -4,6 +4,7 @@ from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from msgplugins.cmdaz import CMD
 from nonebot.message import MessageSegment
+from .superplugins import GroupPointAction
 
 
 class GenShinCardMsgHandler(MsgHandler):
@@ -15,6 +16,8 @@ class GenShinCardMsgHandler(MsgHandler):
     def __init__(self, qq_client):
         super(GenShinCardMsgHandler, self).__init__(qq_client)
         self.cmd = CMD("原神十连")
+        self.once_point = 2000  # 调用一次所需活跃度
+        self.group_point_action = GroupPointAction()
 
     def handle(self, msg: BaseMsg):
         """
@@ -23,6 +26,9 @@ class GenShinCardMsgHandler(MsgHandler):
         """
         msg: GroupMsg
         if self.cmd.az(msg.msg):
+            if self.group_point_action.get_point(msg.group.qq, msg.group_member.qq) < self.once_point:
+                return msg.reply(f"【{msg.group_member.get_name()}】的活跃度不足{self.once_point}")
+
             exe_path = "E:\\Documents\\what\\web\\FE\\GenshinCard"
 
             img_file_name = str(uuid4()) + ".jpg"
@@ -32,3 +38,4 @@ class GenShinCardMsgHandler(MsgHandler):
             r_msg = MessageSegment.text(f"【{msg.group_member.get_name()}】的抽奖结果：") + reply_msg
             msg.reply(r_msg)
             msg.destroy()
+            self.group_point_action.add_point(msg.group.qq, msg.group_member.qq, -self.once_point)
