@@ -28,12 +28,15 @@ class QQClient(QQClientBase):
         else:
             post_data["user_id"] = qq
 
-        max_length = 1500
-        num = math.ceil(len(content) / float(max_length))
-        for i in range(int(num)):
-            msg = content[i * max_length: (i + 1) * max_length]
-            post_data["message"] = msg
+        if isinstance(content, str):
+            max_length = 1500
+            num = math.ceil(len(content) / float(max_length))
+            for i in range(int(num)):
+                msg = content[i * max_length: (i + 1) * max_length]
+                post_data["message"] = msg
 
+                requests.post(self.api_url + "/send_msg", post_data)
+        else:
             requests.post(self.api_url + "/send_msg", post_data)
 
     def get_friends(self) -> List[entity.Friend]:
