@@ -39,6 +39,7 @@ class QQClient(QQClientBase):
         else:
             requests.post(self.api_url + "/send_msg", post_data)
 
+
     def get_friends(self) -> List[entity.Friend]:
         friends = requests.get(self.api_url + "/get_friend_list").json().get("data", [])
         for f in friends:
