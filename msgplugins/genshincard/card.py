@@ -80,6 +80,7 @@ def gacha():
         _4_or_5_slots_ints = [5] + [4] * 9
         results[0] = random.choice(_4_or_5_slots_ints)
 
+    tmp_slots = []
     for star_int in results:
         if star_int == 5:
             _slots = star_5_slots
@@ -87,11 +88,17 @@ def gacha():
             _slots = star_4_slots
         else:
             _slots = star_3_slots
-        slot = create_slot(random.choice(_slots))
+        tmp_slots.append(random.choice(_slots))
+    tmp_slots = sorted(tmp_slots, key=sorted_key, reverse=True)
+    for s in tmp_slots:
+        slot = create_slot(s)
         root.paste(slot, box=(slot1_x, slot1_y), mask=slot)
         slot1_x += 200
 
-    result_path = f"{root_path}/results/{uuid.uuid4()}.png"
-    root.save(result_path)
+    result_path = f"{root_path}/results/{uuid.uuid4()}.jpg"
+    root = root.convert("RGB")
+    root.save(result_path, "jpeg", quality=60)
     return result_path
 
+
+gacha()
