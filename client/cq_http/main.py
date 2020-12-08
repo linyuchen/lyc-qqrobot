@@ -18,8 +18,13 @@ class QQClient(QQClientBase):
 
     def __init__(self):
         super(QQClient, self).__init__()
-        self.get_friends()
-        self.get_groups()
+        while True:
+            try:
+                self.get_friends()
+                self.get_groups()
+                break
+            except:
+                continue
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         post_data = {"message": str(content)}

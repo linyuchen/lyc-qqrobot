@@ -2,3 +2,4 @@ aiocqhttp==1.2.5
 Django==3.0.8
 Flask==1.1.2
 requests==2.24.0
+Pillow==8.0.1
