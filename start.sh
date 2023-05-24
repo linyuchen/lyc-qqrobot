@@ -1,2 +1,2 @@
 source "venv/bin/activate"
-python ./client/mirai/main.py 2691562771
+python ./client/mirai_http/main.py 2691562771

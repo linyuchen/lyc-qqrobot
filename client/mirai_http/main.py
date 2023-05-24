@@ -5,10 +5,10 @@ from typing import List
 import requests
 from flask import Flask, request, Response, json
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from qqsdk.qqclient import QQClientBase
 
 
