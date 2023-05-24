@@ -2,56 +2,28 @@
 
 ## Python版本
 
-采用Python3.7，并配置virtual env，文件夹为**venv**
-
-## 酷Q
-
-下载酷Q，[安装cqhttp插件](https://github.com/richardchien/coolq-http-api)
-
-配置与nonebot对接，修改`data\app\io.github.richardchien.coolqhttpapi\config`下的{qq}.json
-
-```json
-{
-    "$schema": "https://cqhttp.cc/config-schema.json",
-    "host": "0.0.0.0",
-    "port": 57000,
-    "use_http": true,
-    "ws_host": "0.0.0.0",
-    "ws_port": 6700,
-    "use_ws": true,
-    "ws_reverse_url": "ws://127.0.0.1:19081/ws/",
-    "use_ws_reverse": true,
-    "enable_heartbeat": true,
-    "ws_reverse_reconnect_interval": 3000,
-    "ws_reverse_reconnect_on_code_1000": true,
-    "post_url": "",
-    "access_token": "",
-    "secret": "",
-    "post_message_format": "string",
-    "serve_data_files": false,
-    "update_source": "global",
-    "update_channel": "stable",
-    "auto_check_update": false,
-    "auto_perform_update": false,
-    "show_log_console": true,
-    "log_level": "info"
-}
-```
-
+Python3.11
 
 ## 第三方依赖库
 
-`pip install -r pip-pkgs.txt`
+`pip install -r requirements.txt`
 
-# 程序启动
+# 对接第三方QQapi
 
-`start.bat`
+一般第三方QQ框架都提供http api，
 
+新建个类 继承`qqsdk\qqclient`，复写`get_friends`、`get_groups`, `send_msg`, 
+这个三方法里调用第三方的http api
 
-# api文档
-继承`qqsdk\qqclient`，复写`get_friends`、`get_groups`, `send_msg`
+## 接受消息
+复写 `get_msg`方法，
+`get_msg`实际上是个`flask route`，路径是`/`，绑定的端口为`listen_port`
 
-当收到消息时，调用`qqclient.add_msg`
+在`get_msg`方法中, 当收到消息时，调用`qqclient.add_msg`添加消息
+
+## 启动
+
+然后实例化刚刚复写的类，并执行它的start()
 
 # supserplugin插件文档
 

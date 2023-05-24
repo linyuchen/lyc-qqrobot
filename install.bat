@@ -1,1 +1,1 @@
-"venv/scripts/activate" && pip install -r pip-pkgs.txt
+"venv/scripts/activate" && pip install -r requirements.txt

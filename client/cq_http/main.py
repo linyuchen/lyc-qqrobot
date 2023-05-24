@@ -25,7 +25,7 @@ class QQClient(QQClientBase):
                 break
             except:
                 continue
-
+    
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         post_data = {"message": str(content)}
         if is_group:
@@ -44,7 +44,6 @@ class QQClient(QQClientBase):
         else:
             requests.post(self.api_url + "/send_msg", post_data)
 
-
     def get_friends(self) -> List[entity.Friend]:
         friends = requests.get(self.api_url + "/get_friend_list").json().get("data", [])
         for f in friends:
@@ -57,7 +56,8 @@ class QQClient(QQClientBase):
         groups = requests.get(self.api_url + "/get_group_list").json().get("data", [])
         for g in groups:
             group = entity.Group(qq=str(g["group_id"]), name=g["group_name"], members=[])
-            member_list_data = requests.get(self.api_url + "/get_group_member_list?group_id=" + group.qq).json().get("data", [])
+            member_list_data = requests.get(self.api_url + "/get_group_member_list?group_id=" + group.qq).json().get(
+                "data", [])
             for member_data in member_list_data:
                 group_member = entity.GroupMember(qq=str(member_data["user_id"]), nick=member_data["nickname"],
                                                   card=member_data["card"])
@@ -65,35 +65,29 @@ class QQClient(QQClientBase):
             self.qq_user.groups.append(group)
         return self.qq_user.groups
 
-
-qq_client = QQClient()
-app = Flask(__name__)
-
-
-@app.route("/", methods=["POST"])
-def get_msg():
-    data = request.get_data()
-    data = json.loads(data)
-    # print(data)
-    message_type = data.get("message_type")
-    msg = data.get("message")
-    if message_type == "private":
-        friend = qq_client.get_friend(str(data["sender"]["user_id"]))
-        msg = FriendMsg(friend=friend, msg=msg)
-        msg.reply = lambda _msg: qq_client.send_msg(friend.qq, _msg)
-        qq_client.add_msg(msg)
-    elif message_type == "group":
-        group = qq_client.get_group(str(data.get("group_id")))
-        group_member = group.get_member(str(data["sender"]["user_id"]))
-        if not group_member or not group:
-            qq_client.get_groups()
+    def get_msg(self):
+        data = request.get_data()
+        data = json.loads(data)
+        # print(data)
+        message_type = data.get("message_type")
+        msg = data.get("message")
+        if message_type == "private":
+            friend = qq_client.get_friend(str(data["sender"]["user_id"]))
+            msg = FriendMsg(friend=friend, msg=msg)
+            msg.reply = lambda _msg: qq_client.send_msg(friend.qq, _msg)
+            qq_client.add_msg(msg)
+        elif message_type == "group":
             group = qq_client.get_group(str(data.get("group_id")))
             group_member = group.get_member(str(data["sender"]["user_id"]))
-        msg = GroupMsg(group=group, msg=msg, group_member=group_member)
-        msg.reply = lambda _msg: qq_client.send_msg(group.qq, _msg, is_group=True)
-        qq_client.add_msg(msg)
-    return {}
+            if not group_member or not group:
+                qq_client.get_groups()
+                group = qq_client.get_group(str(data.get("group_id")))
+                group_member = group.get_member(str(data["sender"]["user_id"]))
+            msg = GroupMsg(group=group, msg=msg, group_member=group_member)
+            msg.reply = lambda _msg: qq_client.send_msg(group.qq, _msg, is_group=True)
+            qq_client.add_msg(msg)
+        return {}
 
 
+qq_client = QQClient()
 qq_client.start()
-app.run(port="5000")

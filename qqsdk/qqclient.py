@@ -5,19 +5,24 @@ import math
 import time
 import importlib
 from typing import List, Type
+from flask import Flask
 from qqsdk import entity
 from qqsdk.message import MsgHandler
 from qqsdk.eventlistener import EventListener
 
 
 class QQClientBase(EventListener):
+    _flask_app = Flask(__name__)
+    listen_port = 5000
+
     def __init__(self):
         super(QQClientBase, self).__init__()
         self.qq_user = entity.QQUser(friends=[], groups=[])
         self.online = True
         self.msg_handlers = self.get_plugins()
+        self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])
 
-    def get_plugins(self) -> List[Type[MsgHandler]]:
+    def get_plugins(self) -> List[MsgHandler]:
         handlers_class = []
         plugins_path = os.path.dirname(os.path.dirname(__file__))
         plugins_path = os.path.join(plugins_path, "msgplugins")
@@ -35,6 +40,10 @@ class QQClientBase(EventListener):
 
         return handlers_class
 
+    def start(self) -> None:
+        super().start()
+        self._flask_app.run(port=self.listen_port)
+
     def send_msg(self, qq: str, content: str, is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
@@ -46,19 +55,21 @@ class QQClientBase(EventListener):
         """
         获取好友，结果将放在self.qq_user.friends里面
         """
+        # raise NotImplementedError
 
     def get_groups(self) -> List[entity.Group]:
         """
         结果保存在 self.qq_user.groups
         """
+        # raise NotImplementedError
+
+    def get_msg(self):
+        raise NotImplementedError
 
     def get_group(self, group_qq: str) -> entity.Group:
-        for g in self.qq_user.groups:
-            if g.qq == group_qq:
-                return g
+        result = list(filter(lambda g: g.qq == group_qq, self.qq_user.groups))
+        return result and result[0] or None
 
     def get_friend(self, qq: str) -> entity.Friend:
-
-        for f in self.qq_user.friends:
-            if f.qq == qq:
-                return f
+        result = list(filter(lambda f: f.qq == qq, self.qq_user.friends))
+        return result and result[0] or None
