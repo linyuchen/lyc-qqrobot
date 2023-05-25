@@ -29,4 +29,4 @@ class Friend(object):
         有备注则返回备注，无则返回昵称
         """
 
-        return self.mar_name or self.nick
+        return self.mark_name or self.nick

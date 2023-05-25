@@ -1,7 +1,8 @@
 # -*- encoding:UTF8 -*-
 from dataclasses import dataclass
-from qqsdk.message.basemsg import BaseMsg
+
 from qqsdk.entity.group import Group, GroupMember
+from qqsdk.message.basemsg import BaseMsg
 from qqsdk.message.types import MessageTypes
 
 
@@ -57,7 +58,6 @@ class RequestJoinGroupMsg(BaseMsg):
 
 @dataclass
 class NewGroupMemberMsg(GroupMsg):
-
     """
     新成员入群
     """
@@ -146,4 +146,3 @@ class SendGroupMsg(BaseMsg):
     发送给群的消息
     """
     group: Group = None
-

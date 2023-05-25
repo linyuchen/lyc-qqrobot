@@ -1,12 +1,13 @@
 # coding=UTF8
 
-import traceback
 import threading
 import time
-from typing import List
-from qqsdk.message.msghandler import MsgHandler
+import traceback
 from queue import Queue
+from typing import List
+
 from qqsdk.message.friendmsg import BaseMsg
+from qqsdk.message.msghandler import MsgHandler
 
 Thread = threading.Thread
 
@@ -28,7 +29,7 @@ class EventListener(Thread):
 
     def restore(self):
         self.running = True
-    
+
     def run(self):
         while self.running:
             msg: BaseMsg = self.msgs.get()

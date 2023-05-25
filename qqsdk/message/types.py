@@ -3,7 +3,7 @@
 
 class MessageTypes:
     FRIEND = "FriendMsg"
-    FRIEND_SIGNATURED = "FriendSignatureChanged"
+    FRIEND_SIGNATURE = "FriendSignatureChanged"
     FRIEND_STATUS = "FriendStatusChanged"
     FRIEND_VOICE = "FriendVoice"
     TEMP = "temp"  # 临时会话

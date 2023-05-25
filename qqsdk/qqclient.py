@@ -1,14 +1,12 @@
 # coding=UTF8
-import sys
-import os
-import math
-import time
 import importlib
-from typing import List, Type, Union
+from typing import List, Union
+
 from flask import Flask
+
 from qqsdk import entity
-from qqsdk.message import MsgHandler
 from qqsdk.eventlistener import EventListener
+from qqsdk.message import MsgHandler
 from qqsdk.message.segment import MessageSegment
 
 
@@ -25,8 +23,8 @@ class QQClientBase(EventListener):
 
     def get_plugins(self) -> List[MsgHandler]:
         handlers_class = []
-        plugins_path = os.path.dirname(os.path.dirname(__file__))
-        plugins_path = os.path.join(plugins_path, "msgplugins")
+        # plugins_path = os.path.dirname(os.path.dirname(__file__))
+        # plugins_path = os.path.join(plugins_path, "msgplugins")
         # sys.path.append(plugins_path)
         # b = importlib.import_module(os.path.join(plugins_path, "baike"))
         for m_name in ["baike", "superplugins", "bull_fight", "visual_menu", "running_time", "randomimg", "game24",

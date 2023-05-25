@@ -1,8 +1,9 @@
 # coding=UTF8
 from dataclasses import dataclass
-from qqsdk.message.basemsg import BaseMsg
+
 from qqsdk.entity.friend import Friend
 from qqsdk.entity.group import Group
+from qqsdk.message.basemsg import BaseMsg
 from qqsdk.message.types import MessageTypes
 
 
@@ -19,7 +20,7 @@ class FriendSignatureChangedMsg(FriendMsg):
     """
     好友签名修改消息
     """
-    MSG_TYPE = MessageTypes.FRIEND_SIGNATURED
+    MSG_TYPE = MessageTypes.FRIEND_SIGNATURE
 
 
 @dataclass
@@ -32,7 +33,6 @@ class FriendStatusChangeMsg(FriendMsg):
 
 @dataclass
 class FriendVoiceMsg(FriendMsg):
-
     MSG_TYPE = MessageTypes.FRIEND_VOICE
     url: str = ""  # 语音的url
 
@@ -50,7 +50,6 @@ class TempMsg(BaseMsg):
     group: Group = None
 
     def __init__(self):
-
         super(TempMsg, self).__init__()
 
 
@@ -73,7 +72,6 @@ class SendBuddyMsg(FriendMsg):
 
 @dataclass
 class RequestAddMeFriend(BaseMsg):
-
     """
     对方请求添加我为好友
     """
@@ -85,6 +83,7 @@ class RequestAddMeFriend(BaseMsg):
         同意
         :return:
         """
+
     def reject(self, reason: str):
         """
         拒绝

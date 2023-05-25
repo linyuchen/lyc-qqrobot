@@ -25,7 +25,8 @@ class MessageSegment:
     def image_path(path: str):
         return MessageSegment("ImagePath", path)
 
-    def to_data(self, msg_type: str, content: str):
+    @staticmethod
+    def to_data(msg_type: str, content: str):
         """
         可以在外部更改此方法
         """
