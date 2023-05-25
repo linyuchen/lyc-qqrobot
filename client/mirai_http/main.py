@@ -1,14 +1,14 @@
 import sys
 import os
-from typing import List
+from typing import List, Optional, Union
 
 import requests
 from flask import Flask, request, Response, json
 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientBase
 
 
@@ -38,14 +38,17 @@ class MiraiQQClient(QQClientBase):
         res = self.api_post("/bind", {"qq": self.qq_user.qq})
         return res
 
-    def send_msg(self, qq: str, content: str, is_group=False):
+    def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         path = "/sendFriendMessage"
         if is_group:
             path = '/sendGroupMessage'
+
+        message_chain = [{"type": "Plain", "text": content}]
+        if isinstance(content, MessageSegment):
+            message_chain = content.data
         res = self.api_post(path,
                             {"target": int(qq),
-                             "messageChain": [{"type": "Plain",
-                                              "text": content}]})
+                             "messageChain": message_chain})
         return res
 
     def get_friends(self) -> List[entity.Friend]:

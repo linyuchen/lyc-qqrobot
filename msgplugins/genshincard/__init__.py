@@ -4,7 +4,7 @@ import os
 from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from msgplugins.cmdaz import CMD
-from nonebot.message import MessageSegment
+from qqsdk.message.segment import MessageSegment
 from ..superplugins import GroupPointAction
 from .card import gacha
 
@@ -32,7 +32,7 @@ class GenShinCardMsgHandler(MsgHandler):
                 return msg.reply(f"【{msg.group_member.get_name()}】的活跃度不足{self.once_point}")
 
             img_file_name = gacha()
-            reply_msg = MessageSegment.image("file://" + img_file_name)
+            reply_msg = MessageSegment.image_path(img_file_name)
             r_msg = MessageSegment.text(f"【{msg.group_member.get_name()}】的抽奖结果：") + reply_msg
             msg.reply(r_msg)
             msg.destroy()

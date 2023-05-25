@@ -33,3 +33,9 @@ Python3.11
 
 # 备份
 只需要备份`msgplugins/superplugin/db.sqlite3`
+
+# 相关文档
+
+[mirai-http-api接口url文档](https://docs.mirai.mamoe.net/mirai-api-http/adapter/HttpAdapter.html)
+
+[mirai-http-api接口请求和返回数据文档](https://docs.mirai.mamoe.net/mirai-api-http/api/API.html)

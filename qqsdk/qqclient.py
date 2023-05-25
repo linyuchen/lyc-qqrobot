@@ -4,11 +4,12 @@ import os
 import math
 import time
 import importlib
-from typing import List, Type
+from typing import List, Type, Union
 from flask import Flask
 from qqsdk import entity
 from qqsdk.message import MsgHandler
 from qqsdk.eventlistener import EventListener
+from qqsdk.message.segment import MessageSegment
 
 
 class QQClientBase(EventListener):
@@ -44,7 +45,7 @@ class QQClientBase(EventListener):
         super().start()
         self._flask_app.run(port=self.listen_port)
 
-    def send_msg(self, qq: str, content: str, is_group=False):
+    def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
         # content: 要发送的内容，unicode编码

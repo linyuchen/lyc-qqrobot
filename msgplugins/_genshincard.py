@@ -3,7 +3,7 @@ from uuid import uuid4
 from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from msgplugins.cmdaz import CMD
-from nonebot.message import MessageSegment
+from qqsdk.message.segment import MessageSegment
 from .superplugins import GroupPointAction
 
 
@@ -34,7 +34,7 @@ class GenShinCardMsgHandler(MsgHandler):
             img_file_name = str(uuid4()) + ".jpg"
             __cmd = exe_path + "\\node_modules\\.bin\\electron " + exe_path + " " + img_file_name
             os.system(__cmd)
-            reply_msg = MessageSegment.image("file://" + exe_path + "\\temp\\" + img_file_name)
+            reply_msg = MessageSegment.image_path(exe_path + "\\temp\\" + img_file_name)
             r_msg = MessageSegment.text(f"【{msg.group_member.get_name()}】的抽奖结果：") + reply_msg
             msg.reply(r_msg)
             msg.destroy()
