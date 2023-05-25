@@ -4,8 +4,9 @@ import os
 import sys
 import requests
 from flask import Flask, request, Response, json
-from aiocqhttp.message import MessageSegment
 from typing import List, Union, Sequence
+
+from qqsdk.message.segment import MessageSegment
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 from qqsdk.qqclient import QQClientBase
