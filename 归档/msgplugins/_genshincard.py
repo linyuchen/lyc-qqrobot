@@ -4,7 +4,7 @@ from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from msgplugins.cmdaz import CMD
 from qqsdk.message.segment import MessageSegment
-from .superplugins import GroupPointAction
+from msgplugins.superplugins import GroupPointAction
 
 
 class GenShinCardMsgHandler(MsgHandler):
