@@ -1,5 +1,5 @@
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg, BaseMsg
-from chatgpt import gpt_35
+from .chatgpt import gpt_35
 from ..cmdaz import CMD
 
 

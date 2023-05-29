@@ -1,0 +1,30 @@
+ * Serving Flask app 'qqsdk.qqclient'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[33mPress CTRL+C to quit[0m
+[2023-05-28 16:29:38,516] ERROR in app: Exception on / [POST]
+Traceback (most recent call last):
+  File "/home/linyuchen/qqrobot-plugin/venv/lib/python3.9/site-packages/flask/app.py", line 2190, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/linyuchen/qqrobot-plugin/venv/lib/python3.9/site-packages/flask/app.py", line 1486, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/linyuchen/qqrobot-plugin/venv/lib/python3.9/site-packages/flask/app.py", line 1484, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/linyuchen/qqrobot-plugin/venv/lib/python3.9/site-packages/flask/app.py", line 1469, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)
+  File "/home/linyuchen/qqrobot-plugin/./client/mirai_http/main.py", line 78, in get_msg
+    msg = data.get("messageChain")[1].get("text", "")
+TypeError: 'NoneType' object is not subscriptable
+127.0.0.1 - - [28/May/2023 16:29:38] "[35m[1mPOST / HTTP/1.1[0m" 500 -
+127.0.0.1 - - [28/May/2023 16:30:34] "POST / HTTP/1.1" 200 -
+Terminated
+ * Serving Flask app 'qqsdk.qqclient'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[33mPress CTRL+C to quit[0m
+127.0.0.1 - - [30/May/2023 02:02:02] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [30/May/2023 02:02:02] "POST / HTTP/1.1" 200 -
+127.0.0.1 - - [30/May/2023 02:02:07] "POST / HTTP/1.1" 200 -
+Terminated
