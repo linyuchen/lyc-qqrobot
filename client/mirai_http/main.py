@@ -14,6 +14,7 @@ from qqsdk.qqclient import QQClientBase
 
 class MiraiQQClient(QQClientBase):
     api_url = "http://localhost:8080"
+    api_verify_key = "1234567890"
     api_session_key = ""
 
     def __init__(self, qq: int):
@@ -33,7 +34,7 @@ class MiraiQQClient(QQClientBase):
         return res
 
     def __verify(self):
-        r = requests.post(self.api_url + "/verify", json={"verifyKey": "1234567890"})
+        r = requests.post(self.api_url + "/verify", json={"verifyKey": self.api_verify_key})
         self.api_session_key = r.json().get("session")
         res = self.api_post("/bind", {"qq": self.qq_user.qq})
         return res
