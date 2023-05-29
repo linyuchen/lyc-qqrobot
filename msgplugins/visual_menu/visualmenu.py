@@ -65,4 +65,4 @@ class VisualMenu(object):
 if __name__ == "__main__":
 
     test = VisualMenu()
-    name = test.allMenu.keys()[0]
+    name = test.allMenu.keys()

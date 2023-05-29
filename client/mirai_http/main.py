@@ -95,5 +95,4 @@ class MiraiQQClient(QQClientBase):
             self.add_msg(msg)
         return {}
 
-
 MiraiQQClient(qq=int(sys.argv[1])).start()
