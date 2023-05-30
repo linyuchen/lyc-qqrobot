@@ -4,16 +4,7 @@ openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 openai.api_base = "https://api.chatanywhere.com.cn/v1"
 
 
-def gpt_35(question: str):
-    """为提供的对话消息创建新的回答 (流式传输)
-
-    Args:
-        messages (list): 完整的对话消息
-        api_key (str): OpenAI API 密钥
-
-    Returns:
-        str: result
-    """
+def gpt_35(question: str, retry_count=0):
     messages = []
     try:
         response = openai.ChatCompletion.create(
@@ -32,7 +23,9 @@ def gpt_35(question: str):
         messages.append(completion)  # 直接在传入参数 messages 中追加消息
         return "\n".join(map(lambda m: m['content'], messages))
     except Exception as err:
-        return f'OpenAI API 异常: {err}'
+        if retry_count > 2:
+            return f'糟了，发生了未知错误'
+        return gpt_35(question, retry_count+1)
 
 
 if __name__ == '__main__':
