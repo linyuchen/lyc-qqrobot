@@ -23,7 +23,9 @@ class MiraiQQClient(QQClientBase):
         self.__verify()
         self.get_friends()
 
-    def api_get(self, path: str, data: dict = {}):
+    def api_get(self, path: str, data: dict = None):
+        if data is None:
+            data = {}
         data.update({"sessionKey": self.api_session_key})
         res = requests.get(self.api_url + path, params=data)
         return res
@@ -97,5 +99,6 @@ class MiraiQQClient(QQClientBase):
             msg.reply = lambda _msg: self.send_msg(group.qq, _msg, is_group=True)
             self.add_msg(msg)
         return {}
+
 
 MiraiQQClient(qq=int(sys.argv[1])).start()
