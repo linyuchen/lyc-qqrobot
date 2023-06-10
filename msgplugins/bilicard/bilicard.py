@@ -15,11 +15,13 @@ TITLE_SPLIT_LEN = 23
 
 
 def get_bvid(text: str):
+    # 正则检查B站视频BV号
     b23tv = re.findall("(?<=b23.tv/)\w*", text)
     if b23tv:
         text = request.urlopen(f"https://b23.tv/{b23tv[0]}").geturl()
     result = re.findall("(?<=BV)\w*", text)
     return result and result[0] or ""
+
 
 def handle(bvid: str):
     headers = {
@@ -28,12 +30,7 @@ def handle(bvid: str):
         "Referer": "https://www.bilibili.com/",
         "Accept": "application/json;charset=UTF-8"
     }
-    # if bvid in bvid_buffer:
-    #     if time.time() - bvid_buffer[bvid] < 20:
-    #         await asyncio.sleep(random.randint(1, 2))
-    #         return
-    #     else:
-    #         bvid_buffer.pop(bvid)
+
     response_body = requests.get(f"http://api.bilibili.com/x/web-interface/view?bvid={bvid}", headers=headers).json().get("data", {})
     if not response_body:
         return
