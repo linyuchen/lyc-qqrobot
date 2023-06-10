@@ -1,5 +1,6 @@
 *.swp
 *.pyc
+nohup.out
 qqsdkplugins/sqlite_sserver/*.db
 log_helper/*.log
 log_helper/*.log.*
