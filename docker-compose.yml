@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+    environment:
+      - MIRAI_HTTP_ACCOUNT=1577491075
+    command: python /app/client/mirai_http/main.py 1577491075
