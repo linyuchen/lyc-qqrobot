@@ -20,4 +20,4 @@ jobs:
         script: |
           cd /home/linyuchen/qqrobot-plugin
           git pull
-          ./start.sh
+#          ./start.sh
