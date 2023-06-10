@@ -13,7 +13,7 @@ from qqsdk.qqclient import QQClientBase
 
 
 class MiraiQQClient(QQClientBase):
-    api_url = "http://localhost:8080"
+    api_url = "http://172.17.0.1:7000"
     api_verify_key = "1234567890"
     api_session_key = ""
 

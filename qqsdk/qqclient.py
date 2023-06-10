@@ -41,7 +41,7 @@ class QQClientBase(EventListener):
 
     def start(self) -> None:
         super().start()
-        self._flask_app.run(port=self.listen_port)
+        self._flask_app.run(host="0.0.0.0", port=self.listen_port)
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         """
