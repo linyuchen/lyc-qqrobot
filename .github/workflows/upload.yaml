@@ -15,7 +15,8 @@ jobs:
         host: ${{ secrets.HOST }}
         port: ${{secrets.PORT}}
         username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
+        password: ${{ secrets.PASSWORD }}
+#        key: ${{ secrets.SSH_KEY }}
         source: "." # 代码所在目录
         target: "/home/linyuchen/qqrobot-plugin/" # 代码目标路径
     - name: Restart Python server
