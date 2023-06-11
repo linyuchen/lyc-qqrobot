@@ -80,3 +80,9 @@ webhook:
 [mirai-http-api接口url文档](https://docs.mirai.mamoe.net/mirai-api-http/adapter/HttpAdapter.html)
 
 [mirai-http-api接口请求和返回数据文档](https://docs.mirai.mamoe.net/mirai-api-http/api/API.html)
+
+# TODO
+- [ ] ~~mirai也使用docker~~
+- [ ] ~~mirai和qqrobot使用docker network通信~~
+- [x] 不同环境不同的配置文件
+- [ ] docker build脚本，自动识别cpu架构

@@ -1,0 +1,2 @@
+MIRAI_HTTP_HOST = "localhost"
+MIRAI_HTTP_PORT = "8080"

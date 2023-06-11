@@ -6,6 +6,7 @@ import requests
 from flask import Flask, request, Response, json
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+import config
 from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
@@ -13,7 +14,7 @@ from qqsdk.qqclient import QQClientBase
 
 
 class MiraiQQClient(QQClientBase):
-    api_url = "http://172.17.0.1:7000"
+    api_url = f"http://{config.MIRAI_HTTP_HOST}:{config.MIRAI_HTTP_PORT}"
     api_verify_key = "1234567890"
     api_session_key = ""
 
