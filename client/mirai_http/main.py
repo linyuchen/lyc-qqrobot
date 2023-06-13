@@ -14,31 +14,31 @@ from qqsdk.qqclient import QQClientBase
 
 
 class MiraiQQClient(QQClientBase):
-    api_url = f"http://{config.MIRAI_HTTP_HOST}:{config.MIRAI_HTTP_PORT}"
-    api_verify_key = "1234567890"
-    api_session_key = ""
+    __api_url = f"http://{config.MIRAI_HTTP_HOST}:{config.MIRAI_HTTP_PORT}"
+    __api_verify_key = config.MIRAI_HTTP_API_VERIFY_KEY
+    __api_session_key = ""
 
-    def __init__(self, qq: int):
+    def __init__(self):
         super().__init__()
-        self.qq_user.qq = qq
+        self.qq_user.qq = config.QQ
         self.__verify()
         self.get_friends()
 
     def api_get(self, path: str, data: dict = None):
         if data is None:
             data = {}
-        data.update({"sessionKey": self.api_session_key})
-        res = requests.get(self.api_url + path, params=data)
+        data.update({"sessionKey": self.__api_session_key})
+        res = requests.get(self.__api_url + path, params=data)
         return res
 
     def api_post(self, path, data: dict):
-        data.update({"sessionKey": self.api_session_key})
-        res = requests.post(self.api_url + path, json=data)
+        data.update({"sessionKey": self.__api_session_key})
+        res = requests.post(self.__api_url + path, json=data)
         return res
 
     def __verify(self):
-        r = requests.post(self.api_url + "/verify", json={"verifyKey": self.api_verify_key})
-        self.api_session_key = r.json().get("session")
+        r = requests.post(self.__api_url + "/verify", json={"verifyKey": self.__api_verify_key})
+        self.__api_session_key = r.json().get("session")
         res = self.api_post("/bind", {"qq": self.qq_user.qq})
         return res
 
@@ -102,4 +102,4 @@ class MiraiQQClient(QQClientBase):
         return {}
 
 
-MiraiQQClient(qq=int(sys.argv[1])).start()
+MiraiQQClient().start()
