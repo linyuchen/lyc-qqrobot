@@ -19,5 +19,7 @@ jobs:
         script_stop: true
         script: |
           cd /home/linyuchen/qqrobot-plugin
-          git pull
-#          ./start.sh
+          git checkout master
+          git pull origin master
+          sudo docker-compose down
+          sudo docker-compose up -d

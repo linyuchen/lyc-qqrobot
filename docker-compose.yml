@@ -7,7 +7,6 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8080:8080"
       - "5000:5000"
     environment:
       - MIRAI_HTTP_ACCOUNT=1577491075
