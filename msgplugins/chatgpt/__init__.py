@@ -7,7 +7,7 @@ class ChatGPT(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
 
     def handle(self, msg: BaseMsg):
-        cmd = CMD("#", param_len=1)
+        cmd = CMD("#", sep="", param_len=1)
         if cmd.az(msg.msg):
             res = gpt_35(cmd.get_original_param())
             msg.reply(res)

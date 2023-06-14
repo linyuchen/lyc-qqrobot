@@ -80,7 +80,7 @@ class MiraiQQClient(QQClientBase):
         data = request.json
         message_type = data.get("type")
         msg = ""
-        for c in data.get("messageChain"):
+        for c in data.get("messageChain", []):
             msg += c.get("text", "")
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
