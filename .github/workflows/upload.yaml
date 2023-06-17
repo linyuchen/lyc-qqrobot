@@ -21,5 +21,4 @@ jobs:
           cd /home/linyuchen/qqrobot-plugin
           git checkout master
           git pull origin master
-          sudo docker-compose down
-          sudo docker-compose up -d
+          ./start.sh

@@ -100,5 +100,3 @@ def gacha():
     root.save(result_path, "jpeg", quality=60)
     return result_path
 
-
-gacha()
