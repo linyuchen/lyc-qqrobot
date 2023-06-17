@@ -1,6 +1,6 @@
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from ..cmdaz import CMD
-from news import get_news
+from .news import get_news
 
 
 class ExamplePlugin(MsgHandler):

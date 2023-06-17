@@ -1,19 +1,19 @@
 import sys
-import os
-from typing import List, Optional, Union
+from pathlib import PurePath
+from typing import List, Union
 
 import requests
-from flask import Flask, request, Response, json
+from flask import request
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
-from qqsdk.qqclient import QQClientBase
+from qqsdk.qqclient import QQClientFlask
 
 
-class MiraiQQClient(QQClientBase):
+class MiraiQQClient(QQClientFlask):
     __api_url = f"http://{config.MIRAI_HTTP_HOST}:{config.MIRAI_HTTP_PORT}"
     __api_verify_key = config.MIRAI_HTTP_API_VERIFY_KEY
     __api_session_key = ""
