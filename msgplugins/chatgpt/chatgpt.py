@@ -16,7 +16,8 @@ def gpt_35(question: str, retry_count=0):
 
 提问：
     """
-    question = prompt + question
+    if not question.startswith('#'):
+        question = prompt + question
     messages = []
     try:
         response = openai.ChatCompletion.create(
@@ -41,4 +42,4 @@ def gpt_35(question: str, retry_count=0):
 
 
 if __name__ == '__main__':
-    print(gpt_35("Python是什么"))
+    print(gpt_35("#公共场所裸奔是违法的吗？"))
