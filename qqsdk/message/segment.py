@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Self
 
 
 class MessageSegment:
@@ -46,7 +46,7 @@ class MessageSegment:
             result.append(self.to_data(msg_data[0], msg_data[1]))
         return result
 
-    def __add__(self, other: 'MessageSegment') -> 'MessageSegment':
+    def __add__(self, other: Self) -> Self:
         ms = MessageSegment()
         ms.origin_data = self.origin_data
         ms.origin_data.append((other.msg_type, other.content))

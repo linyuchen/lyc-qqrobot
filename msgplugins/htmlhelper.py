@@ -1,13 +1,12 @@
 ﻿# coding=UTF-8
 __doc__ = """
-A convenient module for python 3 to handle html
+A convenient module for handle html
 @author: LinYuChen
-@version:1.4
+@version:1.5
 """
 
 import re
 from urllib import parse
-from typing import List
 
 
 class HtmlHelper:
@@ -54,7 +53,7 @@ class HtmlHelper:
             pos0 = data.find(start_string)
 
             if -1 == pos0:
-                return None
+                return ""
 
             if not contain_start:
                 pos0 += len(start_string)
@@ -66,7 +65,7 @@ class HtmlHelper:
             pos1 = data.find(end_string)
 
         if -1 == pos1:
-            return None
+            return ""
 
         if contain_end:
             pos1 += len(end_string)
@@ -79,8 +78,8 @@ class HtmlHelper:
     def str2dic(s: str) -> dict:
         """
         convert post data string to a dict
-        @param s:post data string
-        @type:string
+        @param s:post data
+        @type: str
 
         @return:a dict of the converted post data string 
         @rtype dic:dict
@@ -118,19 +117,18 @@ class HtmlHelper:
         return param
 
     @staticmethod
-    def remove_charentity(html: str):
+    def remove_char_entity(html: str):
 
-        charentity_dict = {"&nbsp;": " ", "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": "\"",
-                           "&apos;": "'", "&plusmn;": "+",
-                           }
+        char_entity_dict = {
+            "&nbsp;": " ", "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": "\"",
+            "&apos;": "'", "&plusmn;": "+",
+        }
 
-        for i in charentity_dict:
+        for i in char_entity_dict:
             try:
-                html = html.replace(i, charentity_dict[i])
+                html = html.replace(i, char_entity_dict[i])
             except:
                 pass
-
-        #                print html
 
         def func(m):
 
@@ -145,19 +143,22 @@ class HtmlHelper:
 
         return html
 
-    def change2charentity(self, s: str) -> str:
+    @staticmethod
+    def change2char_entity(s: str) -> str:
 
         s = s.replace("&", "&amp;")
-        charentity_dict = {"'": "&apos;", "\"": "&quot;", u"\u0020": "&nbsp;", "<": "&lt;", ">": "&gt;",
-                           "+": "&plusmn;"}
-        for i in charentity_dict:
-            s = s.replace(i, charentity_dict[i])
+        char_entity_dict = {
+            "'": "&apos;", "\"": "&quot;", u"\u0020": "&nbsp;", "<": "&lt;", ">": "&gt;",
+            "+": "&plusmn;"
+        }
+        for i in char_entity_dict:
+            s = s.replace(i, char_entity_dict[i])
 
         return s
 
     def html2txt(self, html: str) -> str:
         """
-        @param html: html string
+        @param html: html text
         @type: string
 
         @return: The converted txt
@@ -178,7 +179,7 @@ class HtmlHelper:
         # replace the <br/>
         html = re.sub(u"<br[^>]*?>", "\n", html)
         html = re.sub(u"<p[^>]*?>", "\n", html)
-        html = re.sub(u"<h[^>]*?>", "\n", html)
+        html = re.sub(u"<h[^>]*?>", "\n\n", html)
         html = re.sub(u"<li[^>]*?>", "\n", html)
         #        html = re.sub(u"</li>","\n",html)
 
@@ -195,18 +196,19 @@ class HtmlHelper:
         #        pattern = re.compile("<.*?/>",re.S)
         #        html = re.sub("<[^>]*?/>","",html)# remove the startend tag
 
-        html = self.remove_charentity(html)
+        html = self.remove_char_entity(html)
 
         return html
 
     def txt2html(self, txt: str) -> str:
 
-        html = self.change2charentity(txt)
+        html = self.change2char_entity(txt)
         html = html.replace("\n", "<br/>")
 
         return html
 
-    def _get_tag_attrs(self, tag: str, tag_html: str) -> dict:
+    @staticmethod
+    def _get_tag_attrs(tag: str, tag_html: str) -> dict:
 
         tag_html = re.findall("<%s[^>]*?>" % tag, tag_html)[0]
         #        print tag_html
@@ -218,8 +220,10 @@ class HtmlHelper:
 
         return _attrs
 
-    def get_start_tag(self, html, tag, attrs={}) -> List[str]:
+    def get_start_tag(self, html, tag, attrs=None | dict) -> list[str]:
 
+        if attrs is None:
+            attrs = {}
         result = re.findall("<%s[^>]*?>" % tag, html)
         #        print result
         start_tag_list = []
@@ -243,7 +247,7 @@ class HtmlHelper:
 
         return start_tag_list
 
-    def get_tag_html(self, html: str, tag: str, attrs={}) -> str:
+    def get_tag_html(self, html: str, tag: str, attrs=None | dict) -> str:
         """
         @param html: html string
         @type: str
@@ -254,6 +258,8 @@ class HtmlHelper:
         @param attrs: {"attribute name": "attribute value"}, value support regular
         """
 
+        if attrs is None:
+            attrs = {}
         start_tag = self.get_start_tag(html, tag, attrs)
         #        print start_tag
         result_list = []
@@ -295,7 +301,7 @@ class HtmlHelper:
 
         return result_list
 
-    def get_tag_attrs(self, html: str, tag: str, attrs={}) -> List[dict]:
+    def get_tag_attrs(self, html: str, tag: str, attrs=None | dict) -> list[dict]:
         """
         @param html:html
         @type html:string
@@ -310,6 +316,8 @@ class HtmlHelper:
         @rtype: dict
         """
 
+        if attrs is None:
+            attrs = {}
         tag_html_list = self.get_tag_html(html, tag, attrs)
         _attrs = []
 
@@ -318,8 +326,10 @@ class HtmlHelper:
 
         return _attrs
 
-    def remove_tag(self, html: str, tag: str, attrs={}):
+    def remove_tag(self, html: str, tag: str, attrs=None):
 
+        if attrs is None:
+            attrs = {}
         tag_html_list = self.get_tag_html(html, tag, attrs)
 
         result_html = html
@@ -327,14 +337,3 @@ class HtmlHelper:
             result_html = result_html.replace(i, "")
 
         return result_html
-
-
-if "__main__" == __name__:
-
-    import time
-
-    http = HtmlHelper()
-#    html = open("html.html").read().decode("gbk")
-#    result = http.get_tag_html(html,"a",{"href":"htm_data/.+"})
-#    print(html[5:317])
-#    print result
