@@ -13,6 +13,7 @@ class GroupMsg(BaseMsg):
     MSG_TYPE = MessageTypes.GROUP
     group: Group = None
     group_member: GroupMember = None
+    is_at_me: bool = False
 
 
 @dataclass

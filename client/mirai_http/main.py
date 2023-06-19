@@ -80,8 +80,12 @@ class MiraiQQClient(QQClientFlask):
         data = request.json
         message_type = data.get("type")
         msg = ""
+        is_at_me = False
         for c in data.get("messageChain", []):
             msg += c.get("text", "")
+            if c.get("type") == "At" and c.get("target") == self.qq_user.qq:
+                is_at_me = True
+
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
             msg = FriendMsg(friend=friend, msg=msg)
@@ -96,7 +100,7 @@ class MiraiQQClient(QQClientFlask):
                 self.get_groups()
                 group = self.get_group(group_qq)
                 group_member = group.get_member(group_member_qq)
-            msg = GroupMsg(group=group, msg=msg, group_member=group_member)
+            msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
             msg.reply = lambda _msg: self.send_msg(group.qq, _msg, is_group=True)
             self.add_msg(msg)
         return {}
