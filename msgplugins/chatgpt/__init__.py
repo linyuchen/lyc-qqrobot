@@ -8,6 +8,6 @@ class ChatGPT(MsgHandler):
 
     def handle(self, msg: BaseMsg):
         cmd = CMD("#", sep="", param_len=1)
-        if cmd.az(msg.msg):
-            res = gpt_35(cmd.get_original_param())
+        if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
+            res = gpt_35(cmd.get_original_param() or msg.msg)
             msg.reply(res)
