@@ -66,9 +66,16 @@ class QQClientBase(EventListener):
         result = list(filter(lambda g: g.qq == group_qq, self.qq_user.groups))
         return result and result[0] or None
 
-    def get_friend(self, qq: str) -> entity.Friend:
+    def __get_friend(self, qq: str) -> entity.Friend | None:
         result = list(filter(lambda f: f.qq == qq, self.qq_user.friends))
         return result and result[0] or None
+
+    def get_friend(self, qq: str) -> entity.Friend:
+        friend = self.__get_friend(qq)
+        if not friend:
+            self.get_friends()
+            friend = self.__get_friend(qq)
+        return friend
 
 
 class QQClientFlask(QQClientBase):
