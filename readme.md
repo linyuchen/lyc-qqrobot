@@ -85,4 +85,4 @@ webhook:
 - [ ] ~~mirai也使用docker~~
 - [ ] ~~mirai和qqrobot使用docker network通信~~
 - [x] 不同环境不同的配置文件
-- [ ] docker build脚本，自动识别cpu架构
+- [x] docker build脚本，自动识别cpu架构
