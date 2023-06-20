@@ -3,6 +3,7 @@ import importlib
 import os
 import pathlib
 import sys
+from abc import ABCMeta, abstractmethod, ABC
 from flask import Flask
 
 import config
@@ -12,7 +13,7 @@ from qqsdk.message import MsgHandler
 from qqsdk.message.segment import MessageSegment
 
 
-class QQClientBase(EventListener):
+class QQClientBase(EventListener, metaclass=ABCMeta):
 
     def __init__(self):
         super(QQClientBase, self).__init__()
@@ -40,25 +41,25 @@ class QQClientBase(EventListener):
     def start(self) -> None:
         super().start()
 
+    @abstractmethod
     def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
         # content: 要发送的内容，unicode编码
         """
-        raise NotImplementedError
+        pass
 
     def get_friends(self) -> list[entity.Friend]:
         """
         获取好友，结果将放在self.qq_user.friends里面
         """
-        # raise NotImplementedError
 
     def get_groups(self) -> list[entity.Group]:
         """
         结果保存在 self.qq_user.groups
         """
-        # raise NotImplementedError
 
+    @abstractmethod
     def get_msg(self):
         raise NotImplementedError
 
@@ -71,7 +72,7 @@ class QQClientBase(EventListener):
         return result and result[0] or None
 
 
-class QQClientFlask(QQClientBase):
+class QQClientFlask(QQClientBase, ABC):
     _flask_app = Flask(__name__)
 
     def __init__(self):
