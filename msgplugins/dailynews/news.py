@@ -1,5 +1,5 @@
 import requests
-from msgplugins.htmlhelper import HtmlHelper
+from common.utils import htmlhelper
 
 
 def get_news():
@@ -11,9 +11,9 @@ def get_news():
     response = requests.get(url, headers=headers)
     res = response.json()
     content = res['data'][0]['content']
-    content = HtmlHelper().remove_tag(content, 'a')
+    content = htmlhelper.remove_tag(content, 'a')
 
-    news = HtmlHelper().html2txt(content).strip()
+    news = htmlhelper.html2txt(content).strip()
     lines = news.split('\n')
     news = '\n'.join(lines[:2]) + '\n\n' + '\n\n'.join(lines[2:])
     return news
