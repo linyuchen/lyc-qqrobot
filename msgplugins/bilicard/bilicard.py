@@ -70,8 +70,8 @@ def gen_text(bv_id: str) -> str:
     owner = video_info["owner"]
     upload_time = video_info["upload_time"]
     # desc超过30字则截断
-    if len(desc) > 40:
-        desc = desc[:40] + "..."
+    # if len(desc) > 40:
+    #     desc = desc[:40] + "..."
     # 组装成文字
     text = f"标题：{title}\n\n" \
            f"简介：{desc}\n\n" \
