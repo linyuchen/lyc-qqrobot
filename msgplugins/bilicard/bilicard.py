@@ -1,5 +1,6 @@
 import re
 import time
+import uuid
 from io import BytesIO
 from pathlib import Path
 from urllib import request
@@ -85,9 +86,9 @@ def gen_image(bv_id: str) -> str:
     video_info = get_video_info(bv_id)
     if not video_info:
         return ""
-    # save_path = Path(__file__).parent / f"{uuid.uuid4()}.png"
     base_path = Path(__file__).parent
-    save_path = base_path / f"test.png"
+    # save_path = base_path / f"test.png"
+    save_path = base_path / f"{uuid.uuid4()}.png"
     image = Image.new("RGBA", (560, 470), (0, 0, 0, 0))
     # image.paste((220, 220, 220), (0, 480, 530, 620))
     cover = Image.open(BytesIO(
