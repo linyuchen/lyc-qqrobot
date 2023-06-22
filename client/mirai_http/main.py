@@ -54,7 +54,7 @@ class MiraiQQClient(QQClientFlask):
             "qq_group_name": qq_group_name,
             "data": message_chain
         }
-        res = requests.post(config.SEND2TIM_HTTP, json=post_data)
+        res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)
         return res
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
