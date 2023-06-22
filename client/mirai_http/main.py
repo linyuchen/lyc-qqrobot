@@ -1,3 +1,4 @@
+import base64
 import sys
 from pathlib import PurePath
 from typing import List, Union
@@ -14,7 +15,7 @@ from qqsdk.qqclient import QQClientFlask
 
 
 class MiraiQQClient(QQClientFlask):
-    __api_url = f"http://{config.MIRAI_HTTP_HOST}:{config.MIRAI_HTTP_PORT}"
+    __api_url = config.MIRAI_HTTP_API
     __api_verify_key = config.MIRAI_HTTP_API_VERIFY_KEY
     __api_session_key = ""
 
@@ -42,6 +43,20 @@ class MiraiQQClient(QQClientFlask):
         res = self.api_post("/bind", {"qq": self.qq_user.qq})
         return res
 
+    def send2tim(self, qq_group_name: str, message_chain: list[dict]):
+        for msg in message_chain:
+            if msg["type"] in ["Image"]:
+                with open(msg["path"], "rb") as f:
+                    msg["data"] = base64.encodebytes(f.read()).decode("utf8")
+            elif msg["type"] == "Plain":
+                msg["data"] = msg["text"]
+        post_data = {
+            "qq_group_name": qq_group_name,
+            "data": message_chain
+        }
+        res = requests.post(config.SEND2TIM_HTTP, json=post_data)
+        return res
+
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         path = "/sendFriendMessage"
         if is_group:
@@ -50,9 +65,13 @@ class MiraiQQClient(QQClientFlask):
         message_chain = [{"type": "Plain", "text": content}]
         if isinstance(content, MessageSegment):
             message_chain = content.data
-        res = self.api_post(path,
-                            {"target": int(qq),
-                             "messageChain": message_chain})
+
+        if is_group and config.SEND2TIM:
+            res = self.send2tim(self.get_group(qq).name, message_chain)
+        else:
+            res = self.api_post(path,
+                                {"target": int(qq),
+                                 "messageChain": message_chain})
         return res
 
     def get_friends(self) -> List[entity.Friend]:
