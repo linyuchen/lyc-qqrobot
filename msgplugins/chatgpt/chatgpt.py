@@ -32,7 +32,10 @@ def del_cat_prompt(messages):
 
 
 def gpt_35(context_id: str, question: str, retry_count=0):
-    messages = context.setdefault(context_id, [])
+    if context_id:
+        messages = context.setdefault(context_id, [])
+    else:
+        messages = []
     if len(messages) > MAX_MESSAGE_LENGTH:
         del messages[:3]
     if question.startswith('#'):
