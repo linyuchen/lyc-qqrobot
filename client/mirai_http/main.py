@@ -52,6 +52,7 @@ class MiraiQQClient(QQClientFlask):
                 msg["data"] = msg["text"]
         post_data = {
             "qq_group_name": qq_group_name,
+            "key": "linyuchen",
             "data": message_chain
         }
         res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)

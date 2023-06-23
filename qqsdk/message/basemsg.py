@@ -1,5 +1,6 @@
 # coding=UTF8
 from dataclasses import dataclass
+from .segment import MessageSegment
 
 
 @dataclass
@@ -15,7 +16,7 @@ class BaseMsg:
     paused: bool = False
     MSG_TYPE: str = ""
 
-    def reply(self, content: str):
+    def reply(self, content: str | MessageSegment):
         """
         :param content:回复内容
         :return:

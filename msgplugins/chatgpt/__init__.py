@@ -9,6 +9,11 @@ class ChatGPT(MsgHandler):
 
     def handle(self, msg: GroupMsg | FriendMsg):
         cmd = CMD("#", sep="", param_len=1)
-        if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
-            res = gpt_35(cmd.get_original_param() or msg.msg)
+        context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
+        if isinstance(msg, GroupMsg):
+            if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
+                res = gpt_35(context_id, cmd.get_original_param() or msg.msg)
+                msg.reply(res)
+        elif isinstance(msg, FriendMsg):
+            res = gpt_35(context_id, msg.msg)
             msg.reply(res)

@@ -7,6 +7,7 @@ from enum import Enum
 from io import BytesIO
 from typing import TypedDict
 
+import win32api
 import win32clipboard
 import win32con
 import win32gui
@@ -45,7 +46,11 @@ def paste(data, is_image):
     except:
         paste(data, is_image)
         return
-    keyboard.send_keys("^v")
+    # keyboard.send_keys("^v")  # 这个在Hyper-V虚拟机中不好使
+    win32api.keybd_event(17, 0, 0, 0)                           # ctrl的键位码是17
+    win32api.keybd_event(86, 0, 0, 0)                           # v的键位码是86
+    win32api.keybd_event(86, 0, win32con.KEYEVENTF_KEYUP, 0)    # 释放按键
+    win32api.keybd_event(17, 0, win32con.KEYEVENTF_KEYUP, 0)
 
     try:
         win32clipboard.CloseClipboard()
@@ -91,6 +96,7 @@ def handle_post():
     # 解析 POST 请求中的 JSON 数据
     data = request.get_json()
     # 将 JSON 数据转换为 Message 类型
+    # if data.get("key") == "linyuchen":
     message = Message(**data)
     # 将消息放入队列中
     message_queue.put(message)
@@ -114,14 +120,14 @@ queue_thread = threading.Thread(target=handle_queue)
 queue_thread.start()
 
 if __name__ == '__main__':
-    # test_msg = Message(qq_group_name="test group", data=[{"type": MsgType.TEXT, "data": "hello"}])
+    test_msg = Message(qq_group_name="test group", data=[{"type": MsgType.TEXT, "data": "hello"}])
     # send_msg("机器人test", msg)
-    image_base64 = base64.b64encode(open("test.jpg", "rb").read()).decode("utf-8")
-    test_msg = Message(qq_group_name="test group",
-                       data=[
-                           {"type": MsgType.TEXT, "data": "hellokitty"},
-                           {"type": MsgType.IMAGE, "data": image_base64},
-                           {"type": MsgType.TEXT, "data": "hellokitty"},
-                       ])
+    # image_base64 = base64.b64encode(open("test.jpg", "rb").read()).decode("utf-8")
+    # test_msg = Message(qq_group_name="test group",
+    #                    data=[
+    #                        {"type": MsgType.TEXT, "data": "hellokitty"},
+    #                        {"type": MsgType.IMAGE, "data": image_base64},
+    #                        {"type": MsgType.TEXT, "data": "hellokitty"},
+    #                    ])
     # send_msg(test_msg)
-    app.run(host='0.0.0.0', port=8088)
+app.run(host='0.0.0.0', port=8088)

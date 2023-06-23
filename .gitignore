@@ -16,3 +16,4 @@ CoolQAir/
 __pycache__/
 mirai/
 config.py
+msgplugins/dailynews/data/*

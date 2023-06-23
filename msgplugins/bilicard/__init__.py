@@ -20,3 +20,4 @@ class BiliCardPlugin(MsgHandler):
                 reply_msg = MessageSegment.image_path(img_path)
                 msg.reply(reply_msg)
                 os.remove(img_path)
+                msg.destroy()

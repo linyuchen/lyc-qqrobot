@@ -4,3 +4,14 @@ QQ = 721011692
 LISTEN_PORT = 5000
 SEND2TIM = True
 SEND2TIM_HTTP_API = "http://localhost:8088"
+
+plugins = [
+    "bilicard",
+    "bull_fight",
+    "dailynews",
+    "game21",
+    "game24",
+    "running_time",
+    "superplugins",
+    "chatgpt"
+]

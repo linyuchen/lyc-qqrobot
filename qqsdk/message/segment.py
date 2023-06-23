@@ -51,3 +51,4 @@ class MessageSegment:
         ms.origin_data = self.origin_data
         ms.origin_data.append((other.msg_type, other.content))
         return ms
+

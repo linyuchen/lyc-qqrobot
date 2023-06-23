@@ -4,6 +4,7 @@ import imp
 import os
 import pathlib
 import sys
+import traceback
 from abc import ABCMeta, abstractmethod, ABC
 from flask import Flask
 
@@ -26,12 +27,11 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         handlers_class = []
         plugins_path = pathlib.PurePath(__file__).parent.parent / "msgplugins"
         sys.path.append(str(plugins_path))
-        for module_name in os.listdir(plugins_path):
-            if module_name.endswith(".py"):
-                module_name = module_name[:-3]
+        for module_name in config.plugins:
             try:
                 module = importlib.import_module(f".{module_name}", "msgplugins")
             except:
+                traceback.print_exc()
                 continue
             for name in dir(module):
                 obj = getattr(module, name)

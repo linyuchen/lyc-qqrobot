@@ -10,3 +10,4 @@ class ExamplePlugin(MsgHandler):
         if CMD("b").az(msg.msg):
             reply_msg = MessageSegment.image_path("")
             msg.reply(reply_msg)
+            msg.destroy()

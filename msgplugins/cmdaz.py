@@ -37,6 +37,7 @@ class CMD(object):
         """
 
         self.original_cmd = original_cmd
+        original_cmd = original_cmd.strip()
         cmd_name = ""
 
         if self.param_length:  # 需要参数，进行参数分割

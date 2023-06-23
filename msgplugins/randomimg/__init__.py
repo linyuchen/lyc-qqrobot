@@ -22,3 +22,4 @@ class RandomImg(MsgHandler):
                 reply_msg = MessageSegment.image_path(img_path)
                 msg.reply(reply_msg)
                 self.group_point_action.add_point(msg.group.qq, msg.group_member.qq, -self.once_point)
+                msg.destroy()

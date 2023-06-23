@@ -1,11 +1,16 @@
+import os.path
 import re
 import textwrap
+import time
+
 import unicodedata
 from pathlib import PurePath
 
 import requests
 from common.utils import htmlhelper
 from PIL import Image, ImageDraw, ImageFont
+
+base_path = PurePath(__file__).parent
 
 
 def get_news():
@@ -38,6 +43,7 @@ def get_news():
     # wrapper.place_holder_width = 0.5
 
     # 进行文本换行
+    line_width = 30
     wrap_news = []
     for line in news.splitlines():
         if line == "":
@@ -56,24 +62,37 @@ def get_news():
                 # 半角字符
                 current_line_width += 0.4
             current_line.append(c)
-            if current_line_width >= 15:
+            if current_line_width >= line_width:
                 wrap_news.append("".join(current_line))
                 current_line = []
                 current_line_width = 0
         if current_line:
             wrap_news.append("".join(current_line))
 
-    image = Image.new("RGB", (700, 41 * len(wrap_news)), (255, 255, 255))
+    line_height = 60
+    image = Image.new("RGB", (1080, (line_height + 1) * len(wrap_news)), (255, 255, 255))
     text_draw = ImageDraw.Draw(image)
-    base_path = PurePath(__file__).parent
-    font = ImageFont.truetype(str(base_path / "银河甜心&宇宙怪兽.ttf"), 40)
+    font = ImageFont.truetype(str(base_path / "仓耳今楷01-9128-W05.otf"), 30)
     for i, line in enumerate(wrap_news):
-        text_draw.text((50, (i + 1) * 40), line, font=font, fill=(0, 0, 0), spacing=10)
+        text_draw.text((50, (i + 1) * line_height), line, font=font, fill=(0, 0, 0), spacing=10)
     image.save(str(base_path / "news.png"))
     return news
 
 
+def get_news2():
+    today = time.strftime("%Y-%m-%d")
+    img_path = base_path / "data" / (today + ".png")
+    if os.path.exists(img_path):
+        return str(img_path)
+    url = "https://api.03c3.cn/zb/"
+    with open(img_path, "wb") as f:
+        try:
+            img_data = requests.get(url).content
+            f.write(img_data)
+            return str(img_path)
+        except:
+            return
+
+
 if __name__ == '__main__':
-    r = get_news()
-    print(r)
-    # print(verse)
+    print(get_news2())
