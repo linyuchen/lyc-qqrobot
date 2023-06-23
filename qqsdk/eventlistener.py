@@ -41,7 +41,10 @@ class EventListener(Thread):
                 handler: MsgHandler
                 if handler.check_type(msg):
                     try:
-                        handler.handle(msg)
+                        if handler.is_async:
+                            threading.Thread(target=lambda: handler.handle(msg)).start()
+                        else:
+                            handler.handle(msg)
                     except Exception:
                         traceback.print_exc()
 

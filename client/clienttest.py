@@ -18,8 +18,8 @@ class ClientTest(QQClientBase):
         super().__init__()
         self.qq_user.groups.append(self.TEST_GROUP)
 
-    # def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
-    #     print(content)
+    def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
+        print(content)
 
     def get_msg(self):
         group_msg = GroupMsg(group=self.TEST_GROUP, group_member=self.TEST_GROUP_MEMBER,

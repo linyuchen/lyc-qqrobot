@@ -7,6 +7,7 @@ class MsgHandler:
 
     name = "base handler"  # 唯一性
     qq_client: None
+    is_async = False
     bind_msg_types: Tuple[Type[BaseMsg]] = ()
 
     def __init__(self, qq_client=None):

@@ -1,5 +1,6 @@
 # coding=UTF8
 import importlib
+import imp
 import os
 import pathlib
 import sys
@@ -28,13 +29,15 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         for module_name in os.listdir(plugins_path):
             if module_name.endswith(".py"):
                 module_name = module_name[:-3]
-            b = importlib.import_module(f".{module_name}", "msgplugins")
-            for v in dir(b):
-                if v == "MsgHandler":
-                    continue
-                class_ = getattr(b, v)
-                if type(class_) == type(type) and issubclass(class_, MsgHandler):
-                    handlers_class.append(class_(self))
+            try:
+                module = importlib.import_module(f".{module_name}", "msgplugins")
+            except:
+                continue
+            for name in dir(module):
+                obj = getattr(module, name)
+                # 判断是否是MsgHandler的子类
+                if isinstance(obj, type) and issubclass(obj, MsgHandler) and obj is not MsgHandler:
+                    handlers_class.append(obj(self))
 
         return handlers_class
 

@@ -18,11 +18,10 @@ from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 
 
 class GroupMsgEvent(MsgHandler):
-    bind_msg_types = (GroupMsg, )
+    bind_msg_types = (GroupMsg,)
 
     def handle(self, msg: GroupMsg):
 
-        # print(msg)
         user_action = UserAction(msg.group_member.qq)
         group_action = GroupAction(msg.group.qq, msg.group_member.qq)
         group_action.group_user.add_point(group_action.group_setting.talk_point)
@@ -31,7 +30,8 @@ class GroupMsgEvent(MsgHandler):
         cmds = [
             CMD("签到", handle_func=group_action.sign),
             CMD("我的活跃度", alias=["活跃度查询", "积分", "查询活跃度"], handle_func=group_action.get_point),
-            CMD("活跃度排名", alias=["活跃度排行", "排行", "排名", "活跃度排行榜", "排行榜"], handle_func=group_action.get_point_rank),
+            CMD("活跃度排名", alias=["活跃度排行", "排行", "排名", "活跃度排行榜", "排行榜"],
+                handle_func=group_action.get_point_rank),
             CMD("清负活跃度", handle_func=group_action.clear_point),
             CMD("清负次数", handle_func=group_action.get_clear_chance),
             CMD("我的状态", handle_func=user_action.get_point),
@@ -57,8 +57,7 @@ class GroupMsgEvent(MsgHandler):
 
 
 class AdminMsgEvent(MsgHandler):
-
-    bind_msg_types = (FriendMsg, )
+    bind_msg_types = (FriendMsg,)
 
     def __init__(self, qq_client):
         super(AdminMsgEvent, self).__init__(qq_client)
@@ -86,4 +85,3 @@ class AdminMsgEvent(MsgHandler):
         if result:
             msg.reply(result)
             msg.destroy()
-

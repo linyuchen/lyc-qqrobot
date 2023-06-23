@@ -7,5 +7,5 @@ class ExamplePlugin(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        if CMD("每日新闻", param_len=0).az(msg.msg):
+        if CMD("每日新闻", param_len=0, alias=["今日新闻"]).az(msg.msg):
             msg.reply(get_news())

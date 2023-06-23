@@ -8,7 +8,8 @@ from typing import List
 
 class CMD(object):
 
-    def __init__(self, cmd_name, sep=" ", int_param_index=[], param_len=0, handle_func=None, alias: List[str]=[]):
+    def __init__(self, cmd_name, sep=" ", int_param_index: list[int] = (), param_len=0, handle_func=None,
+                 alias: list[str] = ()):
         """
         paramSep: 命令与参数的分隔符，同时也是多个参数之间的分隔符
             如果为None 或者 False则不分割
@@ -40,7 +41,7 @@ class CMD(object):
 
         if self.param_length:  # 需要参数，进行参数分割
             cmd_name_length = len(self.cmd_name)
-            if len(original_cmd) <= cmd_name_length: # 如果没有参数
+            if len(original_cmd) <= cmd_name_length:  # 如果没有参数
                 return False
 
             if self.param_sep == " ":
@@ -105,6 +106,7 @@ class CMD(object):
 if "__main__" == __name__:
     def handle_test(*args):
         return ",".join(args)
+
 
     cmd = CMD(u"天气", param_len=1, int_param_index=[], handle_func=handle_test)
     print(cmd.handle(u"天气 上海"))
