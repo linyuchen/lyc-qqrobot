@@ -1,5 +1,6 @@
 import base64
 import json
+import re
 import sys
 from pathlib import PurePath
 from typing import List, Union
@@ -106,10 +107,14 @@ class MiraiQQClient(QQClientFlask):
             msg += c.get("text", "")
             if c.get("type") == "At" and c.get("target") == self.qq_user.qq:
                 is_at_me = True
-            if c.get("type") == "App":
+            elif c.get("type") == "App":
                 content = json.loads(c.get("content"))
                 qq_doc_url = content["meta"]["detail_1"]["qqdocurl"]
                 msg += qq_doc_url
+            elif c.get("type") == "Xml":
+                url = re.findall("url=\"(.*?)\"", c.get("xml"))
+                if url:
+                    msg += url[0]
 
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
