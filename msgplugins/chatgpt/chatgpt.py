@@ -1,4 +1,10 @@
+import re
+import traceback
+
 import openai
+import requests
+
+from common.utils.htmlhelper import html2txt
 
 openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 openai.api_base = "https://api.chatanywhere.com.cn/v1"
@@ -68,11 +74,25 @@ def gpt_35(context_id: str, question: str, retry_count=0):
         return res
 
     except Exception as err:
+        traceback.print_exc()
         if retry_count > 2:
             return f'糟了，发生了未知错误'
         return gpt_35(context_id, question, retry_count + 1)
 
 
+def summary_web(link) -> str:
+    url = link
+    try:
+        html = requests.get(url).text
+    except:
+        return "网页分析失败"
+    text = html2txt(html).replace("\n", "")
+    res = gpt_35("", "#总结下面这个网页：" + text)
+    return res
+
+
 if __name__ == '__main__':
-    while True:
-        print(gpt_35("test", input(">>> ")))
+    # while True:
+    #     print(gpt_35("test", input(">>> ")))
+    _res = summary_web("https://mp.weixin.qq.com/s/Q7yQAXnbFpDRKPqOXvNTgw")
+    print(_res)

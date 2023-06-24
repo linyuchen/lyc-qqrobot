@@ -205,7 +205,7 @@ if __name__ == "__main__":
     # 白色背景封面
     _text = "https://www.bilibili.com/video/BV1sP411g7PZ/?spm_id_from=333.337.search-card.all.click&vd_source=210c4e2f9f0cdc36cd087b10ec64eedc"
 
-    # _text = "https://www.bilibili.com/video/BV1Nm4y1q7rT"
+    _text = "https://www.bilibili.com/video/BV1rh411K7GH"
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     # gen_image(bvid)

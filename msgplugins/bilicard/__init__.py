@@ -7,6 +7,7 @@ from .bilicard import get_bv_id, gen_text, gen_image
 
 class BiliCardPlugin(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
+    is_async = True
 
     def handle(self, msg: GroupMsg | FriendMsg):
         bvid = get_bv_id(msg.msg)
