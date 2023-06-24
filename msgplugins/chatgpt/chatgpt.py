@@ -88,7 +88,7 @@ def summary_web(link) -> str:
     except:
         return "网页分析失败"
     text = html2txt(html).replace("\n", "")
-    res = gpt_35("", "#总结下面这段文字，并翻译成中文：\n" + text)
+    res = gpt_35("", "#总结下面这段文字，总结的结果如果不是中文就翻译成中文：\n" + text)
     return res
 
 
@@ -96,6 +96,7 @@ if __name__ == '__main__':
     # while True:
     #     print(gpt_35("test", input(">>> ")))
     _url = "https://mp.weixin.qq.com/s/YHIZ5I3Eg-fmDEhmhOdcLQ"
-    # _url = "https://www.qpython.org/"
+    _url = "https://www.qpython.org/"
+    # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
     _res = summary_web(_url)
     print(_res)
