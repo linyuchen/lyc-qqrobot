@@ -1,4 +1,3 @@
-import re
 import traceback
 
 import openai
@@ -29,7 +28,7 @@ cat_prompt = {'role': 'system', 'content': cat_prompt_text}
 
 def add_cat_prompt(messages):
     if cat_prompt not in messages:
-        messages.insert(0, cat_prompt)
+        messages.insert(-1, cat_prompt)
 
 
 def del_cat_prompt(messages):
@@ -49,6 +48,8 @@ def gpt_35(context_id: str, question: str, retry_count=0):
     else:
         add_cat_prompt(messages)
 
+    if len(question) > 3000:
+        question = question[0:1500] + question[-1500:]
     messages.append({'role': 'user', 'content': question})
     try:
         response = openai.ChatCompletion.create(
@@ -94,5 +95,5 @@ def summary_web(link) -> str:
 if __name__ == '__main__':
     # while True:
     #     print(gpt_35("test", input(">>> ")))
-    _res = summary_web("https://mp.weixin.qq.com/s/Q7yQAXnbFpDRKPqOXvNTgw")
+    _res = summary_web("https://mp.weixin.qq.com/s/YHIZ5I3Eg-fmDEhmhOdcLQ")
     print(_res)
