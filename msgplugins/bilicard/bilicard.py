@@ -21,18 +21,35 @@ headers = {
 }
 
 
+def check_is_b23(text: str) -> []:
+    b23tv = re.findall("(?<=b23.tv/)\w*", text)
+    return b23tv
+
+
+def transform_b23(b23tv: str):
+    url = f"https://b23.tv/{b23tv}"
+    url = request.urlopen(url).geturl()
+    return url
+
+
 def get_bv_id(text: str):
     # 正则检查B站视频BV号
-    b23tv = re.findall("(?<=b23.tv/)\w*", text)
-    if b23tv:
-        text = request.urlopen(f"https://b23.tv/{b23tv[0]}").geturl()
-    result = re.findall("(?<=BV)\w*", text)
+    result = re.findall("(?<=BV)\w+", text)
     return result and result[0] or ""
 
 
-def get_video_info(bv_id: str) -> None | dict:
-    response_body = requests.get(f"http://api.bilibili.com/x/web-interface/view?bvid={bv_id}",
-                                 headers=headers).json().get("data", {})
+def get_av_id(text: str):
+    result = re.findall("(?<=av)\d+", text)
+    return result and result[0] or ""
+
+
+def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
+    url = ""
+    if bv_id:
+        url = f"http://api.bilibili.com/x/web-interface/view?bvid={bv_id}"
+    elif av_id:
+        url = f"http://api.bilibili.com/x/web-interface/view?aid={av_id}"
+    response_body = requests.get(url, headers=headers).json().get("data", {})
     if not response_body:
         return
     video_info = {
@@ -120,8 +137,8 @@ def get_video_summary_by_ai(aid, cid) -> str:
         return ""
 
 
-def gen_image(bv_id: str) -> tuple[str, str, str]:
-    video_info = get_video_info(bv_id)
+def gen_image(bv_id: str = "", av_id: str = "") -> tuple[str, str, str]:
+    video_info = get_video_info(bv_id, av_id)
     if not video_info:
         return "", "", ""
     base_path = Path(__file__).parent
@@ -209,6 +226,6 @@ if __name__ == "__main__":
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     # gen_image(bvid)
-    video_info = get_video_info(bvid)
-    _r = get_video_summary_by_ai(video_info["aid"], video_info["cid"])
+    _video_info = get_video_info(bvid)
+    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
     print(_r)
