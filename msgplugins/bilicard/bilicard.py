@@ -8,10 +8,15 @@ from urllib import request
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
+import config
 from msgplugins.chatgpt.chatgpt import gpt_35
 
-TITLE_MAX_LEN = 120
-TITLE_SPLIT_LEN = 23
+
+cookies = config.bili_cookies
+cookies = re.findall("(.*?)=(.*?); ", cookies)
+cookies = dict(cookies)
+session = requests.session()
+session.cookies.update(cookies)
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -19,6 +24,7 @@ headers = {
     "Referer": "https://www.bilibili.com/",
     "Accept": "application/json;charset=UTF-8"
 }
+session.headers.update(headers)
 
 
 def check_is_b23(text: str) -> []:
@@ -26,7 +32,10 @@ def check_is_b23(text: str) -> []:
     return b23tv
 
 
-def transform_b23(b23tv: str):
+def b32_to_bv(b23tv: str):
+    """
+    b23.tv链接转BV链接
+    """
     url = f"https://b23.tv/{b23tv}"
     url = request.urlopen(url).geturl()
     return url
@@ -49,7 +58,7 @@ def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
         url = f"http://api.bilibili.com/x/web-interface/view?bvid={bv_id}"
     elif av_id:
         url = f"http://api.bilibili.com/x/web-interface/view?aid={av_id}"
-    response_body = requests.get(url, headers=headers).json().get("data", {})
+    response_body = session.get(url).json().get("data", {})
     if not response_body:
         return
     video_info = {
@@ -102,17 +111,10 @@ def gen_text(bv_id: str) -> str:
     return text
 
 
-cookies = "buvid3=D8857590-C5C6-43D1-A61C-F18C2C04CCC0167632infoc; LIVE_BUVID=AUTO7516361994818922; i-wanna-go-back=-1; CURRENT_BLACKGAP=0; blackside_state=0; buvid4=E0EA01F3-3299-54F7-8A06-1E15FB7D29A647831-022012619-RYZwLL8nRmXgxAPub0ToFw%3D%3D; buvid_fp_plain=undefined; DedeUserID=6961865; DedeUserID__ckMd5=866e87c0bc335a2a; is-2022-channel=1; b_nut=100; fingerprint3=6edb9feba98f9d0c3cf499ff5fd81847; _uuid=F3FD45DF-3B4B-8D23-AF66-9C3248F75EDD18995infoc; rpdid=|(um|uYYY~)l0J'uYY)Yu)l)k; go_old_video=-1; b_ut=5; home_feed_column=5; i-wanna-go-feeds=-1; nostalgia_conf=-1; CURRENT_PID=8e452430-cd7f-11ed-9bac-0d5b6943bfd2; hit-new-style-dyn=1; hit-dyn-v2=1; FEED_LIVE_VERSION=V8; header_theme_version=CLOSE; bp_article_offset_6961865=799955294267375600; fingerprint=e108557d3d7bd729cb1e4fd1184dc209; CURRENT_QUALITY=120; CURRENT_FNVAL=4048; kfcFrom=itemshare; from=itemshare; msource=h5; share_source_origin=QQ; bsource=share_source_qqchat; SESSDATA=fa2711ba%2C1702963527%2Cb96eb%2A62g2NI3aZz7IvKEWBbz19ojEtJFWgmjpe1fKs8G0Byi-7DTG9GiE1gdRttl8a2P-QyFy1ahQAAQQA; bili_jct=5906533e9dcd9b8860118cd388824f7f; sid=6rbzcicr; buvid_fp=e108557d3d7bd729cb1e4fd1184dc209; PVID=1; b_lsid=C1B2E10105_188EA46BA78; bp_video_offset_6961865=810536349680533500"
-cookies = re.findall("(.*?)=(.*?); ", cookies)
-cookies = dict(cookies)
-session = requests.session()
-session.cookies.update(cookies)
-
-
-def get_subtitle(aid, cid):
+def get_subtitle(aid: str, cid: str):
     url = f"https://api.bilibili.com/x/player/v2?aid={aid}&cid={cid}"
 
-    res = session.get(url, headers=headers, cookies=cookies).json()
+    res = session.get(url).json()
     subtitles = res["data"]["subtitle"]["subtitles"]
     subtitle_urls = []
     for sub_t in subtitles:
@@ -121,7 +123,7 @@ def get_subtitle(aid, cid):
 
     subtitle_content = []
     for subtitle_url in subtitle_urls:
-        res = requests.get(subtitle_url, headers=headers).json()
+        res = session.get(subtitle_url).json()
         for i in res["body"]:
             subtitle_content.append(i["content"])
     subtitle = "\n".join(subtitle_content)
@@ -137,17 +139,14 @@ def get_video_summary_by_ai(aid, cid) -> str:
         return ""
 
 
-def gen_image(bv_id: str = "", av_id: str = "") -> tuple[str, str, str]:
-    video_info = get_video_info(bv_id, av_id)
-    if not video_info:
-        return "", "", ""
+def gen_image(video_info: dict) -> str:
     base_path = Path(__file__).parent
     # save_path = base_path / f"test.png"
     save_path = base_path / f"{uuid.uuid4()}.png"
     image = Image.new("RGBA", (560, 470), (255, 255, 255, 255))
     # image.paste((220, 220, 220), (0, 480, 530, 620))
     cover = Image.open(BytesIO(
-        requests.get(video_info["cover_url"], headers=headers).content)).resize((560, 310), Image.ANTIALIAS)
+        session.get(video_info["cover_url"]).content)).resize((560, 310), Image.LANCZOS)
     cover_size = (0, 0, 560, 310)
 
     # mask = Image.new("L", image.size, (255, 255, 255))
@@ -194,24 +193,24 @@ def gen_image(bv_id: str = "", av_id: str = "") -> tuple[str, str, str]:
     # 添加视频时长
     hour, minute = video_info["duration"].split(":")
     text_draw.text((500, cover.height - 35), f"{hour:0>2}:{minute:0>2}", font=font)
-    # 添加标题,15个字一行
-    line_width = 30
+    # 添加标题
+    line_width = 28
+    title = video_info["title"]
+    if len(title) > 50:
+        title = title[:50] + "..."
+
     next_height = cover.height + 10
-    for i in range(len(video_info["title"]) // line_width + 1):
+    for i in range(len(title) // line_width + 1):
         next_height = cover.height + 10 + i * 40
-        text_draw.text((20, next_height), f"{video_info['title'][i * line_width:(i + 1) * line_width]}", font=font,
+        text_draw.text((20, next_height), f"{title[i * line_width:(i + 1) * line_width]}", font=font,
                        fill=(0, 0, 0))
 
     # 作者信息
-    text_draw.text((20, cover.height + 80), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
+    text_draw.text((20, cover.height + 100), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
     # 添加视频上传时间
-    text_draw.text((270, cover.height + 80), f"上传时间: {video_info['upload_time']}", font=font, fill=(0, 0, 0))
+    text_draw.text((270, cover.height + 100), f"上传时间: {video_info['upload_time']}", font=font, fill=(0, 0, 0))
     image.save(save_path)
-    try:
-        summary = get_video_summary_by_ai(video_info["aid"], video_info["cid"])
-    except:
-        summary = ""
-    return str(save_path), video_info["desc"], ("AI总结：" + summary) if summary else ""
+    return str(save_path)
 
 
 if __name__ == "__main__":
@@ -223,9 +222,12 @@ if __name__ == "__main__":
     _text = "https://www.bilibili.com/video/BV1sP411g7PZ/?spm_id_from=333.337.search-card.all.click&vd_source=210c4e2f9f0cdc36cd087b10ec64eedc"
 
     _text = "https://www.bilibili.com/video/BV1MY4y1R7EN"
+
+    # 长标题
+    _text = "https://www.bilibili.com/video/BV17N411D7fB"
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
-    # gen_image(bvid)
     _video_info = get_video_info(bvid)
-    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
-    print(_r)
+    gen_image(_video_info)
+    # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
+    # print(_r)

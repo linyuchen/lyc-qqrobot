@@ -48,12 +48,12 @@ def gpt_35(context_id: str, question: str, retry_count=0):
     else:
         add_cat_prompt(messages)
 
-    if len(question) > 3000:
-        question = question[0:1500] + question[-1500:]
+    # if len(question) > 3000:
+    #     question = question[0:1500] + question[-1500:]
     messages.append({'role': 'user', 'content': question})
     try:
         response = openai.ChatCompletion.create(
-            model='gpt-3.5-turbo-0301',
+            model='gpt-3.5-turbo-16k-0613',
             # prompt=prompt,
             messages=messages,
             stream=True,
@@ -98,5 +98,6 @@ if __name__ == '__main__':
     _url = "https://mp.weixin.qq.com/s/YHIZ5I3Eg-fmDEhmhOdcLQ"
     _url = "https://www.qpython.org/"
     # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
+    _url = "https://b23.tv/vp1yWpF"
     _res = summary_web(_url)
     print(_res)
