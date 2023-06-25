@@ -21,7 +21,7 @@ class ChatGPT(MsgHandler):
         context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
         if isinstance(msg, GroupMsg):
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
-                res = gpt_35(context_id, cmd.get_original_param() or msg.msg)
+                res = gpt_35(context_id, cmd.original_cmd or msg.msg)
                 msg.reply(res)
         elif isinstance(msg, FriendMsg):
             res = gpt_35(context_id, msg.msg)
