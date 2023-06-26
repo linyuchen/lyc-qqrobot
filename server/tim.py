@@ -16,6 +16,9 @@ from pywinauto import keyboard
 from flask import Flask, request
 
 
+TEXT_MAX_LEN = 3000
+
+
 class MsgType(Enum):
     TEXT = "Plain"
     IMAGE = "Image"
@@ -42,6 +45,8 @@ def paste(data, is_image):
         if is_image:
             win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
         else:
+            if len(data) > TEXT_MAX_LEN:
+                data = data[:TEXT_MAX_LEN]
             win32clipboard.SetClipboardData(win32con.CF_UNICODETEXT, data)
     except:
         paste(data, is_image)
