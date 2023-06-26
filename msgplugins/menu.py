@@ -24,6 +24,6 @@ class MenuPlugin(MsgHandler):
         return []
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        if CMD("菜单").az(msg.msg) or msg.msg == "":
+        if CMD("菜单").az(msg.msg):
             msg.reply("\n\n".join(self.collect_cmd(msg)))
             msg.destroy()
