@@ -16,7 +16,7 @@ class MyEvent(MsgHandler):
     运行时间查询
     命令：运行时间
     """
-
+    desc = "发送 运行时间 查看机器人运行了多久"
     bind_msg_types = (FriendMsg, GroupMsg)
     
     def __init__(self, qq_client):

@@ -19,6 +19,7 @@ class MyEvent(MsgHandler):
     __doc__ = """
     群游戏：21点
     """
+    desc = "发送 24点 开始24点游戏"
     bind_msg_types = (GroupMsg, )
     
     def __init__(self, qq_client):

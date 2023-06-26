@@ -9,6 +9,8 @@ Game21 = game21point.Game
 
 
 class Game(GroupPointAction, Game21):
+    desc = "发送 21点 + 数字 开始21点游戏，数字为下注金额\n发送 21点换牌 可换牌"
+
     def __init__(self):
         GroupPointAction.__init__(self)
         Game21.__init__(self)
@@ -26,7 +28,7 @@ class MyEvent(MsgHandler):
 
         super(MyEvent, self).__init__(qq_client)
         self.name = "group_gamble"
-        self.cmdStart = CMD("21点", param_len=1)
+        self.cmdStart = CMD("21点", param_len=1, sep="")
         self.cmdUpdate = CMD("21点换牌")
         self.groupInstances = {}  # key groupQQ, value instanvc
 

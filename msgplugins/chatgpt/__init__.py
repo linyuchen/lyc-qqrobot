@@ -4,6 +4,7 @@ from ..cmdaz import CMD
 
 
 class ChatGPT(MsgHandler):
+    desc = "发送 #+消息 或者 @机器人+消息 进行AI对话\n\n发送 总结+网址 进行AI总结网页"
     is_async = True
     bind_msg_types = (GroupMsg, FriendMsg)
 

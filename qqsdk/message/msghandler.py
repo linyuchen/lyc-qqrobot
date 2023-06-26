@@ -4,13 +4,13 @@ from qqsdk.message.basemsg import BaseMsg
 
 
 class MsgHandler:
-
-    name = "base handler"  # 唯一性
-    qq_client: None
+    name = "base handler"
+    desc = ""  # 描述
+    qq_client: "qqsdk.qqclient.QQClientBase"
     is_async = False
     bind_msg_types: Tuple[Type[BaseMsg]] = ()
 
-    def __init__(self, qq_client=None):
+    def __init__(self, qq_client: "qqsdk.qqclient.QQClientBase" = None):
         self.qq_client = qq_client
 
     def check_type(self, msg: BaseMsg):

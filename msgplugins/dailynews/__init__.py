@@ -5,6 +5,7 @@ from .news import get_news2
 
 
 class ExamplePlugin(MsgHandler):
+    desc = "发送 今日新闻 查看今日重大新闻"
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True
 

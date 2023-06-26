@@ -18,8 +18,9 @@ class MyEvent(MsgHandler):
     __doc__ = u"""
     群游戏：斗牛
     """
-    bind_msg_types = (GroupMsg, )
-    
+    desc = "发送 斗牛 + 数字 开始斗牛游戏，数字为下注金额\n直接发送 斗牛 可坐庄"
+    bind_msg_types = (GroupMsg,)
+
     def __init__(self, qq_client):
         super(MyEvent, self).__init__(qq_client)
         self.name = "group_gamble"
@@ -38,7 +39,7 @@ class MyEvent(MsgHandler):
         此方法是用于处理事件接收到的消息
         main方法必须存在,注意此方法需存在一个参数用于传入消息实例
         """
-        
+
         group_qq = msg.group.qq
         member = msg.group_member
 
@@ -52,4 +53,3 @@ class MyEvent(MsgHandler):
         if result:
             msg.reply(result)
             msg.destroy()
-
