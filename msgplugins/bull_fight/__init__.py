@@ -24,7 +24,7 @@ class MyEvent(MsgHandler):
     def __init__(self, qq_client):
         super(MyEvent, self).__init__(qq_client)
         self.name = "group_gamble"
-        self.cmdStart = CMD("斗牛", param_len=1)
+        self.cmdStart = CMD("斗牛", param_len=1, sep="")
         self.groupInstances = {}  # key groupQQ, value instance
 
         # 不同的QQ群用不同的实例， 因为一个人可以在多个群里
