@@ -2,7 +2,7 @@ import re
 import time
 import uuid
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PurePath
 from urllib import request
 
 import requests
@@ -12,12 +12,7 @@ import config
 from msgplugins.chatgpt.chatgpt import gpt_35
 
 
-cookies = config.bili_cookies
-cookies = re.findall("(.*?)=(.*?); ", cookies)
-cookies = dict(cookies)
 session = requests.session()
-session.cookies.update(cookies)
-
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) "
                   "Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.35 ",
@@ -25,6 +20,15 @@ headers = {
     "Accept": "application/json;charset=UTF-8"
 }
 session.headers.update(headers)
+
+
+def get_cookie():
+    base_path = PurePath(__file__).parent
+    with open(base_path / "cookie.txt") as f:
+        cookies = f.read()
+        cookies = re.findall("(.*?)=(.*?); ", cookies)
+        cookies = dict(cookies)
+        session.cookies.update(cookies)
 
 
 def check_is_b23(text: str) -> []:
@@ -112,6 +116,7 @@ def gen_text(bv_id: str) -> str:
 
 
 def get_subtitle(aid: str, cid: str):
+    get_cookie()
     url = f"https://api.bilibili.com/x/player/v2?aid={aid}&cid={cid}"
 
     res = session.get(url).json()
@@ -228,6 +233,6 @@ if __name__ == "__main__":
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     _video_info = get_video_info(bvid)
-    gen_image(_video_info)
-    # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
-    # print(_r)
+    # gen_image(_video_info)
+    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
+    print(_r)

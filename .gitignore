@@ -17,3 +17,4 @@ __pycache__/
 mirai/
 config.py
 msgplugins/dailynews/data/*
+msgplugins/bilicard/cookie.txt
