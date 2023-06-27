@@ -8,8 +8,7 @@ from urllib import request
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-import config
-from msgplugins.chatgpt.chatgpt import gpt_35
+from msgplugins.chatgpt.chatgpt import chat
 
 
 session = requests.session()
@@ -138,7 +137,7 @@ def get_subtitle(aid: str, cid: str):
 def get_video_summary_by_ai(aid, cid) -> str:
     subtitle = get_subtitle(aid, cid)
     if subtitle:
-        res = gpt_35("", "#有如下一个视频，请完整的总结:\n" + subtitle)
+        res = chat("", "#有如下一个视频，请完整的总结:\n" + subtitle)
         return res
     else:
         return ""

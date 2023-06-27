@@ -36,7 +36,7 @@ def del_cat_prompt(messages):
         messages.remove(cat_prompt)
 
 
-def gpt_35(context_id: str, question: str, retry_count=0):
+def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
     if context_id:
         messages = context.setdefault(context_id, [])
     else:
@@ -51,9 +51,16 @@ def gpt_35(context_id: str, question: str, retry_count=0):
     if len(question) > 10000:
         question = question[0:5000] + question[-5000:]
     messages.append({'role': 'user', 'content': question})
+    if use_gpt4:
+        model = 'gpt-4-0613'
+        openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"
+    else:
+        model = 'gpt-3.5-turbo-16k-0613'
+        openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
+
     try:
         response = openai.ChatCompletion.create(
-            model='gpt-3.5-turbo-16k-0613',
+            model=model,
             # prompt=prompt,
             messages=messages,
             stream=True,
@@ -78,7 +85,7 @@ def gpt_35(context_id: str, question: str, retry_count=0):
         traceback.print_exc()
         if retry_count > 2:
             return f'糟了，发生了未知错误'
-        return gpt_35(context_id, question, retry_count + 1)
+        return chat(context_id, question, retry_count + 1)
 
 
 def summary_web(link) -> str:
@@ -88,7 +95,7 @@ def summary_web(link) -> str:
     except:
         return "网页分析失败"
     text = html2txt(html).replace("\n", "")
-    res = gpt_35("", "#总结下面这段文字，总结的结果如果不是中文就翻译成中文：\n" + text)
+    res = chat("", "#总结下面这段文字，总结的结果如果不是中文就翻译成中文：\n" + text)
     return res
 
 
@@ -99,5 +106,8 @@ if __name__ == '__main__':
     _url = "https://www.qpython.org/"
     # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
     _url = "https://b23.tv/vp1yWpF"
-    _res = summary_web(_url)
+    # _res = summary_web(_url)
+    # print(_res)
+    q = "#公司面试题: 有六只烟，那7个人怎么分?"
+    _res = chat("", q, use_gpt4=True)
     print(_res)

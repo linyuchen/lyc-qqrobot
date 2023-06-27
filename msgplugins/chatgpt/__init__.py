@@ -1,5 +1,6 @@
+import config
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg, BaseMsg
-from .chatgpt import gpt_35, summary_web
+from .chatgpt import chat, summary_web
 from ..cmdaz import CMD
 
 
@@ -22,8 +23,9 @@ class ChatGPT(MsgHandler):
         context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
         if isinstance(msg, GroupMsg):
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
-                res = gpt_35(context_id, cmd.original_cmd or msg.msg)
+                use_gpt_4 = msg.group_member.qq = config.ADMIN_QQ
+                res = chat(context_id, cmd.original_cmd or msg.msg, use_gpt4=use_gpt_4)
                 msg.reply(res)
         elif isinstance(msg, FriendMsg):
-            res = gpt_35(context_id, msg.msg)
+            res = chat(context_id, msg.msg)
             msg.reply(res)
