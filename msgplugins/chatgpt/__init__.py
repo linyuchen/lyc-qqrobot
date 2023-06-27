@@ -16,7 +16,7 @@ class ChatGPT(MsgHandler):
             url = (cmd.paramList and cmd.paramList[0]) or (cmd2.paramList and cmd2.paramList[0])
             res = summary_web(url)
             if res:
-                msg.reply(res)
+                msg.reply(res + "\n\n" + url)
                 msg.destroy()
                 return
         cmd = CMD("#", sep="", param_len=1)
