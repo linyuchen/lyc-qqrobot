@@ -48,8 +48,8 @@ def gpt_35(context_id: str, question: str, retry_count=0):
     else:
         add_cat_prompt(messages)
 
-    # if len(question) > 3000:
-    #     question = question[0:1500] + question[-1500:]
+    if len(question) > 10000:
+        question = question[0:5000] + question[-5000:]
     messages.append({'role': 'user', 'content': question})
     try:
         response = openai.ChatCompletion.create(
