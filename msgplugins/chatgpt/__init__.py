@@ -23,7 +23,8 @@ class ChatGPT(MsgHandler):
         context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
         if isinstance(msg, GroupMsg):
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
-                use_gpt_4 = msg.group_member.qq == config.ADMIN_QQ
+                # use_gpt_4 = msg.group_member.qq == config.ADMIN_QQ
+                use_gpt_4 = False
                 res = chat(context_id, cmd.original_cmd or msg.msg, use_gpt4=use_gpt_4)
                 msg.reply(res)
         elif isinstance(msg, FriendMsg):
