@@ -137,7 +137,7 @@ def get_subtitle(aid: str, cid: str):
 def get_video_summary_by_ai(aid, cid) -> str:
     subtitle = get_subtitle(aid, cid)
     if subtitle:
-        res = chat("", "#有如下一个视频，请完整的总结:\n" + subtitle)
+        res = chat("", "#有如下一个视频，请用中文完整的总结:\n" + subtitle)
         return res
     else:
         return ""
@@ -232,6 +232,9 @@ if __name__ == "__main__":
 
     # 长字幕
     _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
+
+    # 被翻译成英文了
+    _text = 'https://bilibili.com/video/BVBV1Ds4y1e7ZB'
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     _video_info = get_video_info(bvid)

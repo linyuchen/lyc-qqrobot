@@ -12,6 +12,12 @@ class BiliCardPlugin(MsgHandler):
     is_async = True
     cached = {}
 
+    def check_in_cache(self, bvid):
+        if bvid in self.cached and time.time() - self.cached[bvid] < 60:
+            return True
+        self.cached[bvid] = time.time()
+        return False
+
     def handle(self, msg: GroupMsg | FriendMsg):
         msg_text = msg.msg
         b32_url = bilicard.check_is_b23(msg_text)
@@ -28,15 +34,16 @@ class BiliCardPlugin(MsgHandler):
             # if text:
             #     msg.reply(text)
             msg.destroy()
+            if bvid and self.check_in_cache(bvid):
+                return
             video_info = bilicard.get_video_info(bvid, avid)
             bvid = video_info.get("bvid")
-            if bvid in self.cached and time.time() - self.cached[bvid] < 60:
+            if self.check_in_cache(bvid):
                 return
-            self.cached[bvid] = time.time()
             img_path = bilicard.gen_image(video_info)
             summary = bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
             summary = "AI总结：" + summary if summary else ""
-            url = f"https://bilibili.com/video/BV{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
+            url = f"https://bilibili.com/video/{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
             if img_path:
                 reply_msg = MessageSegment.image_path(img_path) + \
                             MessageSegment.text("简介：" + video_info["desc"] + "\n\n" + summary +
