@@ -234,7 +234,7 @@ if __name__ == "__main__":
     _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
 
     # 被翻译成英文了
-    _text = 'https://bilibili.com/video/BVBV1Ds4y1e7ZB'
+    # _text = 'https://bilibili.com/video/BV1Ds4y1e7ZB'
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     _video_info = get_video_info(bvid)

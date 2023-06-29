@@ -90,8 +90,18 @@ def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
 
 def summary_web(link) -> str:
     url = link
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        # "Accept-Language": "zh-CN,zh;q=0.9",
+        # "Sec-Ch-Ua-Platform": "Windows",
+        # 'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+        # "Sec-Fetch-Dest": "document",
+        # "Accept-Encoding": "gzip, deflate, br",
+        # "Connection:"keep-alive"
+    }
     try:
-        html = requests.get(url).text
+        html = requests.get(url, headers=headers).text
     except:
         return "网页分析失败"
     text = html2txt(html).replace("\n", "")
@@ -106,8 +116,9 @@ if __name__ == '__main__':
     _url = "https://www.qpython.org/"
     # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
     _url = "https://b23.tv/vp1yWpF"
-    # _res = summary_web(_url)
-    # print(_res)
-    q = "#公司面试题: 有六只烟，那7个人怎么分?"
-    _res = chat("", q, use_gpt4=True)
+    _url = "https://baijiahao.baidu.com/s?id=1769863923572250746"
+    _res = summary_web(_url)
     print(_res)
+    # q = "#公司面试题: 有六只烟，那7个人怎么分?"
+    # _res = chat("", q, use_gpt4=True)
+    # print(_res)

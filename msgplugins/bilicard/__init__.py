@@ -42,7 +42,7 @@ class BiliCardPlugin(MsgHandler):
                 return
             img_path = bilicard.gen_image(video_info)
             summary = bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
-            summary = "AI总结：" + summary if summary else ""
+            summary = "AI总结：" + (summary if summary else "此视频不支持")
             url = f"https://bilibili.com/video/{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
             if img_path:
                 reply_msg = MessageSegment.image_path(img_path) + \
