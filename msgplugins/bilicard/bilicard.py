@@ -147,11 +147,11 @@ def gen_image(video_info: dict) -> str:
     base_path = Path(__file__).parent
     # save_path = base_path / f"test.png"
     save_path = base_path / f"{uuid.uuid4()}.png"
-    image = Image.new("RGBA", (560, 470), (255, 255, 255, 255))
+    image = Image.new("RGBA", (560, 470 + 15), (255, 255, 255, 255))
     # image.paste((220, 220, 220), (0, 480, 530, 620))
     cover = Image.open(BytesIO(
-        session.get(video_info["cover_url"]).content)).resize((560, 310), Image.LANCZOS)
-    cover_size = (0, 0, 560, 310)
+        session.get(video_info["cover_url"]).content)).resize((560, 315), Image.LANCZOS)
+    cover_size = (0, 0, 560, 315)
 
     # mask = Image.new("L", image.size, (255, 255, 255))
     # # 创建 draw 对象
@@ -180,8 +180,7 @@ def gen_image(video_info: dict) -> str:
     # 添加播放数量
     image.paste(image_play_icon, (20, cover.height - 45), image_play_icon)
     text_draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(str(Path(__file__).parent.parent.parent / "common/仓耳今楷01-9128-W05.otf"),
-                              20)
+    font = get_font()
     view_count = video_info["view"]
     if view_count >= 10000:
         # 超过一万播放量则显示万,保留一位小数
@@ -198,10 +197,12 @@ def gen_image(video_info: dict) -> str:
     hour, minute = video_info["duration"].split(":")
     text_draw.text((500, cover.height - 35), f"{hour:0>2}:{minute:0>2}", font=font)
     # 添加标题
-    line_width = 28
+    font = get_font(32)
+    line_width = 16
     title = video_info["title"]
-    if len(title) > 50:
-        title = title[:50] + "..."
+    max_title_len = line_width * 3 - 5
+    if len(title) > max_title_len:
+        title = title[:max_title_len] + "..."
 
     next_height = cover.height + 10
     for i in range(len(title) // line_width + 1):
@@ -209,12 +210,18 @@ def gen_image(video_info: dict) -> str:
         text_draw.text((20, next_height), f"{title[i * line_width:(i + 1) * line_width]}", font=font,
                        fill=(0, 0, 0))
 
+    font = get_font(25)
     # 作者信息
-    text_draw.text((20, cover.height + 100), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
+    text_draw.text((20, cover.height + 140), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
     # 添加视频上传时间
-    text_draw.text((270, cover.height + 100), f"上传时间: {video_info['upload_time']}", font=font, fill=(0, 0, 0))
+    text_draw.text((230, cover.height + 140), f"上传时间: {video_info['upload_time']}", font=font, fill=(0, 0, 0))
     image.save(save_path)
     return str(save_path)
+
+
+def get_font(size=20):
+    font = ImageFont.truetype(str(Path(__file__).parent.parent.parent / "common/仓耳今楷01-9128-W05.otf"), size)
+    return font
 
 
 if __name__ == "__main__":
@@ -225,19 +232,19 @@ if __name__ == "__main__":
     # 白色背景封面
     _text = "https://www.bilibili.com/video/BV1sP411g7PZ/?spm_id_from=333.337.search-card.all.click&vd_source=210c4e2f9f0cdc36cd087b10ec64eedc"
 
-    _text = "https://www.bilibili.com/video/BV1MY4y1R7EN"
+    # _text = "https://www.bilibili.com/video/BV1MY4y1R7EN"
 
     # 长标题
-    _text = "https://www.bilibili.com/video/BV17N411D7fB"
+    # _text = "https://www.bilibili.com/video/BV17N411D7fB"
 
     # 长字幕
-    _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
+    # _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
 
     # 被翻译成英文了
     # _text = 'https://bilibili.com/video/BV1Ds4y1e7ZB'
     bvid = get_bv_id(_text)
     # print(gen_text(bvid))
     _video_info = get_video_info(bvid)
-    # gen_image(_video_info)
-    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
-    print(_r)
+    gen_image(_video_info)
+    # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
+    # print(_r)
