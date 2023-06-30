@@ -1,5 +1,4 @@
-import config
-from qqsdk.message import MsgHandler, GroupMsg, FriendMsg, BaseMsg
+from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from .chatgpt import chat, summary_web
 from ..cmdaz import CMD
 
@@ -14,8 +13,7 @@ class ChatGPT(MsgHandler):
         cmd2 = CMD("总结", alias=["摘要"], param_len=1, sep="")
         if cmd.az(msg.msg) or cmd2.az(msg.msg):
             url = (cmd.paramList and cmd.paramList[0]) or (cmd2.paramList and cmd2.paramList[0])
-            res = summary_web(url)
-            if res:
+            if res := summary_web(url):
                 msg.reply(res + "\n\n" + url)
                 msg.destroy()
                 return
