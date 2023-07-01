@@ -7,6 +7,8 @@ import unicodedata
 from pathlib import PurePath
 
 import requests
+
+from common.stringplus import split_lines
 from common.utils import htmlhelper
 from PIL import Image, ImageDraw, ImageFont
 
@@ -44,31 +46,7 @@ def get_news():
 
     # 进行文本换行
     line_width = 30
-    wrap_news = []
-    for line in news.splitlines():
-        if line == "":
-            wrap_news.append("")
-            continue
-        current_line_width = 0
-        current_line = []
-        for c in line:
-            # todo: 这里标点符号被算做了半角字符，导致换行不准确
-            # 标点符号算作全角字符
-            if not re.match("[\da-zA-Z]", c):
-            # if unicodedata.east_asian_width(c) in ('F', 'W'):
-                # 全角字符
-                current_line_width += 1
-            else:
-                # 半角字符
-                current_line_width += 0.4
-            current_line.append(c)
-            if current_line_width >= line_width:
-                wrap_news.append("".join(current_line))
-                current_line = []
-                current_line_width = 0
-        if current_line:
-            wrap_news.append("".join(current_line))
-
+    wrap_news = split_lines(news, line_width)
     line_height = 60
     image = Image.new("RGB", (1080, (line_height + 1) * len(wrap_news)), (255, 255, 255))
     text_draw = ImageDraw.Draw(image)

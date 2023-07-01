@@ -8,6 +8,7 @@ from urllib import request
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
+from common.stringplus import split_lines
 from msgplugins.chatgpt.chatgpt import chat
 
 
@@ -205,9 +206,9 @@ def gen_image(video_info: dict) -> str:
         title = title[:max_title_len] + "..."
 
     next_height = cover.height + 10
-    for i in range(len(title) // line_width + 1):
+    for i, line in enumerate(split_lines(title, line_width)):
         next_height = cover.height + 10 + i * 40
-        text_draw.text((20, next_height), f"{title[i * line_width:(i + 1) * line_width]}", font=font,
+        text_draw.text((20, next_height), f"{line}", font=font,
                        fill=(0, 0, 0))
 
     font = get_font(25)
@@ -235,7 +236,7 @@ if __name__ == "__main__":
     # _text = "https://www.bilibili.com/video/BV1MY4y1R7EN"
 
     # 长标题
-    # _text = "https://www.bilibili.com/video/BV17N411D7fB"
+    _text = "https://www.bilibili.com/video/BV17N411D7fB"
 
     # 长字幕
     # _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
