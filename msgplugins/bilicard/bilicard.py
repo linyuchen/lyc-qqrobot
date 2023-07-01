@@ -214,7 +214,7 @@ def gen_image(video_info: dict) -> str:
     # 作者信息
     text_draw.text((20, cover.height + 140), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
     # 添加视频上传时间
-    text_draw.text((230, cover.height + 140), f"上传时间: {video_info['upload_time']}", font=font, fill=(0, 0, 0))
+    text_draw.text((340, cover.height + 140), f" {video_info['upload_time']}", font=font, fill=(0, 0, 0))
     image.save(save_path)
     return str(save_path)
 

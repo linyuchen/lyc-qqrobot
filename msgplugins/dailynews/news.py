@@ -81,15 +81,22 @@ def get_news():
 
 def get_news2():
     today = time.strftime("%Y-%m-%d")
-    img_path = base_path / "data" / (today + ".png")
-    if os.path.exists(img_path):
-        return str(img_path)
+    yesterday = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 60 * 60))
+    today_img_path = base_path / "data" / (today + ".png")
+    yesterday_img_path = base_path / "data" / (yesterday + ".png")
+
+    if os.path.exists(today_img_path):
+        # 对比昨天的图片，如果一样就不更新
+        if os.path.exists(yesterday_img_path) and os.path.getsize(yesterday_img_path) == os.path.getsize(today_img_path):
+            os.remove(today_img_path)
+        else:
+            return str(today_img_path)
     url = "https://api.03c3.cn/zb/"
-    with open(img_path, "wb") as f:
+    with open(today_img_path, "wb") as f:
         try:
             img_data = requests.get(url).content
             f.write(img_data)
-            return str(img_path)
+            return str(today_img_path)
         except:
             return
 
