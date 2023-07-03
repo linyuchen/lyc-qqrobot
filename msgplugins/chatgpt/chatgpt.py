@@ -117,8 +117,8 @@ if __name__ == '__main__':
     # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
     _url = "https://b23.tv/vp1yWpF"
     _url = "https://baijiahao.baidu.com/s?id=1769863923572250746"
-    _res = summary_web(_url)
-    print(_res)
-    # q = "#公司面试题: 有六只烟，那7个人怎么分?"
-    # _res = chat("", q, use_gpt4=True)
+    # _res = summary_web(_url)
     # print(_res)
+    q = "#鲁迅和周树人打起来怎么办"
+    _res = chat("", q, use_gpt4=True)
+    print(_res)

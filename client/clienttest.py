@@ -5,7 +5,7 @@ from qqsdk.qqclient import QQClientBase
 
 TEST_GROUP_QQ = "123"
 TEST_GROUP_NAME = "test group"
-TEST_GROUP_MEMBER_QQ = "456"
+TEST_GROUP_MEMBER_QQ = "379450326"
 TEST_GROUP_MEMBER_NAME = "test"
 
 
