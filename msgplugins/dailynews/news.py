@@ -14,13 +14,15 @@ from PIL import Image, ImageDraw, ImageFont
 
 base_path = PurePath(__file__).parent
 
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/83.0.4103.106 Safari/537.36"}
+
 
 def get_news():
     # 从知乎每日新闻接口获取新闻内容
     url = 'https://www.zhihu.com/api/v4/columns/c_1261258401923026944/items'
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-                      "Chrome/83.0.4103.106 Safari/537.36"}
+
     response = requests.get(url, headers=headers)
     res = response.json()
     content = res['data'][0]['content']
@@ -69,10 +71,10 @@ def get_news2():
             os.remove(today_img_path)
         else:
             return str(today_img_path)
-    url = "https://api.03c3.cn/zb/"
+    url = "https://api.03c3.cn/zb/index.php"
     with open(today_img_path, "wb") as f:
         try:
-            img_data = requests.get(url).content
+            img_data = requests.get(url, headers=headers).content
             f.write(img_data)
             return str(today_img_path)
         except:

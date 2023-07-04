@@ -7,6 +7,7 @@ SEND2TIM = True
 SEND2TIM_HTTP_API = "http://localhost:8088"
 
 plugins = [
+    "menu",
     "bilicard",
     "bull_fight",
     "dailynews",

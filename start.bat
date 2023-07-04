@@ -1,1 +1,1 @@
-"venv/scripts/activate" && python "client/marai/main.py"
+"venv/scripts/activate" && python "client/mirai_http/main.py"
