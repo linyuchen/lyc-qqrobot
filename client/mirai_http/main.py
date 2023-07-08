@@ -91,6 +91,9 @@ class MiraiQQClient(QQClientFlask):
         for g in data:
             group = entity.Group(qq=str(g["id"]), name=g["name"], members=[])
             member_list_data = self.api_get("/memberList", {"target": group.qq}).json().get("data")
+            my_info = self.api_get("/memberInfo", {"target": group.qq, "memberId": self.qq_user.qq}).json()
+            group_member = entity.GroupMember(qq=str(self.qq_user.qq), nick=my_info["memberName"], card="")
+            group.members.append(group_member)
             for member_data in member_list_data:
                 group_member = entity.GroupMember(qq=str(member_data["id"]), nick=member_data["memberName"],
                                                   card="")

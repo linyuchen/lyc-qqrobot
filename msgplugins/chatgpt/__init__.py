@@ -18,9 +18,11 @@ class ChatGPT(MsgHandler):
                 msg.reply(res + "\n\n" + url)
                 msg.destroy()
                 return
-        cmd = CMD("#", sep="", param_len=1)
+
         context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
         if isinstance(msg, GroupMsg):
+            robot_name = msg.group.get_member(str(config.QQ)).get_name()
+            cmd = CMD("#", alias=[f"@{robot_name}"], sep="", param_len=1)
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
                 use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
                 res = chat(context_id, cmd.original_cmd or msg.msg, use_gpt4=use_gpt_4)

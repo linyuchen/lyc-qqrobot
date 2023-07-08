@@ -39,9 +39,16 @@ class CMD(object):
         self.original_cmd = original_cmd
         original_cmd = original_cmd.strip()
         cmd_name = ""
+        cmds = list(self.alias) + [self.cmd_name]
+        cmds.sort(key=len)
+        for i in cmds:
+            if original_cmd.startswith(i):
+                cmd_name = i
+        if not cmd_name:
+            return False
 
         if self.param_length:  # 需要参数，进行参数分割
-            cmd_name_length = len(self.cmd_name)
+            cmd_name_length = len(cmd_name)
             if len(original_cmd) <= cmd_name_length:  # 如果没有参数
                 return False
 
@@ -58,8 +65,8 @@ class CMD(object):
                 self.original_param = self.param_sep.join(self.paramList)
 
             if not self.param_sep:  # 无分隔符
-                self.paramList = [original_cmd[cmd_name_length:]]
-                cmd_name = original_cmd[:cmd_name_length]
+                self.paramList = [original_cmd[cmd_name_length:].strip()]
+                # cmd_name = original_cmd[:cmd_name_length]
                 self.original_param = self.paramList[0]
         else:
             cmd_name = original_cmd
