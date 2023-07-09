@@ -48,6 +48,9 @@ def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
     else:
         add_cat_prompt(messages)
 
+    if question.startswith("##"):
+        messages = []
+
     if len(question) > 10000:
         question = question[0:5000] + question[-5000:]
     messages.append({'role': 'user', 'content': question})
