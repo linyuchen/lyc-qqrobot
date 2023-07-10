@@ -20,3 +20,4 @@ msgplugins/dailynews/data/*
 msgplugins/bilicard/cookie.txt
 !/.gitkeep
 msgplugins/blacklist/config.json
+msgplugins/stable_diffusion/*.png

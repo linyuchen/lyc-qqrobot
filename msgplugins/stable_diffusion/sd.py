@@ -1,0 +1,42 @@
+import base64
+import io
+import uuid
+from pathlib import Path
+
+import requests
+from PIL import Image
+
+import config
+from msgplugins.chatgpt.chatgpt import chat
+
+
+def trans2en(txt: str):
+    prompt = "从现在开始你是一名基于输入描述的绘画AI提示词生成器，你会根据我输入的中文描述，生成符合主题的完整提示词。请注意，你生成后的内容服务于一个绘画AI，它只能理解具象的提示词而非抽象的概念，我将提供简短的描述，以便生成器可以为我提供准确的提示词。我希望生成的提示词能够包含人物的姿态、服装、妆容、情感表达和环境背景等细节，并且在必要时进行优化和重组以提供更加准确的描述，以便更好地服务于我的绘画AI，请严格遵守此条规则，也只输出翻译后的英文内容。请模仿结构示例生成准确提示词。示例输入：一位坐在床上的少女。 示例输出：1girl, sitting on, hand on own chest, head tilt, (indian_style:1.1), light smile, aqua eyes, (large breasts:1.2), blondehair, shirt, pleated_skirt, school uniform, (torn pantyhose:0.9), black garter belt, mary_janes, flower ribbon, glasses, looking at viewer, on bed,indoors,between legs. 请开始将下面的句子生成我需要的英文内容\n"
+    result = chat("", prompt + txt)
+    return result
+
+
+def txt2img(txt: str):
+    """
+    文字转图片
+    :param txt: 文字
+    :return: 图片的base64编码
+    """
+    txt = trans2en(txt)
+    url = config.SD_HTTP_API + "/sdapi/v1/txt2img"
+    data = {
+        "prompt": "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2)," + txt,
+        "negative_prompt": "NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),",
+        "steps": 20,
+    }
+    r = requests.post(url, json=data).json()
+    for i in r['images']:
+        image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
+        image_path = Path(__file__).parent / (str(uuid.uuid4()) + ".png")
+        image.save(image_path)
+        # image.show()
+        return str(image_path)
+
+
+if __name__ == '__main__':
+    print(txt2img("一只小鸟在蓝色的天空中飞翔"))
