@@ -8,6 +8,7 @@ from .sd import txt2img
 
 class SDPlugin(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
+    is_async = True
 
     def handle(self, msg: GroupMsg | FriendMsg):
         c = CMD("画图", param_len=1, sep="")
