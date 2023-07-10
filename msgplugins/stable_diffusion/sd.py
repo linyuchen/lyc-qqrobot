@@ -16,20 +16,22 @@ def trans2en(txt: str):
     return result
 
 
-def txt2img(txt: str):
+def txt2img(txt: str, trans=True):
     """
     文字转图片
     :param txt: 文字
+    :param trans: 是否翻译为英文
     :return: 图片的base64编码
     """
-    txt = trans2en(txt)
+    if trans:
+        txt = trans2en(txt)
     url = config.SD_HTTP_API + "/sdapi/v1/txt2img"
     data = {
         "prompt": "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2)," + txt,
         "negative_prompt": "NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),",
         "steps": 20,
     }
-    r = requests.post(url, json=data).json()
+    r = requests.post(url, json=data, timeout=30).json()
     for i in r['images']:
         image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
         image_path = Path(__file__).parent / (str(uuid.uuid4()) + ".png")
@@ -39,4 +41,4 @@ def txt2img(txt: str):
 
 
 if __name__ == '__main__':
-    print(txt2img("一只小鸟在蓝色的天空中飞翔"))
+    print(txt2img("absurdres, 1girl, ocean, railing, white dress, sun hat,", False))
