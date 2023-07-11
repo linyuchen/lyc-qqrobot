@@ -41,4 +41,5 @@ class BaseMsg:
         """
         销毁此消息，不再让其他event处理
         """
+        self.paused = False
         self.is_over = True

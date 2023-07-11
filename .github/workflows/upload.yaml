@@ -17,8 +17,8 @@ jobs:
 #        password: ${{ secrets.PASSWORD }}
         key: ${{ secrets.SSH_KEY }}
         script_stop: true
-        script: |
-          cd /home/linyuchen/qqrobot-plugin
-          git checkout master
-          git pull origin master
-          ./start.sh
+#        script: |
+#          cd /home/linyuchen/qqrobot-plugin
+#          git checkout master
+#          git pull origin master
+#          ./start.sh
