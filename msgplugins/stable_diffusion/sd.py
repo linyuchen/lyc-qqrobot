@@ -59,7 +59,14 @@ def txt2img(txt: str, trans=True):
 
 def __get_models():
     res = __api_get("sd-models")
-    models = [m["model_name"] for m in res]
+    options = __api_get("options")
+    current_model_hash = options["sd_checkpoint_hash"]
+    models = []
+    for m in res:
+        model_name = m["model_name"]
+        if current_model_hash == m["sha256"]:
+            model_name = "当前模型：" + model_name
+        models.append(model_name)
     models = "\n".join(models)
     return models
 
@@ -90,4 +97,4 @@ if __name__ == '__main__':
     # print(get_models())
     print(get_models())
     # print(set_model("二次元：AbyssOrangeMix2_sfw"))
-    print(set_model("2.5D：Guofeng3 V32"))
+    print(set_model("2.5D：国风3"))
