@@ -47,6 +47,9 @@ def txt2img(txt: str, trans=True):
         "prompt": "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2)," + txt,
         "negative_prompt": "(NSFW:2), (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),",
         "steps": 20,
+        "width": 512,
+        "height": 768,
+        "sampler_index": "DPM++ 2M Karras"
     }
     r = __api_post("txt2img", data)
     for i in r['images']:
@@ -65,7 +68,7 @@ def __get_models():
     for m in res:
         model_name = m["model_name"]
         if current_model_hash == m["sha256"]:
-            model_name = "当前模型：" + model_name
+            model_name = f"*当前模型：{model_name}*"
         models.append(model_name)
     models = "\n".join(models)
     return models
@@ -94,7 +97,7 @@ def set_model(model_name: str):
 
 if __name__ == '__main__':
     # print(txt2img("absurdres, 1girl, ocean, railing, white dress, sun hat,", False))
-    # print(get_models())
     print(get_models())
+    # print(get_models())
     # print(set_model("二次元：AbyssOrangeMix2_sfw"))
-    print(set_model("2.5D：国风3"))
+    # print(set_model("2.5D：国风3"))

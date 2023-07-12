@@ -15,7 +15,7 @@ class SDPlugin(MsgHandler):
     def handle(self, msg: GroupMsg | FriendMsg):
         get_models_cmd = CMD("查看画图模型", param_len=0)
         set_model_cmd = CMD("设置画图模型", param_len=1, sep=" ")
-        draw_cmd = CMD("画图", param_len=1, sep="")
+        draw_cmd = CMD("画图", param_len=1, sep=" ")
         draw_cmd2 = CMD("sd", param_len=1, sep=" ")
         trans = True
         draw_txt = ""
