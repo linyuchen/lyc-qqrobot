@@ -1,5 +1,6 @@
 import base64
 import io
+import re
 import uuid
 from pathlib import Path
 
@@ -33,14 +34,15 @@ def __api_post(url_path: str, data: dict = None):
     return resp.json()
 
 
-def txt2img(txt: str, trans=True):
+def txt2img(txt: str):
     """
     文字转图片
     :param txt: 文字
-    :param trans: 是否翻译为英文
     :return: 图片的base64编码
     """
-    if trans:
+    chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
+    match_chinese = re.search(chinese_pattern, txt)
+    if match_chinese:
         txt = trans2en(txt)
     txt = txt.lower().replace("nsfw", "")
     data = {
@@ -97,7 +99,11 @@ def set_model(model_name: str):
 
 if __name__ == '__main__':
     # print(txt2img("absurdres, 1girl, ocean, railing, white dress, sun hat,", False))
-    print(get_models())
+    # print(get_models())
+    text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
+    pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
+    match = re.search(pattern, text)
+    print(match)
     # print(get_models())
     # print(set_model("二次元：AbyssOrangeMix2_sfw"))
     # print(set_model("2.5D：国风3"))
