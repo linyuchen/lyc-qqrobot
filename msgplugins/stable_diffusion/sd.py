@@ -90,20 +90,26 @@ def get_models():
 
 
 def set_model(model_name: str):
+    res = __api_get("sd-models")
+    model = filter(lambda m: model_name in m["model_name"], res)
+    model = list(model)
+    if len(model) == 0:
+        return f"模型{model_name}不存在"
+    model_name = model[0]["model_name"]
     data = {
         "sd_model_checkpoint": model_name
     }
     r = __api_post("options", data)
-    return r
+    return f"模型已切换为：{model_name}"
 
 
 if __name__ == '__main__':
     # print(txt2img("absurdres, 1girl, ocean, railing, white dress, sun hat,", False))
     # print(get_models())
-    text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
-    pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
-    match = re.search(pattern, text)
-    print(match)
+    # text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
+    # pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
+    # match = res.search(pattern, text)
+    # print(match)
     # print(get_models())
     # print(set_model("二次元：AbyssOrangeMix2_sfw"))
-    # print(set_model("2.5D：国风3"))
+    print(set_model("国风4"))

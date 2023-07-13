@@ -23,8 +23,7 @@ class SDPlugin(MsgHandler):
             return
         elif set_model_cmd.az(msg.msg):
             model_name = set_model_cmd.get_original_param().strip()
-            set_model(model_name)
-            msg.reply(f"画图模型已设置为{model_name}")
+            msg.reply(set_model(model_name))
             msg.destroy()
         elif draw_cmd.az(msg.msg):
             draw_txt = draw_cmd.get_original_param()
