@@ -95,8 +95,7 @@ class MiraiQQClient(QQClientFlask):
             group_member = entity.GroupMember(qq=str(self.qq_user.qq), nick=my_info["memberName"], card="")
             group.members.append(group_member)
             for member_data in member_list_data:
-                group_member = entity.GroupMember(qq=str(member_data["id"]), nick=member_data["memberName"],
-                                                  card="")
+                group_member = entity.GroupMember(qq=str(member_data["id"]), nick=member_data["memberName"], card="")
                 group.members.append(group_member)
             self.qq_user.groups.append(group)
         return self.qq_user.groups
@@ -133,6 +132,9 @@ class MiraiQQClient(QQClientFlask):
                 self.get_groups()
                 group = self.get_group(group_qq)
                 group_member = group.get_member(group_member_qq)
+                if not group_member:
+                    group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
+                    group.members.append(group_member)
             msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
             msg.reply = lambda _msg: self.send_msg(group.qq, _msg, is_group=True)
             self.add_msg(msg)
