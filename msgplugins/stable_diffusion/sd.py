@@ -34,10 +34,12 @@ def __api_post(url_path: str, data: dict = None):
     return resp.json()
 
 
-def txt2img(txt: str):
+def txt2img(txt: str, width: int = 512, height: int = 512):
     """
     文字转图片
     :param txt: 文字
+    :param width: 图片宽度
+    :param height: 图片高度
     :return: 图片的base64编码
     """
     chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
@@ -51,8 +53,8 @@ def txt2img(txt: str):
         "prompt": "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2)," + txt,
         "negative_prompt": "(NSFW:2), (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),NSFW, (worst quality:2), (low quality:2), (normal quality:2), lowres, normal quality, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, (ugly:1.331), (duplicate:1.331), (morbid:1.21), (mutilated:1.21), (tranny:1.331), mutated hands, (poorly drawn hands:1.5), blurry, (bad anatomy:1.21), (bad proportions:1.331), extra limbs, (disfigured:1.331), (missing arms:1.331), (extra legs:1.331), (fused fingers:1.61051), (too many fingers:1.61051), (unclear eyes:1.331), lowers, bad hands, missing fingers, extra digit,bad hands, missing fingers, (((extra arms and legs))),",
         "steps": 20,
-        "width": 600,
-        "height": 600,
+        "width": width,
+        "height": height,
         "sampler_index": "DPM++ 2M Karras"
     }
     r = __api_post("txt2img", data)
@@ -81,8 +83,16 @@ def __get_models():
 def __get_loras():
     res = __api_get("loras")
     # loras = [{"name": lora["name"], "frequency_tag": lora["metadata"]["ss_tag_frequency"].keys()} for lora in res]
-    loras = [f'{lora["name"]}，标签：{"，".join(lora["metadata"]["ss_tag_frequency"].keys())}' for lora in res]
-    loras = "\n\n".join(loras)
+    loras = []
+    for lora in res:
+        trigger_tags = lora["metadata"].get("ss_tag_frequency", {}).keys()
+        # if not trigger_tags:
+        #     continue
+        trigger_tags = [tag.split("_")[1] for tag in trigger_tags]
+        trigger_tags = "，".join(trigger_tags)
+        loras.append(f"{lora['name']}，触发词：{trigger_tags}")
+
+    loras = "\n".join(loras)
     return loras
 
 
@@ -106,8 +116,8 @@ def set_model(model_name: str):
 
 
 if __name__ == '__main__':
-    # print(txt2img("absurdres, 1girl, ocean, railing, white dress, sun hat,", False))
-    print(txt2img("裸体 女孩"))
+    print(txt2img("<lora:genshin:1>,keqingdef", 1024, 768))
+    # print(txt2img("裸体 女孩"))
     # print(get_models())
     # text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
     # pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
@@ -117,4 +127,3 @@ if __name__ == '__main__':
     # print(set_model("二次元：AbyssOrangeMix2_sfw"))
     # print(set_model("国风4"))
     # print(trans2en("裸体 女孩"))
-

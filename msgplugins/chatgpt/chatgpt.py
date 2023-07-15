@@ -43,12 +43,12 @@ def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
         messages = []
     if len(messages) > MAX_MESSAGE_LENGTH:
         del messages[:3]
-    if question.startswith('#'):
+    if question.startswith('##'):
         del_cat_prompt(messages)
     else:
         add_cat_prompt(messages)
 
-    if question.startswith("##"):
+    if question.startswith("###"):
         messages.clear()
 
     if len(question) > 10000:
