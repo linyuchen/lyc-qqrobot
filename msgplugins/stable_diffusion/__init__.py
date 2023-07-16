@@ -18,7 +18,7 @@ class SDPlugin(MsgHandler):
         if isinstance(msg, GroupMsg):
             if msg.is_at_me:
                 sep = ""
-        get_models_cmd = CMD("查看画图模型", alias=["画图模型", "查看模型"], param_len=0)
+        get_models_cmd = CMD("查看画图模型", alias=["画图模型", "查看模型", "切换模型", "设置模型"], param_len=0)
         get_loras_cmd = CMD("查看lora", param_len=0)
         set_model_cmd = CMD("设置画图模型", alias=["画图模型", "设置模型", "切换模型", "切换画图模型"], param_len=1, sep=sep)
         draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个"], param_len=1, sep=sep)
