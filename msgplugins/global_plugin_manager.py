@@ -21,23 +21,26 @@ class GlobalPluginManager(MsgHandler):
             return
         cmd_open = CMD("开启全局插件", param_len=1, sep="")
         cmd_close = CMD("关闭全局插件", param_len=1, sep="")
+        enabled = True
+        plugin_name = ""
         if cmd_open.az(msg.msg):
             cmd_param = cmd_open.get_param_list()
             plugin_name = cmd_param[0]
-            config.plugins[plugin_name]["enabled"] = True
-            config.save_config()
-            msg.reply(f"已开启插件{plugin_name}")
-            msg.destroy()
-            return
         elif cmd_close.az(msg.msg):
             cmd_param = cmd_close.get_param_list()
             plugin_name = cmd_param[0]
+            enabled = False
             if plugin_name == "global_plugin_manager":
                 msg.reply("不能关闭全局插件管理器")
                 msg.destroy()
-                return
-            config.plugins[plugin_name]["enabled"] = False
-            config.save_config()
-            msg.reply(f"已关闭插件{plugin_name}")
+        else:
+            return
+
+        if plugin_name not in config.plugins:
+            msg.reply(f"插件名有误，插件【{plugin_name}】不存在")
             msg.destroy()
             return
+        config.plugins[plugin_name]["enabled"] = enabled
+        config.save_config()
+        msg.reply(f"已{'开启' if enabled else '关闭'}插件{plugin_name}")
+        msg.destroy()

@@ -23,6 +23,29 @@ def get_plugins(group_qq):
     return res
 
 
+def manage_plugin(msg, plugin_name, group_qq, plugin_enabled):
+    # 如果插件不能被管理
+    if not plugins.get(plugin_name, {}).get("can_group_manage", True):
+        return
+    if plugin_name in plugins:
+        groups = plugins[plugin_name].get("exclude_groups", [])
+        groups = list(set(groups))
+        if plugin_enabled:
+            if group_qq in groups:
+                groups.remove(group_qq)
+            msg.reply(f"插件【{plugin_name}】已开启")
+        else:
+            if group_qq not in groups:
+                groups.append(group_qq)
+            msg.reply(f"插件【{plugin_name}】已关闭")
+        plugins[plugin_name]["exclude_groups"] = groups
+        config.plugins = plugins
+        config.save_config()
+    else:
+        msg.reply(f"插件名有误，插件【{plugin_name}】不存在")
+    msg.destroy()
+
+
 class GroupPluginManager(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
     desc = "发送 插件列表 即可查看各插件状态\n" + \
@@ -47,8 +70,10 @@ class GroupPluginManager(MsgHandler):
                     return
                 cmd_param = cmd.get_param_list()
                 plugin_name, group_qq = cmd_param
+                group_qq = str(group_qq)
             else:
                 return
+            manage_plugin(msg, plugin_name, group_qq, plugin_enabled)
         else:
             cmd_open = CMD("开启插件", param_len=1, sep="")
             cmd_close = CMD("关闭插件", param_len=1, sep="")
@@ -69,27 +94,7 @@ class GroupPluginManager(MsgHandler):
             plugin_name = cmd.get_param_list()[0]
             group_qq = msg.group.qq
 
-        if plugin_name:
             if not msg.group_member.isAdmin and msg.group_member.qq != str(ADMIN_QQ):
                 msg.reply("插件管理仅管理员或群主可用")
                 return
-            # 如果插件不能被管理
-            if not plugins[plugin_name].get("can_group_manage", True):
-                return
-            if plugin_name in plugins:
-                groups = plugins[plugin_name].get("exclude_groups", [])
-                groups = list(set(groups))
-                if plugin_enabled:
-                    if group_qq in groups:
-                        groups.remove(group_qq)
-                    msg.reply(f"插件【{plugin_name}】已开启")
-                else:
-                    if group_qq not in groups:
-                        groups.append(group_qq)
-                    msg.reply(f"插件【{plugin_name}】已关闭")
-                plugins[plugin_name]["exclude_groups"] = groups
-                config.plugins = plugins
-                config.save_config()
-            else:
-                msg.reply(f"插件名有误，插件【{plugin_name}】不存在")
-            msg.destroy()
+            manage_plugin(msg, plugin_name, group_qq, plugin_enabled)
