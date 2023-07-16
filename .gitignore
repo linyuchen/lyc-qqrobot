@@ -15,9 +15,9 @@ venv/
 CoolQAir/
 __pycache__/
 mirai/
-config.py
 msgplugins/dailynews/data/*
 msgplugins/bilicard/cookie.txt
 !/.gitkeep
 msgplugins/blacklist/config.json
 msgplugins/stable_diffusion/*.png
+config.json

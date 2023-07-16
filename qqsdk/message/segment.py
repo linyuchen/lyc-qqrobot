@@ -26,6 +26,16 @@ class MessageSegment:
         return MessageSegment("ImagePath", path)
 
     @staticmethod
+    def voice_path(path: str):
+        return MessageSegment("VoicePath", path)
+
+    @staticmethod
+    def voice_base64(base64_data):
+        if "base64," in base64_data:
+            base64_data = base64_data.split("base64,")[1]
+        return MessageSegment("VoiceBase64", base64_data)
+
+    @staticmethod
     def to_data(msg_type: str, content: str):
         """
         可以在外部更改此方法
@@ -37,6 +47,10 @@ class MessageSegment:
             data.update({"type": "Image", "url": content})
         elif msg_type == "ImagePath":
             data.update({"type": "Image", "path": content})
+        elif msg_type == "VoicePath":
+            data.update({"type": "Voice", "path": content})
+        elif msg_type == "VoiceBase64":
+            data.update({"type": "Voice", "base64": content})
         return data
 
     @property
@@ -51,4 +65,5 @@ class MessageSegment:
         ms.origin_data = self.origin_data
         ms.origin_data.append((other.msg_type, other.content))
         return ms
+
 

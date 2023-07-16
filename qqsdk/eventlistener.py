@@ -6,6 +6,8 @@ import traceback
 from queue import Queue
 from typing import List
 
+import config
+from qqsdk.message import GroupMsg
 from qqsdk.message.friendmsg import BaseMsg
 from qqsdk.message.msghandler import MsgHandler
 
@@ -39,6 +41,15 @@ class EventListener(Thread):
                 if msg.is_over:
                     break
                 handler: MsgHandler
+                handler_plugin_name = handler.get_module_name()
+                enabled = config.plugins[handler_plugin_name].get("enabled", True)
+                if not enabled:
+                    continue
+                if isinstance(msg, GroupMsg):
+                    exclude_groups = config.plugins[handler_plugin_name].get("exclude_groups", [])
+                    exclude_groups = map(str, exclude_groups)
+                    if msg.group.qq in exclude_groups:
+                        continue
                 if handler.check_type(msg):
                     try:
                         if handler.is_async:

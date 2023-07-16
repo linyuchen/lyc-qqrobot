@@ -18,3 +18,6 @@ class MsgHandler:
 
     def handle(self, msg: BaseMsg):
         pass
+
+    def get_module_name(self):
+        return self.__module__.split(".")[1]

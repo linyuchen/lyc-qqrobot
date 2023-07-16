@@ -13,8 +13,8 @@ class SDPlugin(MsgHandler):
         "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型"
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        get_models_cmd = CMD("查看画图模型", param_len=0)
-        set_model_cmd = CMD("设置画图模型", param_len=1, sep=" ")
+        get_models_cmd = CMD("查看画图模型", alias=["画图模型"], param_len=0)
+        set_model_cmd = CMD("设置画图模型", alias=["画图模型"], param_len=1, sep=" ")
         draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个"], param_len=1, sep=" ")
         draw_hd_cmd = CMD("画图hd", param_len=1, sep=" ")
         draw_txt = ""
@@ -33,9 +33,9 @@ class SDPlugin(MsgHandler):
                 width = 1024
                 height = 768
             else:
-                width = 1024
-                height = 768
-            # msg.reply("正在生成图片，请稍后...")
+                width = 600
+                height = 800
+            msg.reply("正在努力画画中（吭哧吭哧~），请稍后...")
             image_path = txt2img(draw_txt, width, height)
             reply_msg = MessageSegment.image_path(image_path)
             msg.reply(reply_msg)
