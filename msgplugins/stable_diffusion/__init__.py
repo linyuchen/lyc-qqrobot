@@ -13,10 +13,14 @@ class SDPlugin(MsgHandler):
         "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型"
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        get_models_cmd = CMD("查看画图模型", alias=["画图模型"], param_len=0)
-        set_model_cmd = CMD("设置画图模型", alias=["画图模型"], param_len=1, sep=" ")
-        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个"], param_len=1, sep=" ")
-        draw_hd_cmd = CMD("画图hd", param_len=1, sep=" ")
+        sep = " "
+        if isinstance(msg, GroupMsg):
+            if msg.is_at_me:
+                sep = ""
+        get_models_cmd = CMD("查看画图模型", alias=["画图模型", "查看模型"], param_len=0)
+        set_model_cmd = CMD("设置画图模型", alias=["画图模型", "设置模型", "切换模型", "切换画图模型"], param_len=1, sep=sep)
+        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个"], param_len=1, sep=sep)
+        draw_hd_cmd = CMD("画图hd", param_len=1, sep=sep)
         draw_txt = ""
         if get_models_cmd.az(msg.msg):
             msg.reply(get_models())
@@ -24,6 +28,7 @@ class SDPlugin(MsgHandler):
             return
         elif set_model_cmd.az(msg.msg):
             model_name = set_model_cmd.get_original_param().strip()
+            msg.reply("正在设置模型，请稍后...")
             msg.reply(set_model(model_name))
             msg.destroy()
         elif draw_cmd.az(msg.msg) or draw_hd_cmd.az(msg.msg):
