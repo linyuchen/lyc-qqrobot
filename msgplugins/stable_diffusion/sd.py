@@ -95,14 +95,19 @@ def __get_loras():
             continue
         trigger_tags = [tag.split("_")[1] for tag in trigger_tags]
         trigger_tags = "，".join(trigger_tags)
-        loras.append(f"{lora['name']}，触发词：{trigger_tags}")
+        loras.append(f"{lora['name']}：{trigger_tags}")
 
     loras = "\n\n".join(loras)
     return loras
 
 
 def get_models():
-    res = f"模型列表：\n{__get_models()}\n\nLora列表：\n{__get_loras()}"
+    res = f"模型列表：\n{__get_models()}"
+    return res
+
+
+def get_loras():
+    res = f"lora列表：\n{__get_loras()}"
     return res
 
 
