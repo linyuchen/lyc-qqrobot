@@ -47,6 +47,7 @@ class ChatGPT(MsgHandler):
                 self.records[msg.group_member.qq] = time.time()
                 use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
                 res = chat(context_id, cmd.original_cmd or msg.msg, use_gpt4=use_gpt_4)
+                send_voice(msg, res)
                 msg.reply(res)
         elif isinstance(msg, FriendMsg):
             res = chat(context_id, msg.msg)
