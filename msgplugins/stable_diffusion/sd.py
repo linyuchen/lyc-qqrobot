@@ -17,6 +17,10 @@ session.timeout = 30
 
 
 def trans2en(txt: str):
+    chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
+    match_chinese = re.search(chinese_pattern, txt)
+    if not match_chinese:
+        return txt
     prompt = "从现在开始你是一名基于输入描述的绘画AI提示词生成器，你会根据我输入的中文描述，生成符合主题的完整提示词。请注意，你生成后的内容服务于一个绘画AI，它只能理解具象的提示词而非抽象的概念，我将提供简短的描述，以便生成器可以为我提供准确的提示词。我希望生成的提示词能够包含人物的姿态、服装、妆容、情感表达和环境背景等细节，并且在必要时进行优化和重组以提供更加准确的描述，并且过滤NSFW的内容，以便更好地服务于我的绘画AI，请严格遵守此条规则，也只输出翻译后的英文内容。请模仿结构示例生成准确提示词。示例输入：一位坐在床上的少女。 示例输出：1girl, sitting on, hand on own chest, head tilt, (indian_style:1.1), light smile, aqua eyes, (large breasts:1.2), blondehair, shirt, pleated_skirt, school uniform, (torn pantyhose:0.9), black garter belt, mary_janes, flower ribbon, glasses, looking at viewer, on bed,indoors,between legs. 请开始将下面的句子生成我需要的英文内容\n"
     result = chat("", prompt + txt)
     return result
@@ -42,14 +46,11 @@ def txt2img(txt: str, width: int = 512, height: int = 512):
     :param height: 图片高度
     :return: 图片的base64编码
     """
-    chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
-    match_chinese = re.search(chinese_pattern, txt)
-    if match_chinese:
-        txt = trans2en(txt)
+
     txt = txt.lower().replace("nsfw", "")
     if "I'm sorry" in txt:
         txt = ""
-
+    txt = trans2en(txt)
     # 添加lora
     res_loras = __api_get("loras")
     for lora in res_loras:

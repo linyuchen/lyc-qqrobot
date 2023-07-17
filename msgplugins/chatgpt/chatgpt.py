@@ -6,7 +6,7 @@ import requests
 from common.utils.htmlhelper import html2txt
 
 openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
-openai.api_base = "https://api.chatanywhere.com.cn/v1"
+openai.api_base = "https://api.chatanywhere.cn/v1"
 
 context = {}  # key: user_id, value: messages
 
@@ -36,7 +36,7 @@ def del_cat_prompt(messages):
         messages.remove(cat_prompt)
 
 
-def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
+def chat(context_id: str | None, question: str, retry_count=0, use_gpt4=False) -> str:
     if context_id:
         messages = context.setdefault(context_id, [])
     else:
@@ -91,6 +91,9 @@ def chat(context_id: str, question: str, retry_count=0, use_gpt4=False) -> str:
         return chat(context_id, question, retry_count + 1)
 
 
+def trans2en(text: str) -> str:
+    return chat("", f'将下面的文字翻译成英文，如果已经是英文则不翻译: {text}')
+
 def summary_web(link) -> str:
     url = link
     headers = {
@@ -123,5 +126,5 @@ if __name__ == '__main__':
     # _res = summary_web(_url)
     # print(_res)
     q = "#鲁迅和周树人打起来怎么办"
-    _res = chat("", q, use_gpt4=True)
+    _res = chat("", q, use_gpt4=False)
     print(_res)

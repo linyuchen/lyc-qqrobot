@@ -10,6 +10,7 @@ def save_config():
 
 
 config_data = {
+    "GFW_PROXY": "http://192.168.1.4:7890",
     "MIRAI_HTTP_API": "http://localhost:8080",
     "MIRAI_HTTP_API_VERIFY_KEY": "1234567890",
     "QQ": 721011692,
@@ -64,6 +65,10 @@ config_data = {
         },
         "stable_diffusion": {
             "summary": "AI画图",
+            "exclude_groups": [""]
+        },
+        "sdxl": {
+            "summary": "AI画图(sdxl版本)",
             "exclude_groups": [""]
         },
         "chatgpt": {
