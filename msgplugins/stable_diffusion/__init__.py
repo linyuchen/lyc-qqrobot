@@ -25,34 +25,33 @@ class SDPlugin(MsgHandler):
         draw_hd_cmd = CMD("画图hd", param_len=1, sep=sep)
         draw_txt = ""
         if get_models_cmd.az(msg.msg):
-            msg.reply(get_models())
             msg.destroy()
+            msg.reply(get_models())
             return
         elif get_loras_cmd.az(msg.msg):
-            msg.reply(get_loras())
             msg.destroy()
+            msg.reply(get_loras())
             return
         elif set_model_cmd.az(msg.msg):
-            model_name = set_model_cmd.get_original_param().strip()
-            msg.reply("正在设置模型，请稍后...")
-            msg.reply(set_model(model_name))
             msg.destroy()
+            model_name = set_model_cmd.get_original_param().strip()
+            msg.reply("正在设置模型，请稍等...")
+            msg.reply(set_model(model_name))
         elif draw_cmd.az(msg.msg) or draw_hd_cmd.az(msg.msg):
             draw_txt = draw_cmd.get_original_param()
         if draw_txt:
+            msg.destroy()
             if draw_hd_cmd.az(msg.msg):
                 width = 1024
                 height = 768
             else:
                 width = 600
                 height = 800
-            msg.reply("正在努力画画中（吭哧吭哧~），请稍后...")
+            msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             image_path = txt2img(draw_txt, width, height)
             reply_msg = MessageSegment.image_path(image_path)
             msg.reply(reply_msg)
             os.remove(image_path)
-            msg.destroy()
             return
-
 
 

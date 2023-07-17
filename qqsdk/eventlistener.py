@@ -57,6 +57,7 @@ class EventListener(Thread):
                         else:
                             handler.handle(msg)
                     except Exception:
+                        msg.resume()
                         traceback.print_exc()
 
             time.sleep(self.interval)
