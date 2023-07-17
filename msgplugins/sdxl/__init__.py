@@ -29,4 +29,3 @@ class SDXLPlugin(MsgHandler):
             for img_path in img_paths:
                 res_msg += MessageSegment.image_path(img_path)
             msg.reply(res_msg)
-        msg.destroy()
