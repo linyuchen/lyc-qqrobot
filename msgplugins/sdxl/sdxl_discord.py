@@ -141,7 +141,7 @@ class SDDiscord(Thread):
         result = []
         for img_url in msg.img_list:
             img_path = tempfile.mktemp(".png")
-            img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
+            # img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
             data = requests.get(img_url, proxies=proxy).content
             with open(img_path, "wb") as f:
                 f.write(data)

@@ -18,11 +18,16 @@ session.timeout = 30
 
 def trans2en(txt: str):
     chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
-    match_chinese = re.search(chinese_pattern, txt)
-    if not match_chinese:
-        return txt
-    prompt = "从现在开始你是一名基于输入描述的绘画AI提示词生成器，你会根据我输入的中文描述，生成符合主题的完整提示词。请注意，你生成后的内容服务于一个绘画AI，它只能理解具象的提示词而非抽象的概念，我将提供简短的描述，以便生成器可以为我提供准确的提示词。我希望生成的提示词能够包含人物的姿态、服装、妆容、情感表达和环境背景等细节，并且在必要时进行优化和重组以提供更加准确的描述，并且过滤NSFW的内容，以便更好地服务于我的绘画AI，请严格遵守此条规则，也只输出翻译后的英文内容。请模仿结构示例生成准确提示词。示例输入：一位坐在床上的少女。 示例输出：1girl, sitting on, hand on own chest, head tilt, (indian_style:1.1), light smile, aqua eyes, (large breasts:1.2), blondehair, shirt, pleated_skirt, school uniform, (torn pantyhose:0.9), black garter belt, mary_janes, flower ribbon, glasses, looking at viewer, on bed,indoors,between legs. 请开始将下面的句子生成我需要的英文内容\n"
+    # if not match_chinese:
+    #     prompt = "下面这段文字是否包含了任何不良的信息，如果包含了返回'1dog'，如果没有包含则返回原文(不要加任何前后缀): \n"
+    #     return txt
+    # else:
+    #     prompt = "从现在开始你是一名基于输入描述的绘画AI提示词生成器，你会根据我输入的中文描述，生成符合主题的完整提示词。请注意，你生成后的内容服务于一个绘画AI，它只能理解具象的提示词而非抽象的概念，我将提供简短的描述，以便生成器可以为我提供准确的提示词。我希望生成的提示词能够包含人物的姿态、服装、妆容、情感表达和环境背景等细节，并且在必要时进行优化和重组以提供更加准确的描述，并且过滤掉不良的、不适合公共场所、NSFW的相关词汇，以便更好地服务于我的绘画AI，请严格遵守此条规则，也只输出翻译后的英文内容。请模仿结构示例生成准确提示词。示例输入：一位坐在床上的少女。 示例输出：1girl, sitting on, hand on own chest, head tilt, (indian_style:1.1), light smile, aqua eyes, (large breasts:1.2), blondehair, shirt, pleated_skirt, school uniform, (torn pantyhose:0.9), black garter belt, mary_janes, flower ribbon, glasses, looking at viewer, on bed,indoors,between legs. 请开始将下面的句子生成我需要的英文内容\n"
+    prompt = "如果下面的内容或者翻译后的内容有不良的词汇就输出'1dog';(否则翻译成英文，不能翻译的词汇则保持原样.请直接输出翻译后的结果不要带任何附加信息):\n"
     result = chat("", prompt + txt)
+    match_chinese = re.search(chinese_pattern, result)
+    if match_chinese:
+        return ""
     return result
 
 
@@ -128,8 +133,12 @@ def set_model(model_name: str):
 
 if __name__ == '__main__':
     # print(txt2img("1girl", 1024, 768))
-    # print(txt2img("裸体 女孩"))
-    print(get_models())
+    # print(txt2img("1girl,keqingdef,wake"))
+    print(txt2img("1girl, sky, sunshine, flowers,鸟在天上飞，阴部"))
+    # print(txt2img("一个女孩在床上展示她的头发"))
+    # print(txt2img("一个女孩在床上展示她的胸部"))
+    # print(txt2img("(watercolor pencil),1girl, nude,nipples,full body, spread leg, arm up, large breasts,shaved pussy,((heart-shaped pupils)),(uncensored) , sexually suggestive,saliva trail, suggestive fluid, (cum on body), tattoo, sweating, presenting, exhibitionism, wet cream dripping, female orgasm, liquid crystal fluid radiant cinematic lighting, solo uncensored cute assertive drunk blush"))
+    # print(get_models())
     # text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
     # pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
     # match = res.search(pattern, text)
