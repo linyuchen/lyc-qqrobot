@@ -104,8 +104,8 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
 
     def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
         if self.task_list:
-            self.txt2img(txt, callback)
             time.sleep(self.query_interval)
+            self.txt2img(txt, callback)
             return
         task_id = self.__post_task(txt, callback)
         # img_url = self.__get_image(task_id)
