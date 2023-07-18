@@ -1,5 +1,7 @@
 import os
 
+import ifnude
+
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .tusi import TusiDraw
@@ -65,6 +67,10 @@ class SDPlugin(MsgHandler):
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             # image_path = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
             image_path = txt2img(draw_txt, width=width, height=height)
+            if ifnude.detect(image_path):
+                msg.reply("图片违规，已被删除")
+                os.remove(str(image_path))
+                return
             reply_msg = MessageSegment.image_path(image_path)
             msg.reply(reply_msg)
             os.remove(str(image_path))
