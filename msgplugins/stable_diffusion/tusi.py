@@ -108,7 +108,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         # return img_url
 
     def get_models(self) -> str:
-        return "模型列表：" + "\n".join([f"{'当前' if m == self.model else ''}模型名：{m.name}" for m in self.models])
+        return "模型列表：\n" + "\n".join([f"{'当前' if m == self.model else ''}模型名：{m.name}" for m in self.models])
 
     def set_model(self, model_name: str) -> str:
         model = list(filter(lambda m: model_name in m.name, self.models))
