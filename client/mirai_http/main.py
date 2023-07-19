@@ -11,7 +11,7 @@ from flask import request
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg
+from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
@@ -61,6 +61,13 @@ class MiraiQQClient(QQClientFlask):
         }
         res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)
         return res
+
+    def reply_group_msg(self, content: str | MessageSegment, msg: GroupMsg, at=True):
+        if at:
+            if not isinstance(content, MessageSegment):
+                content = MessageSegment.text(content)
+            content = MessageSegment.at(msg.group_member.qq) + content
+        self.send_msg(msg.group.qq, content, is_group=True)
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         path = "/sendFriendMessage"
@@ -141,10 +148,7 @@ class MiraiQQClient(QQClientFlask):
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
             msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
-            msg.reply = lambda _msg: self.send_msg(
-                group.qq,
-                MessageSegment.at(group_member_qq) + (MessageSegment.text(_msg) if isinstance(_msg, str) else _msg),
-                is_group=True)
+            msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
             self.add_msg(msg)
         return {}
 
