@@ -36,21 +36,28 @@ class MessageSegment:
         return MessageSegment("VoiceBase64", base64_data)
 
     @staticmethod
+    def at(qq: str):
+        return MessageSegment("At", qq)
+
+    @staticmethod
     def to_data(msg_type: str, content: str):
         """
         可以在外部更改此方法
         """
         data = {"type": msg_type}
-        if msg_type == "Plain":
-            data.update({"text": content})
-        elif msg_type == "ImageUrl":
-            data.update({"type": "Image", "url": content})
-        elif msg_type == "ImagePath":
-            data.update({"type": "Image", "path": content})
-        elif msg_type == "VoicePath":
-            data.update({"type": "Voice", "path": content})
-        elif msg_type == "VoiceBase64":
-            data.update({"type": "Voice", "base64": content})
+        match msg_type:
+            case "Plain":
+                data.update({"text": content})
+            case "ImageUrl":
+                data.update({"type": "Image", "url": content})
+            case "ImagePath":
+                data.update({"type": "Image", "path": content})
+            case "VoicePath":
+                data.update({"type": "Voice", "path": content})
+            case "VoiceBase64":
+                data.update({"type": "Voice", "base64": content})
+            case "At":
+                data.update({"type": "At", "target": int(content)})
         return data
 
     @property
