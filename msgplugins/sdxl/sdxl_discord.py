@@ -10,7 +10,7 @@ from selenium import webdriver
 from selenium.webdriver import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from msgplugins.stable_diffusion.sd import trans2en
+# from msgplugins.stable_diffusion.sd import trans2en
 from config import GFW_PROXY
 
 sd_url = 'https://discord.com/channels/1002292111942635562/1101178553900478464'
@@ -121,7 +121,7 @@ class SDDiscord(Thread):
 
     def draw(self, text: str) -> list[str]:
         try:
-            text = trans2en(text)
+            # text = trans2en(text)
             self.req_queue.put(text, timeout=TIME_OUT)
             self.__send_text(text)
             res = self.res_queue.get(timeout=TIME_OUT)

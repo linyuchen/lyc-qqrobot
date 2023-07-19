@@ -52,6 +52,8 @@ class MiraiQQClient(QQClientFlask):
                     msg["data"] = base64.encodebytes(f.read()).decode("utf8")
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
+            elif msg["type"] == "At":
+                msg["data"] = "@" + str(msg["target"])
         post_data = {
             "qq_group_name": qq_group_name,
             "key": "linyuchen",
@@ -139,7 +141,10 @@ class MiraiQQClient(QQClientFlask):
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
             msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
-            msg.reply = lambda _msg: self.send_msg(group.qq, _msg, is_group=True)
+            msg.reply = lambda _msg: self.send_msg(
+                group.qq,
+                MessageSegment.at(group_member_qq) + (MessageSegment.text(_msg) if isinstance(_msg, str) else _msg),
+                is_group=True)
             self.add_msg(msg)
         return {}
 
