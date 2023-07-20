@@ -1,4 +1,5 @@
 import dataclasses
+import logging
 import threading
 import time
 import traceback
@@ -9,6 +10,8 @@ import ifnude
 
 from common.utils.downloader import download2temp
 from .base import AIDrawBase
+
+logger = logging.getLogger(__name__)
 
 
 @dataclasses.dataclass()
@@ -21,26 +24,51 @@ class DrawModel:
 
 @dataclasses.dataclass()
 class Task:
-    task_id: str
-    callback: Callable[[list[str]], None]
+    task_id: str = ""
+    callback: Callable[[list[str]], None] = None
     finished: bool = False
     # status: str = ""
     img_urls: list[str] = None
-    # prompt: str = ""
+    prompt: str = ""
     # progress: int = 0
 
 
 class TaskStatusListener(threading.Thread):
+    # 最高并发
+    max_concurrency = 2
+
     def __init__(self):
         super().__init__()
         self.lock = threading.Lock()
-        self.task_list: list[Task] = []  # [task_id, ...]
+        self.tasks: list[Task] = []  # [task_id, ...]
+        self.handling_tasks: list[Task] = []
         self.query_interval = 3
+        threading.Thread(target=self.__put_task_thread).start()
 
-    def _join_task(self, task_id: str, callback: callable):
+    def _join_task(self, prompt: str, callback: callable):
         self.lock.acquire()
-        self.task_list.append(Task(task_id, callback))
+        self.tasks.append(Task(callback=callback, prompt=prompt))
         self.lock.release()
+
+    def __put_task_thread(self):
+        while True:
+            time.sleep(0.1)
+            self.lock.acquire()
+            if len(self.tasks) == 0:
+                self.lock.release()
+                continue
+            if len(self.handling_tasks) == self.max_concurrency:
+                self.lock.release()
+                continue
+            if self.tasks:
+                task = self.tasks.pop(0)
+                try:
+                    self._post_task(task)
+                    self.handling_tasks.append(task)
+                except:
+                    traceback.print_exc()
+            self.lock.release()
+            # self._post_task(task)
 
     @abstractmethod
     def _get_tasks(self, task_ids: list[str]) -> dict:
@@ -63,7 +91,7 @@ class TaskStatusListener(threading.Thread):
         while True:
             time.sleep(self.query_interval)
             self.lock.acquire()
-            task_ids = [t.task_id for t in self.task_list]
+            task_ids = [t.task_id for t in self.handling_tasks]
             if not task_ids:
                 self.lock.release()
                 continue
@@ -74,27 +102,34 @@ class TaskStatusListener(threading.Thread):
                 self.lock.release()
                 continue
             # for task_id, task in res_tasks.items():
-            for task in self.task_list:
+            for task in self.handling_tasks:
                 status = res_tasks.get(task.task_id, {}).get("status")
+                logger.info(
+                    f"task {task.prompt} status: {status} progress: {res_tasks[task.task_id]['items'][0]['processPercent']}")
                 if status == "FINISH":
                     task.finished = True
                     task.img_urls = [item["url"] for item in res_tasks[task.task_id]["items"]]
                 # task.progress = res_tasks[task.task_id]["processPercent"]
-            finished_tasks = filter(lambda t: t.finished, self.task_list)
+            finished_tasks = filter(lambda t: t.finished, self.handling_tasks)
             for task in finished_tasks:
                 threading.Thread(target=lambda: self.__handle_finished_task(task)).start()
-                self.task_list.remove(task)
+                self.handling_tasks.remove(task)
 
             self.lock.release()
+
+    @abstractmethod
+    def _post_task(self, task: Task):
+        pass
 
 
 class TusiDraw(AIDrawBase, TaskStatusListener):
     def __init__(self):
         super().__init__()
+        self.base_prompt = ""
         TaskStatusListener.__init__(self)
         self.models = [
+            DrawModel(name="动漫风", model_id="603766951782701925", model_file_id="603766951781653350"),
             DrawModel(name="真人3D", model_id="603003048899406426", model_file_id="603003048898357851"),
-            DrawModel(name="动漫风", model_id="601420727112962175", model_file_id="601420727111913600"),
         ]
         self.model = self.models[0]
         token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxNTg2OTMwMjA1ODM1OTMzOCwiZGV2aWNlSWQiOiIyMDI1NTUiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNMU3R4NnM0Vy9qZmJVVnV1NEgzUzgzU1M1bVR6c1cxSFVUd3plYmQwSGwxZVZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTIyNTcyNDZ9.Mhw0LH1vNY4yKVa2vcCqdY1wksrSsuhmjChrtHwgDEQ"
@@ -103,11 +138,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         self.start()
 
     def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
-        if self.task_list:
-            time.sleep(self.query_interval)
-            self.txt2img(txt, callback)
-            return
-        task_id = self.__post_task(txt, callback)
+        self._join_task(txt, callback)
         # img_url = self.__get_image(task_id)
         # return img_url
 
@@ -121,7 +152,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         self.model = model[0]
         return f"模型已切换为{self.model.name}"
 
-    def __post_task(self, txt: str, callback: Callable[[list[str]], None]):
+    def _post_task(self, task: Task):
         res = self._api_post("/works/v1/works/task", {
             "params": {
                 "baseModel": {
@@ -133,7 +164,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
                 },
                 "models": [],
                 "sdVae": "Automatic",
-                "prompt": self.base_prompt + txt,
+                "prompt": self.base_prompt + task.prompt,
                 "negativePrompt": self.negative_prompt,
                 "height": 768,
                 "width": 512,
@@ -151,7 +182,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         })
         if res.get("code") == '0':
             task_id = res["data"]["task"]["taskId"]
-            self._join_task(task_id, callback=callback)
+            task.task_id = task_id
         else:
             raise Exception(res.get("message"))
 

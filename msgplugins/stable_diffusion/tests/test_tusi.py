@@ -8,8 +8,9 @@ class TestTusi(unittest.TestCase):
         self.draw = TusiDraw()
 
     def test_txt2img(self):
-        self.draw.txt2img("一个女孩在床上展示她的头发", print)
-        input("drawing...")
+        while True:
+            text = input("prompt: ")
+            self.draw.txt2img(text, print)
 
     def test_get_models(self):
         print(self.draw.get_models())
