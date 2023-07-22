@@ -2,10 +2,9 @@ from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from ..cmdaz import CMD
 from .sdxl_discord import SDDiscord
-from ..chatgpt.chatgpt import trans2en
 
-# sd_discord = SDDiscord()
-# sd_discord.start()
+sd_discord = SDDiscord()
+sd_discord.start()
 
 
 class SDXLPlugin(MsgHandler):
@@ -24,9 +23,13 @@ class SDXLPlugin(MsgHandler):
 
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             draw_txt = draw_cmd.get_original_param()
-            return
-            img_paths = sd_discord.draw(draw_txt)
-            res_msg = MessageSegment()
-            for img_path in img_paths:
-                res_msg += MessageSegment.image_path(img_path)
-            msg.reply(res_msg)
+            sd_discord.draw(draw_txt, lambda img_paths: self.send_img(msg, img_paths))
+            # msg.reply(res_msg)
+
+    @staticmethod
+    def send_img(msg, img_paths):
+        reply_msg = MessageSegment()
+        for i in img_paths:
+            reply_msg += MessageSegment.image_path(str(i))
+        msg.reply(reply_msg)
+        
