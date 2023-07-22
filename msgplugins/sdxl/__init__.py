@@ -20,7 +20,6 @@ class SDXLPlugin(MsgHandler):
 
         if draw_cmd.az(msg.msg):
             msg.destroy()
-
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             draw_txt = draw_cmd.get_original_param()
             sd_discord.draw(draw_txt, lambda img_paths: self.send_img(msg, img_paths))

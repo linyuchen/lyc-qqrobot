@@ -49,7 +49,7 @@ class MiraiQQClient(QQClientFlask):
         for msg in message_chain:
             if msg["type"] in ["Image"]:
                 with open(msg["path"], "rb") as f:
-                    msg["data"] = base64.encodebytes(f.read()).decode("utf8")
+                    msg["data"] = base64.b64encode(f.read()).decode("utf8")
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
             elif msg["type"] == "At":
@@ -60,6 +60,7 @@ class MiraiQQClient(QQClientFlask):
             "data": message_chain
         }
         res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)
+        
         return res
 
     def reply_group_msg(self, content: str | MessageSegment, msg: GroupMsg, at=True):

@@ -9,6 +9,7 @@ from typing import TypeVar, Generic
 
 class Task:
     callback: callable
+    create_time: float = 0
     finished: bool = False
 
 
@@ -18,6 +19,7 @@ TaskT = TypeVar('TaskT')
 class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
     # 并发数
     concurrency: int = 1
+    time_out = 60 * 2
     
     def __init__(self):
         super(threading.Thread, self).__init__()
@@ -30,6 +32,7 @@ class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
     
     def _join_task(self, task: TaskT):
         self._lock.acquire()
+        task.create_time = time.time()
         self.tasks.append(task)
         self._lock.release()
     
@@ -71,6 +74,10 @@ class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
                 self._lock.release()
                 continue
             for task in self.handling_tasks:
+                if time.time() - task.create_time > self.time_out:
+                    self.handling_tasks.remove(task)
+                    print()
+                    continue
                 if task.finished:
                     self.handling_tasks.remove(task)
                     threading.Thread(target=self._handle_finished_task, args=(task,)).start()

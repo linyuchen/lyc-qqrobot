@@ -6,13 +6,14 @@ import gradio_client
 import requests
 from gradio_client.utils import encode_url_or_file_to_base64
 
-from config import VITS_HTTP_API
+from config import VITS_HTTP_API, GFW_PROXY
 
 root_url = VITS_HTTP_API
 session = requests.Session()
 session.timeout = 10
-
+# 设置gradio代理
 client = gradio_client.Client("zomehwh/vits-uma-genshin-honkai")
+
 
 
 def tts(text):

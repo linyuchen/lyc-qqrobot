@@ -18,7 +18,7 @@ from config import GFW_PROXY
 from common.taskpool import TaskPool, Task
 from common.utils.baidu_translator import trans, is_chinese
 
-sd_url = 'https://discord.com/channels/1002292111942635562/1101178553900478464'
+sd_url = 'https://discord.com/channels/1002292111942635562/1101178530865352815'
 
 TIME_OUT = 60
 # DEFAULT_PROMPT = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
@@ -166,6 +166,7 @@ class SDDiscord(TaskPool[DrawTask]):
             data = requests.get(img_url, proxies=proxy).content
             with open(img_path, "wb") as f:
                 f.write(data)
+                f.close()
             result.append(Path(img_path))
         return result
 

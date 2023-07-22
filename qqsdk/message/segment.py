@@ -69,7 +69,17 @@ class MessageSegment:
     def __add__(self, other: Self) -> Self:
         ms = MessageSegment()
         ms.origin_data = self.origin_data
-        ms.origin_data.append((other.msg_type, other.content))
+        ms.origin_data.extend(other.origin_data)
         return ms
 
 
+if __name__ == '__main__':
+    
+    msg = MessageSegment.text("123")
+    print(msg.data)
+    msg += MessageSegment.text("123")
+    msg += MessageSegment.text("123")
+    print(msg.data)
+    msg = MessageSegment.at("123") + msg
+    print(msg.data)
+    
