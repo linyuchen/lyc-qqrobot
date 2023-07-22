@@ -1,5 +1,6 @@
 # 百度翻译api
 import hashlib
+import re
 
 import requests
 
@@ -8,6 +9,12 @@ def sign(appid: str, q: str, salt: str, app_key):
     sign_str = appid + q + salt + app_key
     sign_result = hashlib.md5(sign_str.encode()).hexdigest()
     return sign_result
+
+
+def is_chinese(text: str) -> bool:
+    chinese_pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
+    match_chinese = re.search(chinese_pattern, text)
+    return bool(match_chinese)
 
 
 def trans(text: str, from_lang="zh", to_lang: str = "en"):

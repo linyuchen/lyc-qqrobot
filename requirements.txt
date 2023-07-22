@@ -5,3 +5,4 @@ Pillow
 openai>=0.27.6
 selenium
 ifnude
+gradio
