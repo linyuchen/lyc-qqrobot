@@ -6,6 +6,7 @@ from pathlib import Path
 from PIL import Image
 
 import config
+from common.utils.baidu_translator import trans, is_chinese
 from .base import AIDrawBase
 
 base_url = config.SD_HTTP_API + "/sdapi/v1/"
@@ -17,7 +18,7 @@ class SDDraw(AIDrawBase):
         super().__init__()
         self.base_url = base_url
 
-    def txt2img(self, txt: str, width: int = 512, height: int = 512):
+    def txt2img(self, txt: str, width: int = 1024, height: int = 1024):
         """
         文字转图片
         :param txt: 文字
@@ -27,13 +28,14 @@ class SDDraw(AIDrawBase):
         """
 
         txt = txt.lower().replace("nsfw", "")
-        if "I'm sorry" in txt:
-            txt = ""
-        txt = self.trans2en(txt)
+        if is_chinese(txt):
+            txt = trans(txt)
+        # if "I'm sorry" in txt:
+        #     txt = ""
         # 添加lora
-        res_loras = self._api_get("loras")
-        for lora in res_loras:
-            txt += f",<lora:{lora['name']}:1>,"
+        # res_loras = self._api_get("loras")
+        # for lora in res_loras:
+        #     txt += f",<lora:{lora['name']}:1>,"
         data = {
             "prompt": self.base_prompt + txt,
             "negative_prompt": self.negative_prompt,

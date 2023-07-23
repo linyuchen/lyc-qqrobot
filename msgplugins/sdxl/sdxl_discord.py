@@ -163,7 +163,18 @@ class SDDiscord(TaskPool[DrawTask]):
         for img_url in img_urls:
             img_path = tempfile.mktemp(".png")
             img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
-            data = requests.get(img_url, proxies=proxy).content
+            try_count = 0
+            while True:
+                try:
+                    data = requests.get(img_url, proxies=proxy).content
+                    try_count = 0
+                    break
+                except:
+                    try_count += 1
+                    if try_count > 3:
+                        break
+            if try_count > 3:
+                continue
             with open(img_path, "wb") as f:
                 f.write(data)
                 f.close()
