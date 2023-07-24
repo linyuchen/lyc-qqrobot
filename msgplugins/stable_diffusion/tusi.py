@@ -8,6 +8,7 @@ from typing import Callable
 
 import ifnude
 
+from common.utils.baidu_translator import is_chinese, trans
 from common.utils.downloader import download2temp
 from .base import AIDrawBase
 
@@ -128,6 +129,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         self.base_prompt = ""
         TaskStatusListener.__init__(self)
         self.models = [
+            DrawModel(name="sdxl0.9", model_id="611736766128336332", model_file_id="611736766127287757"),
             DrawModel(name="动漫风", model_id="603766951782701925", model_file_id="603766951781653350"),
             DrawModel(name="真人3D", model_id="603003048899406426", model_file_id="603003048898357851"),
         ]
@@ -138,6 +140,8 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         self.start()
 
     def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
+        if is_chinese(txt):
+            txt = trans(txt)
         self._join_task(txt, callback)
         # img_url = self.__get_image(task_id)
         # return img_url
@@ -166,8 +170,8 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
                 "sdVae": "Automatic",
                 "prompt": self.base_prompt + task.prompt,
                 "negativePrompt": self.negative_prompt,
-                "height": 768,
-                "width": 512,
+                "height": 1024,
+                "width": 1024,
                 "imageCount": 1,
                 "steps": 20,
                 "samplerName": "DPM++ 2M Karras",
@@ -202,7 +206,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
             #     return self.__get_image(task_id)
         raise Exception(res.get("message"))
 
-    def __get_image(self, task_id: str) -> str:
+    def __get_image(self, task_id: str) -> list[str]:
         """
         阻塞方式检查任务状态
         :param task_id: 任务id
@@ -216,7 +220,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
                 raise Exception("task not found")
             status = task.get("status")
             if status == "FINISH":
-                return task["items"][0]["url"]
+                return [item["url"] for item in task["items"]]
             else:
                 time.sleep(self.query_interval)
                 return self.__get_image(task_id)

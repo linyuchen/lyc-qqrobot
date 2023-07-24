@@ -9,8 +9,8 @@ from .tusi import TusiDraw
 from .tusi import TusiDraw
 from ..cmdaz import CMD
 
-sd = SDDraw()
-# sd = TusiDraw()
+# sd = SDDraw()
+sd = TusiDraw()
 txt2img = sd.txt2img
 get_models = sd.get_models
 set_model = sd.set_model
@@ -69,7 +69,7 @@ class SDPlugin(MsgHandler):
                 height = 800
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
-                image_path = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
+                txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
             else:
                 image_path = txt2img(draw_txt, width=1024, height=1024)
                 if ifnude.detect(image_path):
