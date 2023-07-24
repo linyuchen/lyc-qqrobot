@@ -1,14 +1,14 @@
+from functools import reduce
+
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from ..cmdaz import CMD
 from .sdxl_discord import SDDiscord
-from ..chatgpt.chatgpt import trans2en
-
-sd_discord = SDDiscord()
-sd_discord.start()
 
 
 class SDXLPlugin(MsgHandler):
+    sd_discord = SDDiscord()
+    sd_discord.start()
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True
 
@@ -21,12 +21,12 @@ class SDXLPlugin(MsgHandler):
 
         if draw_cmd.az(msg.msg):
             msg.destroy()
-
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             draw_txt = draw_cmd.get_original_param()
-            img_paths = sd_discord.draw(draw_txt)
-            res_msg = MessageSegment()
-            for img_path in img_paths:
-                res_msg += MessageSegment.image_path(img_path)
-            msg.reply(res_msg)
-        msg.destroy()
+            self.sd_discord.draw(draw_txt, lambda img_paths: self.send_img(msg, img_paths))
+            # msg.reply(res_msg)
+
+    @staticmethod
+    def send_img(msg, img_paths):
+        reply_msg = reduce(lambda x, y: x + y, map(MessageSegment.image_path, img_paths))
+        msg.reply(reply_msg)

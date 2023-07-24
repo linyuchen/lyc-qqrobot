@@ -11,7 +11,7 @@ from flask import request
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg
+from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
@@ -49,16 +49,26 @@ class MiraiQQClient(QQClientFlask):
         for msg in message_chain:
             if msg["type"] in ["Image"]:
                 with open(msg["path"], "rb") as f:
-                    msg["data"] = base64.encodebytes(f.read()).decode("utf8")
+                    msg["data"] = base64.b64encode(f.read()).decode("utf8")
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
+            elif msg["type"] == "At":
+                msg["data"] = "@" + str(msg["target"])
         post_data = {
             "qq_group_name": qq_group_name,
             "key": "linyuchen",
             "data": message_chain
         }
         res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)
+        
         return res
+
+    def reply_group_msg(self, content: str | MessageSegment, msg: GroupMsg, at=True):
+        if at:
+            if not isinstance(content, MessageSegment):
+                content = MessageSegment.text(content)
+            content = MessageSegment.at(msg.group_member.qq) + content
+        self.send_msg(msg.group.qq, content, is_group=True)
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         path = "/sendFriendMessage"
@@ -139,7 +149,7 @@ class MiraiQQClient(QQClientFlask):
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
             msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
-            msg.reply = lambda _msg: self.send_msg(group.qq, _msg, is_group=True)
+            msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
             self.add_msg(msg)
         return {}
 

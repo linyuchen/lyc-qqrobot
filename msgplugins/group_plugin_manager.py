@@ -75,8 +75,8 @@ class GroupPluginManager(MsgHandler):
                 return
             manage_plugin(msg, plugin_name, group_qq, plugin_enabled)
         else:
-            cmd_open = CMD("开启插件", param_len=1, sep="")
-            cmd_close = CMD("关闭插件", param_len=1, sep="")
+            cmd_open = CMD("开启插件", alias=["启用插件", "打开插件"], param_len=1, sep="")
+            cmd_close = CMD("关闭插件", alias=["禁用插件"], param_len=1, sep="")
             cmd_plugins = CMD("插件列表", alias=["查看插件", "管理插件"], param_len=0)
             if cmd_plugins.az(msg.msg):
                 msg.reply(get_plugins(msg.group.qq))

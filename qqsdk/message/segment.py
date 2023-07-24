@@ -45,19 +45,18 @@ class MessageSegment:
         可以在外部更改此方法
         """
         data = {"type": msg_type}
-        match msg_type:
-            case "Plain":
-                data.update({"text": content})
-            case "ImageUrl":
-                data.update({"type": "Image", "url": content})
-            case "ImagePath":
-                data.update({"type": "Image", "path": content})
-            case "VoicePath":
-                data.update({"type": "Voice", "path": content})
-            case "VoiceBase64":
-                data.update({"type": "Voice", "base64": content})
-            case "At":
-                data.update({"type": "At", "target": int(content)})
+        if msg_type == "Plain":
+            data.update({"text": content})
+        elif msg_type == "ImageUrl":
+            data.update({"type": "Image", "url": content})
+        elif msg_type == "ImagePath":
+            data.update({"type": "Image", "path": content})
+        elif msg_type == "VoicePath":
+            data.update({"type": "Voice", "path": content})
+        elif msg_type == "VoiceBase64":
+            data.update({"type": "Voice", "base64": content})
+        elif msg_type == "At":
+            data.update({"type": "At", "target": int(content)})
         return data
 
     @property
@@ -70,7 +69,17 @@ class MessageSegment:
     def __add__(self, other: Self) -> Self:
         ms = MessageSegment()
         ms.origin_data = self.origin_data
-        ms.origin_data.append((other.msg_type, other.content))
+        ms.origin_data.extend(other.origin_data)
         return ms
 
 
+if __name__ == '__main__':
+    
+    msg = MessageSegment.text("123")
+    print(msg.data)
+    msg += MessageSegment.text("123")
+    msg += MessageSegment.text("123")
+    print(msg.data)
+    msg = MessageSegment.at("123") + msg
+    print(msg.data)
+    

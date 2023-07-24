@@ -1,33 +1,45 @@
+import dataclasses
 import tempfile
 import time
 import traceback
 from dataclasses import dataclass
+from pathlib import Path
 from queue import Queue
 from threading import Thread, Lock
+from typing import Callable
 
 import requests
 from selenium import webdriver
-from selenium.webdriver import Keys
+from selenium.webdriver import Keys, ChromeOptions
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from msgplugins.stable_diffusion.sd import trans2en
+# from msgplugins.stable_diffusion.sd import trans2en
 from config import GFW_PROXY
+from common.taskpool import TaskPool, Task
+from common.utils.baidu_translator import trans, is_chinese
 
-sd_url = 'https://discord.com/channels/1002292111942635562/1101178553900478464'
+sd_url = 'https://discord.com/channels/1002292111942635562/1101178530865352815'
 
 TIME_OUT = 60
 # DEFAULT_PROMPT = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
 DEFAULT_PROMPT = "masterpiece,"
 proxy = {"https": GFW_PROXY}
+USE_REMOTE_DEBUG = False
 
 webdriver.DesiredCapabilities.CHROME['proxy'] = {
     "httpProxy": GFW_PROXY,
     "sslProxy": GFW_PROXY,
     "proxyType": "manual"
 }
-options = Options()
-tempdir = tempfile.gettempdir()
-options.add_argument(f"user-data-dir={tempdir}")
+options = ChromeOptions()
+# chrome.exe --remote-debugging-port=9990 --user-data-dir=d:/
+if USE_REMOTE_DEBUG:
+    options.add_experimental_option("debuggerAddress", "127.0.0.1:9990")
+else:
+    tempdir = tempfile.gettempdir()
+    options.add_argument(f"user-data-dir={tempdir}")
+    prefs = {"profile.managed_default_content_settings.images": 2}  # 不显示图片
+    options.add_experimental_option("prefs", prefs)
 
 
 @dataclass()
@@ -36,9 +48,18 @@ class Message:
     img_list: list[str]
 
 
-class SDDiscord(Thread):
+@dataclasses.dataclass()
+class DrawTask(Task):
+    prompt: str
+    callback: Callable[[list[Path]], None]
+    img_urls: list[str] = None
+    # img_paths: list[Path] = None
+
+
+class SDDiscord(TaskPool[DrawTask]):
     driver = webdriver.Chrome(options=options)
-    driver.get(url=sd_url)
+    if not USE_REMOTE_DEBUG:
+        driver.get(url=sd_url)
     username = "linyuchen"
     token = 'OTcxNjU4ODc5MzM3MzkwMTEx.Gt5JCd.iuJrUQwSSeZT9f9Tsc-u2bJy2LbhotwbeNTL3s'
     # 注入token
@@ -52,15 +73,19 @@ class SDDiscord(Thread):
         }}, 2500);
     """
     driver.execute_script(js)
-    is_first = True
+    ready = False
 
     def __init__(self):
         super().__init__()
-        self.messages = []
-        self.res_queue = Queue(maxsize=1)  # 用于存放结果
-        self.req_queue = Queue(maxsize=1)  # 用于存放请求
-        self.lock = Lock()
+        self.finished_messages: list[Message] = []  # 用于存放已经处理过的消息
 
+    def _handle_put_task(self, task):
+        self.__send_text(task.prompt)
+
+    def _handle_finished_task(self, task: DrawTask):
+        img_paths = self.__download_img(task.img_urls)
+        task.callback(img_paths)
+    
     def find_msg(self) -> list[Message]:
         result: list[Message] = []
         # 查找消息列表元素
@@ -87,10 +112,18 @@ class SDDiscord(Thread):
                     href = img_ele.get_attribute("href")
                     message.img_list.append(href)
                 result.append(message)
+        self._lock.acquire()
+        if message_els and not self.ready:
+            # 第一次获取到消息
+            # 把获取到的消息放到finished_messages里面
+            # 这样就不会把第一次获取到的消息当做结果返回给用户
+            self.ready = True
+            self.finished_messages = result
+        self._lock.release()
         return result
 
     def run(self):
-        time.sleep(60)
+        # 处理discord的回复
         while True:
             time.sleep(1)
             try:
@@ -98,61 +131,69 @@ class SDDiscord(Thread):
             except:
                 # traceback.print_exc()
                 continue
-            messages.reverse()
-            self.lock.acquire()
-            if self.is_first:
-                self.messages = messages
-                self.is_first = False
-                self.lock.release()
-                continue
-            self.lock.release()
+            messages.reverse()  # 反转一下，这样就能先判断最新的消息
+
             for msg in messages:
-                if list(filter(lambda m: m.msg_id == msg.msg_id, self.messages)):
+                msg: Message
+                if list(filter(lambda m: m.msg_id == msg.msg_id, self.finished_messages)):
                     continue
-                self.lock.acquire()
-                self.messages.append(msg)
-                self.lock.release()
+
+                # 处理获取到的新回复
+                self._lock.acquire()
+                self.finished_messages.append(msg)
+                self._lock.release()
                 try:
-                    self.res_queue.put(msg, timeout=1)
+                    if self.handling_tasks:
+                        task = self.handling_tasks[0]
+                        task.finished = True
+                        task.img_urls = msg.img_list
                 except:
                     pass
-            # print(self.messages)
-            # self.driver.refresh()
 
-    def draw(self, text: str) -> list[str]:
-        try:
-            text = trans2en(text)
-            self.req_queue.put(text, timeout=TIME_OUT)
-            self.__send_text(text)
-            res = self.res_queue.get(timeout=TIME_OUT)
-            self.req_queue.get(timeout=1)
-            return self.__download_img(res)
-        except:
-            try:
-                self.res_queue.get(timeout=1)
-            except:pass
-            try:
-                self.req_queue.get(timeout=1)
-            except:pass
-            traceback.print_exc()
-            return []
+    def draw(self, text: str, callback: Callable[[list[Path]], None]):
+        while not self.ready:
+            time.sleep(1)
+        if is_chinese(text):
+            text = trans(text)
+        task = DrawTask(prompt=text, callback=callback)
+        self._join_task(task)
 
-    def __download_img(self, msg: Message) -> list[str]:
-        result = []
-        for img_url in msg.img_list:
+    def __download_img(self, img_urls: list[str]) -> list[Path]:
+        result: list[Path] = []
+        for img_url in img_urls:
             img_path = tempfile.mktemp(".png")
-            data = requests.get(img_url, proxies=proxy).content
+            img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
+            try_count = 0
+            while True:
+                try:
+                    data = requests.get(img_url, proxies=proxy).content
+                    try_count = 0
+                    break
+                except:
+                    try_count += 1
+                    if try_count > 3:
+                        break
+            if try_count > 3:
+                continue
             with open(img_path, "wb") as f:
                 f.write(data)
-            result.append(img_path)
-            # 只保存一张
-            continue
+                f.close()
+            result.append(Path(img_path))
         return result
 
     def __send_text(self, text):
         text_box = self.driver.find_element(by=By.CSS_SELECTOR, value='div[role=textbox]')
         text_box.send_keys("/dream")
-        time.sleep(2)
+        time.sleep(1)
+        while True:
+            try:
+                cmds = self.driver.find_elements(by=By.CSS_SELECTOR, value='div[data-text-variant="text-xs/normal"]')
+                # for c in cmds:
+                #     print(c.text)
+                if len(cmds) > 1:
+                    break
+            except:
+                pass
         text_box.send_keys(Keys.ENTER)
         text_box.send_keys(DEFAULT_PROMPT + text)
         text_box.send_keys(Keys.ENTER)
@@ -165,5 +206,4 @@ if __name__ == '__main__':
         _text = input("text:")
         if _text == 'exit':
             break
-        _res = sd.draw(_text)
-        print(_res)
+        sd.draw(_text, print)

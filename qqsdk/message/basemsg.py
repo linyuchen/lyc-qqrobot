@@ -16,9 +16,10 @@ class BaseMsg:
     paused: bool = False
     MSG_TYPE: str = ""
 
-    def reply(self, content: str | MessageSegment):
+    def reply(self, content: str | MessageSegment, at=True):
         """
         :param content:回复内容
+        :param at:是否@发送者
         :return:
         """
         raise NotImplementedError
