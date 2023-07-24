@@ -28,5 +28,6 @@ class SDXLPlugin(MsgHandler):
 
     @staticmethod
     def send_img(msg, img_paths):
+        img_paths = map(lambda x: str(x), img_paths)
         reply_msg = reduce(lambda x, y: x + y, map(MessageSegment.image_path, img_paths))
         msg.reply(reply_msg)

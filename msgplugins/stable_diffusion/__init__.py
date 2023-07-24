@@ -5,13 +5,11 @@ import ifnude
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .sd import SDDraw
-from .tusi import TusiDraw
-from .tusi import TusiDraw
+from .tusi import TusiDraw, MultipleCountPool
 from ..cmdaz import CMD
 
-# sd = SDDraw()
-sd = TusiDraw()
-txt2img = sd.txt2img
+sd = TusiDraw("")
+txt2img = MultipleCountPool().txt2img
 get_models = sd.get_models
 set_model = sd.set_model
 get_loras = sd.get_loras
@@ -28,7 +26,7 @@ class SDPlugin(MsgHandler):
     def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[str]):
         for img_path in img_paths:
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path))
+                msg.reply(MessageSegment.image_path(str(img_path)))
             else:
                 msg.reply("图片违规，已被删除")
 
@@ -70,13 +68,14 @@ class SDPlugin(MsgHandler):
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
                 txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
+
             else:
                 image_path = txt2img(draw_txt, width=1024, height=1024)
                 if ifnude.detect(image_path):
                     msg.reply("图片违规，已被删除")
                     os.remove(str(image_path))
                     return
-                reply_msg = MessageSegment.image_path(image_path)
+                reply_msg = MessageSegment.image_path(str(image_path))
                 msg.reply(reply_msg)
                 os.remove(str(image_path))
             return
