@@ -36,7 +36,7 @@ class Task:
 
 class TaskStatusListener(threading.Thread):
     # 最高并发
-    max_concurrency = 2
+    max_concurrency = 1
 
     def __init__(self):
         super().__init__()
