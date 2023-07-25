@@ -4,6 +4,7 @@ import threading
 import time
 import traceback
 from abc import abstractmethod
+from pathlib import Path
 from typing import Callable
 
 import ifnude
@@ -84,7 +85,7 @@ class TaskStatusListener(threading.Thread):
     def _handle_img(self, img_url: str) -> Path | None:
         img_path = download2temp(img_url, ".png")
         # todo: 检查图片是否违规，违规的要打码
-        if ifnude.detect(img_path):
+        if ifnude.detect(str(img_path)):
             return None
         return img_path
 
@@ -143,7 +144,24 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         threading.Thread(target=self.__get_balance_thread).start()
         self.start()
 
-    def txt2img(self, txt: str, callback: Callable[[list[Path]], None]):
+    def __get_balance(self):
+        data = self._api_get("/user-web/v1/user/credits")
+        data = data["data"]
+        if not data:
+            return
+        self.lock.acquire()
+        self.balance = data.get("dailyAmount", 0)
+        self.lock.release()
+
+    def __get_balance_thread(self):
+        while True:
+            time.sleep(60)
+            try:
+                self.__get_balance()
+            except:
+                traceback.print_exc()
+
+    def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
         if is_chinese(txt):
             txt = trans(txt)
         self._join_task(txt, callback)
