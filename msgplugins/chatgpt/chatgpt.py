@@ -5,9 +5,9 @@ import requests
 
 from common.utils.htmlhelper import html2txt
 
-# openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
-openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
-openai.api_base = "https://api.chatanywhere.com.cn/v1"
+openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
+# openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
+openai.api_base = "https://api.chatanywhere.cn/v1"
 
 context = {}  # key: user_id, value: messages
 

@@ -1,3 +1,4 @@
+import re
 import time
 
 import config
@@ -5,12 +6,12 @@ from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .chatgpt import chat, summary_web
 from ..cmdaz import CMD
-from ..tts.vits import tts
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):
+    from ..tts.vits import tts
     text = text.replace("喵", "")
-    if len(text) <= 60:
+    if len(text) <= 80:
         try:
             base64_data = tts(text)
             msg.reply(MessageSegment.voice_base64(base64_data))
@@ -19,19 +20,17 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
 
 
 class ChatGPT(MsgHandler):
-    desc = "发送 #+消息 或者 @机器人+消息 进行AI对话\n\n发送 总结+网址 进行AI总结网页"
+    desc = "发送 #+消息 或者 @机器人+消息 进行AI对话\n\n@机器人发送 网址(如:http://qq.com) 进行AI总结网页"
     is_async = True
     bind_msg_types = (GroupMsg, FriendMsg)
     records = {}
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        cmd = CMD("总结", alias=["摘要"], param_len=1)
-        cmd2 = CMD("总结", alias=["摘要"], param_len=1, sep="")
-        if cmd.az(msg.msg) or cmd2.az(msg.msg):
-            url = (cmd.paramList and cmd.paramList[0]) or (cmd2.paramList and cmd2.paramList[0])
-            if not url.startswith("http"):
-                msg.destroy()
+        pattern = re.compile("^https?://[A-Za-z0-9$\-_.+!*'(),;:@&=/?#\[\]]+$")
+        if re.match(pattern, msg.msg.strip()):
+            if isinstance(msg, GroupMsg) and not msg.is_at_me:
                 return
+            url = msg.msg.strip()
             if res := summary_web(url):
                 msg.reply(res + "\n\n" + url)
                 msg.destroy()
