@@ -37,7 +37,7 @@ class Task:
 
 class TaskStatusListener(threading.Thread):
     # 最高并发
-    max_concurrency = 2
+    max_concurrency = 1
 
     def __init__(self):
         super().__init__()
@@ -125,7 +125,7 @@ class TaskStatusListener(threading.Thread):
 
 
 class TusiDraw(AIDrawBase, TaskStatusListener):
-    def __init__(self):
+    def __init__(self, token: str):
         super().__init__()
         self.base_prompt = ""
         TaskStatusListener.__init__(self)
@@ -135,7 +135,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
             DrawModel(name="真人3D", model_id="603003048899406426", model_file_id="603003048898357851"),
         ]
         self.model = self.models[0]
-        token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxNTg2OTMwMjA1ODM1OTMzOCwiZGV2aWNlSWQiOiIyMDI1NTUiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNMU3R4NnM0Vy9qZmJVVnV1NEgzUzgzU1M1bVR6c1cxSFVUd3plYmQwSGwxZVZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTIyNTcyNDZ9.Mhw0LH1vNY4yKVa2vcCqdY1wksrSsuhmjChrtHwgDEQ"
+        # token =
         self.base_url = "https://api.tusi.art"
         self.session.cookies.set("ta_token_prod", token)
         self.start()
@@ -229,3 +229,19 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
 
     def get_loras(self):
         return "暂无lora"
+
+
+class MultipleCountPool:
+    tokens = [
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxNTg2OTMwMjA1ODM1OTMzOCwiZGV2aWNlSWQiOiIyMDI1NTUiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNMU3R4NnM0Vy9qZmJVVnV1NEgzUzgzU1M1bVR6c1cxSFVUd3plYmQwSGwxZVZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTIyNTcyNDZ9.Mhw0LH1vNY4yKVa2vcCqdY1wksrSsuhmjChrtHwgDEQ",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxODE0NjQ1MDc2ODk3NzM3MSwiZGV2aWNlSWQiOiIyMDYwNDgiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNJQ0p6NWNrVC9ERFlVVkdzN24zVytuU1M1bUQyc0dCSFVUd3plTHgzSGx0WlZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTI3ODc0MzZ9.UPHYfUDE1F8jPNGf0ePFgZiDSJRiMK0i7IbVHS4sS3Q"
+    ]
+
+    def __init__(self):
+        self.threads = [TusiDraw(token) for token in self.tokens]
+
+    def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
+        # threads进行排序，按照任务数从小到大排序
+        self.threads.sort(key=lambda x: len(x.tasks))
+        # 任务数最少的线程进行任务
+        self.threads[0].txt2img(txt, callback)
