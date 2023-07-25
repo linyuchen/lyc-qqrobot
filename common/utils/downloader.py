@@ -1,14 +1,15 @@
 import tempfile
+from pathlib import Path
 
 import requests
 
 
-def download2temp(url, suffix=""):
+def download2temp(url, suffix="") -> Path:
     res_f = requests.get(url).content
     tmp_path = tempfile.mktemp(suffix)
     with open(tmp_path, "wb") as f:
         f.write(res_f)
-    return tmp_path
+    return Path(tmp_path)
 
 
 if __name__ == '__main__':
