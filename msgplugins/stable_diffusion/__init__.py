@@ -67,8 +67,9 @@ class SDPlugin(MsgHandler):
                 height = 800
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
-                txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
-
+                error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
+                if error:
+                    msg.reply(error)
             else:
                 image_path = txt2img(draw_txt, width=1024, height=1024)
                 if ifnude.detect(image_path):

@@ -1,16 +1,18 @@
 import unittest
-from ..tusi import TusiDraw
+from ..tusi import TusiDraw, MultipleCountPool
 
 
 class TestTusi(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.draw = TusiDraw()
+        self.draw = MultipleCountPool()
 
     def test_txt2img(self):
         while True:
             text = input("prompt: ")
-            self.draw.txt2img(text, print)
+            error = self.draw.txt2img(text, print)
+            print(error)
+
 
     def test_get_models(self):
         print(self.draw.get_models())

@@ -137,7 +137,28 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         # token =
         self.base_url = "https://api.tusi.art"
         self.session.cookies.set("ta_token_prod", token)
+        # 是否已经用完了余额
+        self.balance = 0
+        self.__get_balance()
+        threading.Thread(target=self.__get_balance_thread).start()
         self.start()
+
+    def __get_balance(self):
+        data = self._api_get("/user-web/v1/user/credits")
+        data = data["data"]
+        if not data:
+            return
+        self.lock.acquire()
+        self.balance = data.get("dailyAmount", 0)
+        self.lock.release()
+
+    def __get_balance_thread(self):
+        while True:
+            time.sleep(60)
+            try:
+                self.__get_balance()
+            except:
+                traceback.print_exc()
 
     def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
         if is_chinese(txt):
@@ -232,15 +253,22 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
 
 class MultipleCountPool:
     tokens = [
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxNTg2OTMwMjA1ODM1OTMzOCwiZGV2aWNlSWQiOiIyMDI1NTUiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNMU3R4NnM0Vy9qZmJVVnV1NEgzUzgzU1M1bVR6c1cxSFVUd3plYmQwSGwxZVZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTIyNTcyNDZ9.Mhw0LH1vNY4yKVa2vcCqdY1wksrSsuhmjChrtHwgDEQ",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxODE0NjQ1MDc2ODk3NzM3MSwiZGV2aWNlSWQiOiIyMDYwNDgiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNJQ0p6NWNrVC9ERFlVVkdzN24zVytuU1M1bUQyc0dCSFVUd3plTHgzSGx0WlZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTI3ODc0MzZ9.UPHYfUDE1F8jPNGf0ePFgZiDSJRiMK0i7IbVHS4sS3Q"
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxODE0NjQ1MDc2ODk3NzM3MSwiZGV2aWNlSWQiOiI0NTUxODciLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNJQ0p6NWNrVC9ERFlVVkdzN24zVytuU1U0MlAzdkc5SFVUd3plTHQzRlZaYldBPT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTI4ODA5MTl9.H4gNr6L7n7uCCoAYKXSvVncnrP_mzVaHjSd_d-J-TbY",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjYxNTg2OTMwMjA1ODM1OTMzOCwiZGV2aWNlSWQiOiI2NTUxNzIiLCJyZWZyZXNoVG9rZW4iOiJOV1UzTWpNME9EUXpPVE15T0RReFlYbXNMU3R4NnM0Vy9qZmJVVnV1NEgzUzgzU1c0MlAzczJwSFVUd3plYmQ1SGx0YVZ3PT0iLCJleHBpcmVUaW1lIjoyNTkyMDAwLCJleHAiOjE2OTIzMDc0MDZ9.f4_pI2Ih3tohn5DHTofSPYq3R2mx0n8cBv2gpSeo6ls"
     ]
 
     def __init__(self):
         self.threads = [TusiDraw(token) for token in self.tokens]
 
-    def txt2img(self, txt: str, callback: Callable[[list[str]], None]):
+    def txt2img(self, txt: str, callback: Callable[[list[str]], None]) -> str:
         # threads进行排序，按照任务数从小到大排序
-        self.threads.sort(key=lambda x: len(x.tasks))
+        self.threads.sort(key=lambda x: len(x.tasks) - x.balance)
         # 任务数最少的线程进行任务
-        self.threads[0].txt2img(txt, callback)
+        available_thread = None
+        for thread in self.threads:
+            if thread.balance == 0:
+                continue
+            available_thread = thread
+        if not available_thread:
+            return "画图余额不足，请明天再试"
+        available_thread.txt2img(txt, callback)
