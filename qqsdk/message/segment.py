@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional, List, Tuple, Self
 
 
@@ -22,12 +23,12 @@ class MessageSegment:
         return MessageSegment("ImageUrl", image_url)
 
     @staticmethod
-    def image_path(path: str):
-        return MessageSegment("ImagePath", path)
+    def image_path(path: str | Path):
+        return MessageSegment("ImagePath", str(path))
 
     @staticmethod
-    def voice_path(path: str):
-        return MessageSegment("VoicePath", path)
+    def voice_path(path: str | Path):
+        return MessageSegment("VoicePath", str(path))
 
     @staticmethod
     def voice_base64(base64_data):

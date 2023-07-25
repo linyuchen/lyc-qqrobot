@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import ifnude
 
@@ -23,7 +24,7 @@ class SDPlugin(MsgHandler):
            "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
            "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
 
-    def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[str]):
+    def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[Path]):
         for img_path in img_paths:
             if img_path:
                 msg.reply(MessageSegment.image_path(str(img_path)))
