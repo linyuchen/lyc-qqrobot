@@ -138,9 +138,13 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         # token =
         self.base_url = "https://api.tusi.art"
         self.session.cookies.set("ta_token_prod", token)
-        # 是否已经用完了余额
+        # 余额，生成一张图片扣除一次
         self.balance = 0
+        # 多久(秒)检查一次余额
+        self.balance_check_interval = 60 * 10
+        # 首次启动时获取一次余额
         self.__get_balance()
+
         threading.Thread(target=self.__get_balance_thread).start()
         self.start()
 
@@ -155,7 +159,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
 
     def __get_balance_thread(self):
         while True:
-            time.sleep(60)
+            time.sleep(self.balance_check_interval)
             try:
                 self.__get_balance()
             except:
@@ -209,6 +213,8 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         if res.get("code") == '0':
             task_id = res["data"]["task"]["taskId"]
             task.task_id = task_id
+            with self.lock:
+                self.balance -= 1
         else:
             raise Exception(res.get("message"))
 
