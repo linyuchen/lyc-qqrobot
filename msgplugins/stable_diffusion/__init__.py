@@ -28,6 +28,7 @@ class SDPlugin(MsgHandler):
         for img_path in img_paths:
             if img_path:
                 msg.reply(MessageSegment.image_path(str(img_path)))
+                img_path.unlink(missing_ok=True)
             else:
                 msg.reply("图片违规，已被删除")
 
