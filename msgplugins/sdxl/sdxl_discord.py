@@ -79,10 +79,10 @@ class SDDiscord(TaskPool[DrawTask]):
         super().__init__()
         self.finished_messages: list[Message] = []  # 用于存放已经处理过的消息
 
-    def _handle_put_task(self, task):
+    def _on_handling_putted(self, task):
         self.__send_text(task.prompt)
 
-    def _handle_finished_task(self, task: DrawTask):
+    def _on_task_finished(self, task: DrawTask):
         img_paths = self.__download_img(task.img_urls)
         task.callback(img_paths)
     
