@@ -224,7 +224,10 @@ class MultipleCountPool:
 
     def txt2img(self, txt: str, callback: Callable[[list[Path]], None]) -> str:
         # threads进行排序，按照任务数从小到大排序
-        self.threads.sort(key=lambda x: len(x.tasks) - x.balance)
+        def sort_task(t: TusiDraw):
+            size = t.tasks.qsize()
+            return size - t.balance
+        self.threads.sort(key=sort_task)
         # 任务数最少的线程进行任务
         available_thread = None
         for thread in self.threads:
