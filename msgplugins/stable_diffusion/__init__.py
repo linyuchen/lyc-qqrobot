@@ -41,7 +41,7 @@ class SDPlugin(MsgHandler):
         get_loras_cmd = CMD("查看lora", param_len=0)
         set_model_cmd = CMD("设置画图模型", alias=["画图模型", "设置模型", "切换模型", "切换画图模型"], param_len=1,
                             sep=sep)
-        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个"], param_len=1, sep=sep)
+        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一个", "画个", "给我画个", "给我画一个", "给我画"], param_len=1, sep=sep)
         draw_hd_cmd = CMD("画图hd", param_len=1, sep=sep)
         draw_txt = ""
         if get_models_cmd.az(msg.msg):

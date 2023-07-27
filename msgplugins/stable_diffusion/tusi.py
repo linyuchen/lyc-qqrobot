@@ -130,7 +130,7 @@ class TusiDraw(AIDrawBase, TaskStatusListener):
         self.base_prompt = ""
         TaskStatusListener.__init__(self)
         self.models = [
-            DrawModel(name="sdxl0.9", model_id="611736766128336332", model_file_id="611736766127287757"),
+            DrawModel(name="sdxl1.0", model_id="619188908049212188", model_file_id="619188908048163613"),
             DrawModel(name="动漫风", model_id="603766951782701925", model_file_id="603766951781653350"),
             DrawModel(name="真人3D", model_id="603003048899406426", model_file_id="603003048898357851"),
         ]
