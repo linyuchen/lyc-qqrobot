@@ -13,7 +13,6 @@ class TestTusi(unittest.TestCase):
             error = self.draw.txt2img(text, print)
             print(error)
 
-
     def test_get_models(self):
         print(self.draw.get_models())
 
