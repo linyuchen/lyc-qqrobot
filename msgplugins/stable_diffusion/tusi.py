@@ -56,7 +56,6 @@ class TusiDraw(TaskPool[TusiTask], AIDrawBase):
         self.query_interval = 5
         self.models = [
             DrawModel(name="sdxl1.0", model_id="619188908049212188", model_file_id="619188908048163613"),
-            DrawModel(name="sdxl0.9", model_id="611736766128336332", model_file_id="611736766127287757"),
             DrawModel(name="动漫风", model_id="603766951782701925", model_file_id="603766951781653350"),
             DrawModel(name="真人3D", model_id="603003048899406426", model_file_id="603003048898357851"),
         ]
@@ -68,8 +67,6 @@ class TusiDraw(TaskPool[TusiTask], AIDrawBase):
         self.balance = 0
         # 多久(秒)检查一次余额
         self.balance_check_interval = 60 * 10
-        # 首次启动时获取一次余额
-        self.__get_balance()
         threading.Thread(target=self.__get_balance_thread).start()
         self.start()
 
@@ -115,11 +112,11 @@ class TusiDraw(TaskPool[TusiTask], AIDrawBase):
 
     def __get_balance_thread(self):
         while True:
-            time.sleep(self.balance_check_interval)
             try:
                 self.__get_balance()
             except TusiError:
                 traceback.print_exc()
+            time.sleep(self.balance_check_interval)
 
     def txt2img(self, txt: str, callback: Callable[[list[Path]], None]):
         if is_chinese(txt):
