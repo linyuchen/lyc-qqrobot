@@ -31,7 +31,7 @@ class GroupMsgEvent(MsgHandler):
         cmds = [
             CMD("签到", handle_func=group_action.sign),
             CMD("我的活跃度", alias=["活跃度查询", "积分", "查询活跃度", "活跃度"], handle_func=group_action.get_point),
-            CMD("活跃度排名", alias=["活跃度排行", "排行", "排名", "活跃度排行榜", "排行榜"],
+            CMD("活跃度排名", alias=["活跃度排行", "排行", "排名", "活跃度排行榜", "排行榜", "查看排行榜"],
                 handle_func=group_action.get_point_rank),
             CMD("清负活跃度", handle_func=group_action.clear_point),
             CMD("清负次数", handle_func=group_action.get_clear_chance),

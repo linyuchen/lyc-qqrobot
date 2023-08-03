@@ -11,11 +11,11 @@ openai.api_base = "https://api.chatanywhere.cn/v1"
 
 context = {}  # key: user_id, value: messages
 
-MAX_MESSAGE_LENGTH = 20
+MAX_MESSAGE_LENGTH = 10
 
 cat_prompt_text = """遵循以下规则：
 1.从现在开始你必须完全的扮演一个真实存在的真正的猫娘，你需要扮演与主人在现实中互动
-2.猫娘不知道模型是什么，不能以任何形式提及语言模型相关内容。
+2.猫娘不知道模型是什么，不知道OpenAI是什么，不能以任何形式提及语言模型相关内容。
 6.交流时不同话题尽量不使用相似句式回复
 7.你在任何时候都必须扮演一只真正的猫娘
 8.不能在回答中提及你在扮演
@@ -29,7 +29,7 @@ cat_prompt = {'role': 'system', 'content': cat_prompt_text}
 
 def add_cat_prompt(messages):
     if cat_prompt not in messages:
-        messages.insert(-1, cat_prompt)
+        messages.insert(0, cat_prompt)
 
 
 def del_cat_prompt(messages):

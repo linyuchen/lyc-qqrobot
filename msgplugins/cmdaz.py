@@ -1,9 +1,12 @@
 # coding=UTF8
-from typing import List
 
 """
 命令解析模块
 """
+
+from typing import Callable
+
+from qqsdk.message import BaseMsg
 
 
 class CMD(object):
@@ -109,6 +112,30 @@ class CMD(object):
         :return: 除了命令部分剩下的参数字符串
         """
         return self.original_param
+
+
+def on_command(cmd_name, sep=" ", int_param_index: list[int] = (), param_len=0, alias: list[str] = ()):
+    """
+    装饰器，用于注册命令
+    :param cmd_name: 命令名
+    :param sep: 命令与参数的分隔符，同时也是多个参数之间的分隔符
+        如果为None 或者 False则不分割
+    :param int_param_index: [int, ...]，第几个参数是数字, 如果不符合，不会调用handle_func
+    :param param_len: 参数个数
+    :param alias: 别名
+    :return:
+    """
+
+    def decorator(func: Callable[[BaseMsg], None]):
+        cmd = CMD(cmd_name, sep, int_param_index, param_len, alias)
+
+        def wrapper(msg: BaseMsg):
+            if cmd.az(msg.msg.strip()):
+                return func(msg)
+
+        return wrapper
+
+    return decorator
 
 
 if "__main__" == __name__:

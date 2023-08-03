@@ -22,6 +22,9 @@ config_data = {
     "SD_HTTP_API": "http://192.168.1.4:7860",
     "VITS_HTTP_API": "http://192.168.1.4:7862",
     "TTS_ENABLED": False,
+    "TUSI_TOKENS": [
+
+    ],
     "plugins": {
         "group_plugin_manager": {
             "exclude_groups": [""],  # 列表中的群号将不会启用此插件
