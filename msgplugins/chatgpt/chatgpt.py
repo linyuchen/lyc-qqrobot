@@ -59,7 +59,7 @@ def chat(context_id: str | None, question: str, retry_count=0, use_gpt4=False) -
         model = 'gpt-4-0613'
         openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"
     else:
-        model = 'gpt-3.5-turbo-16k-0613'
+        model = 'gpt-3.5-turbo-0613'
         openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 
     try:
