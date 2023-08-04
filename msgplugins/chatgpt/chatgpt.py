@@ -52,8 +52,8 @@ def chat(context_id: str | None, question: str, retry_count=0, use_gpt4=False) -
     if question.startswith("###"):
         messages.clear()
 
-    if len(question) > 10000:
-        question = question[0:5000] + question[-5000:]
+    if len(question) > 4000:
+        question = question[0:2000] + question[-2000:]
     messages.append({'role': 'user', 'content': question})
     if use_gpt4:
         model = 'gpt-4-0613'
