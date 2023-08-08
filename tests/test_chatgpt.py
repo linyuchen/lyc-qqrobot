@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from msgplugins.chatgpt.chatgpt import chat, set_prompt, clear_prompt, get_prompt
+from msgplugins.chatgpt.chatgpt import chat, set_prompt, clear_prompt, get_prompt, summary_web
 
 
 class TestChatGPT(TestCase):
@@ -15,3 +15,6 @@ class TestChatGPT(TestCase):
 
     def test_get_prompt(self):
         print(get_prompt(self.context_id))
+
+    def test_summary_web(self):
+        print(summary_web("https://github.com/FlowiseAI/Flowise"))

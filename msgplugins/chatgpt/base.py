@@ -39,7 +39,7 @@ class ChatGPT:
             self.set_prompt()
 
         if len(question) > self.question_max_len:
-            question = question[0:self.question_max_len / 2] + question[-self.question_max_len / 2:]
+            question = question[0:(self.question_max_len // 2)] + question[-(self.question_max_len // 2):]
         messages.append({'role': 'user', 'content': question})
 
         response = openai.ChatCompletion.create(
