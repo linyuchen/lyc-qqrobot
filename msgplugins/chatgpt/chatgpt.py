@@ -1,13 +1,14 @@
 import requests
 
 from common.utils.htmlhelper import html2txt
+from config import CHATGPT
 from .base import ChatGPT
 
 # openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 # openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
 # openai.api_base = "https://api.chatanywhere.cn/v1"
 
-context = {}  # key: user_id, value: ChatGPT instance
+context = {}  # key: user_id, value: [ChatGPT instances]
 
 cat_prompt_text = """遵循以下规则：
 1.从现在开始你必须完全的扮演一个真实存在的真正的猫娘，你需要扮演与主人在现实中互动
@@ -21,10 +22,45 @@ cat_prompt_text = """遵循以下规则：
     """
 
 
+def __get_chatgpt(context_id: str) -> list[ChatGPT]:
+    gpt_list = [
+        ChatGPT(prompt=cat_prompt_text,
+                api_key=gpt_config['key'],
+                api_base=gpt_config['api'],
+                model=gpt_config['model']
+                ) for gpt_config in CHATGPT
+    ]
+    if not context_id:
+        return gpt_list
+    if context_id not in context:
+        context[context_id] = gpt_list
+
+    return context[context_id]
+
+
 def chat(context_id: str | None, question: str) -> str:
-    gpt = context.setdefault(context_id, ChatGPT(prompt=cat_prompt_text))
-    res = gpt.chat(question)
-    return res
+    for gpt in __get_chatgpt(context_id):
+        try:
+            res = gpt.chat(question)
+            return res
+        except Exception as e:
+            print(e)
+            continue
+    return "本喵累了，休息一下再来吧~"
+
+
+def set_prompt(context_id: str, prompt: str):
+    for gpt in __get_chatgpt(context_id):
+        gpt.set_prompt(prompt)
+
+
+def clear_prompt(context_id: str):
+    for gpt in __get_chatgpt(context_id):
+        gpt.set_prompt(cat_prompt_text)
+
+
+def get_prompt(context_id: str) -> str:
+    return __get_chatgpt(context_id)[0].get_prompt()
 
 
 def trans2en(text: str) -> str:
@@ -64,5 +100,5 @@ if __name__ == '__main__':
     # print(_res)
     q = "鲁迅和周树人打起来怎么办"
     q = "你好"
-    _res = chat("123", q, use_gpt4=False)
+    _res = chat("123", q)
     print(_res)

@@ -25,6 +25,13 @@ config_data = {
     "TUSI_TOKENS": [
 
     ],
+    "CHATGPT": [
+        {
+            "key": "API_KEY",
+            "api": "https://",
+            "model": "gpt-3.5-turbo-0613"
+        }
+    ],
     "plugins": {
         "group_plugin_manager": {
             "exclude_groups": [""],  # 列表中的群号将不会启用此插件

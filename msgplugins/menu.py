@@ -20,7 +20,7 @@ class MenuPlugin(MsgHandler):
                 continue
             if FriendMsg in h.bind_msg_types:
                 friend_cmds.append(h.desc)
-            if GroupMsg in h.bind_msg_types:
+            if GroupMsg in h.bind_msg_types and isinstance(msg, GroupMsg):
                 exclude_groups = plugins[plugin_name].get("exclude_groups", [])
                 exclude_groups = map(str, exclude_groups)
                 if msg.group.qq in exclude_groups:

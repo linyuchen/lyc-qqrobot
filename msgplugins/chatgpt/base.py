@@ -13,11 +13,18 @@ class ChatGPT:
         self.model = model
         self.question_max_len = 4000
         self.history_max = 10
+        self.prompt_text = prompt
         self.prompt = {'role': 'system', 'content': prompt}
         self.history = []  # messages
-        self.add_prompt()
+        self.set_prompt()
 
-    def add_prompt(self):
+    def get_prompt(self):
+        return self.prompt["content"]
+
+    def set_prompt(self, prompt_text: str = ""):
+        self.del_prompt()
+        if prompt_text:
+            self.prompt["content"] = prompt_text
         if self.prompt not in self.history:
             self.history.insert(0, self.prompt)
 
@@ -29,6 +36,7 @@ class ChatGPT:
         messages = self.history
         if len(messages) > self.history_max:
             del messages[:3]
+            self.set_prompt()
 
         if len(question) > self.question_max_len:
             question = question[0:self.question_max_len / 2] + question[-self.question_max_len / 2:]
