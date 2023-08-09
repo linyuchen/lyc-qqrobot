@@ -49,7 +49,7 @@ class ChatGPT(MsgHandler):
             msg.destroy()
             return
 
-        pattern = re.compile("^https?://[A-Za-z0-9$\-_.+!*'(),;:@&=/?#\[\]]+$")
+        pattern = re.compile("^https?://[A-Za-z0-9$\-_.+!*'(),%;:@&=/?#\[\]]+$")
         if re.match(pattern, msg.msg.strip()):
             if isinstance(msg, GroupMsg) and not msg.is_at_me:
                 return
