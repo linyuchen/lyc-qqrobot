@@ -18,7 +18,7 @@ class MyEvent(MsgHandler):
     __doc__ = u"""
     群游戏：斗牛
     """
-    desc = "发送 斗牛 + 数字 开始斗牛游戏，数字为下注金额\n直接发送 斗牛 可坐庄"
+    desc = "发送 斗牛 + 数字 开始斗牛游戏，数字为下注金额\n下注金额0可坐庄"
     bind_msg_types = (GroupMsg,)
 
     def __init__(self, qq_client):
