@@ -16,28 +16,23 @@ class ChatGPT:
         self.prompt_text = prompt
         self.prompt = {'role': 'system', 'content': prompt}
         self.history = []  # messages
-        self.set_prompt()
 
     def get_prompt(self):
         return self.prompt["content"]
 
     def set_prompt(self, prompt_text: str = ""):
-        self.del_prompt()
         if prompt_text:
             self.prompt["content"] = prompt_text
-        if self.prompt not in self.history:
-            self.history.insert(0, self.prompt)
 
     def del_prompt(self):
-        if self.prompt in self.history:
-            self.history.remove(self.prompt)
+        self.set_prompt()
 
     def chat(self, question: str) -> str:
-        messages = self.history
-        if len(messages) > self.history_max:
-            del messages[:3]
-            self.set_prompt()
-
+        if len(self.history) > self.history_max:
+            del self.history[:3]
+            # self.set_prompt()
+        messages = self.history[:]
+        messages.append(self.prompt)
         if len(question) > self.question_max_len:
             question = question[0:(self.question_max_len // 2)] + question[-(self.question_max_len // 2):]
         messages.append({'role': 'user', 'content': question})
@@ -61,5 +56,5 @@ class ChatGPT:
                 completion[delta_k] += delta_v
         res.append(completion)  # 直接在传入参数 messages 中追加消息
         res = "\n".join(map(lambda m: m['content'], res))
-        messages.append({'role': 'assistant', 'content': res})
+        self.history.append({'role': 'assistant', 'content': res})
         return res
