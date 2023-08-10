@@ -11,30 +11,30 @@ class ChatGPT:
         self.api_key = api_key
         self.api_base = api_base
         self.model = model
-        self.question_max_len = 4000
+        self.question_max = 4000
         self.history_max = 10
-        self.prompt_text = prompt
-        self.prompt = {'role': 'system', 'content': prompt}
+        self.prompt = prompt
         self.history = []  # messages
 
     def get_prompt(self):
-        return self.prompt["content"]
+        return self.prompt
 
     def set_prompt(self, prompt_text: str = ""):
-        if prompt_text:
-            self.prompt["content"] = prompt_text
+        self.prompt = prompt_text
 
     def del_prompt(self):
         self.set_prompt()
 
+    def clear_history(self):
+        self.history.clear()
+
     def chat(self, question: str) -> str:
         if len(self.history) > self.history_max:
             del self.history[:3]
-            # self.set_prompt()
         messages = self.history[:]
-        messages.append(self.prompt)
-        if len(question) > self.question_max_len:
-            question = question[0:(self.question_max_len // 2)] + question[-(self.question_max_len // 2):]
+        messages.append({'role': 'system', 'content': self.prompt})
+        if len(question) > self.question_max:
+            question = question[0:(self.question_max // 2)] + question[-(self.question_max // 2):]
         messages.append({'role': 'user', 'content': question})
 
         response = openai.ChatCompletion.create(

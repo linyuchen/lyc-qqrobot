@@ -5,6 +5,7 @@ import requests
 from common.utils.htmlhelper import html2txt
 from config import CHATGPT
 from .base import ChatGPT
+from config import CHAT_GPT
 
 # openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 # openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
@@ -55,6 +56,7 @@ def chat(context_id: str | None, question: str) -> str:
 def set_prompt(context_id: str, prompt: str):
     for gpt in __get_chatgpt(context_id):
         gpt.set_prompt(prompt)
+        gpt.clear_history()
 
 
 def clear_prompt(context_id: str):
@@ -89,20 +91,3 @@ def summary_web(link) -> str:
     text = html2txt(html).replace("\n", "")
     res = chat("", "#总结下面这段文字，总结的结果如果不是中文就翻译成中文：\n" + text)
     return res
-
-
-if __name__ == '__main__':
-    # while True:
-    #     print(gpt_35("test", input(">>> ")))
-    _url = "https://mp.weixin.qq.com/s/YHIZ5I3Eg-fmDEhmhOdcLQ"
-    _url = "https://www.qpython.org/"
-    # _url = "https://www.bilibili.com/read/readlist/rl321663?plat_id=6&share_from=collection&share_medium=android&share_plat=android&share_session_id=d4b7fccc-c289-467a-98b6-1140c85af34a&share_source=QQ&share_tag=s_i&timestamp=1687591463&unique_k=LbWT34o"
-    _url = "https://b23.tv/vp1yWpF"
-    _url = "https://baijiahao.baidu.com/s?id=1769863923572250746"
-    _url = "https://github.com/FlowiseAI/Flowise"
-    _res = summary_web(_url)
-    print(_res)
-    # q = "鲁迅和周树人打起来怎么办"
-    # q = "你好"
-    # _res = chat("123", q)
-    # print(_res)
