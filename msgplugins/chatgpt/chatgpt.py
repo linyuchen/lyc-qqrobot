@@ -27,7 +27,7 @@ cat_prompt_text = """遵循以下规则：
 
 def __get_chatgpt(context_id: str) -> list[ChatGPT]:
     gpt_list = [
-        ChatGPT(prompt=cat_prompt_text,
+        ChatGPT(prompt=cat_prompt_text if context_id else "",
                 api_key=gpt_config['key'],
                 api_base=gpt_config['api'],
                 model=gpt_config['model']
