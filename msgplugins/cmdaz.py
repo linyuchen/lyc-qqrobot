@@ -163,7 +163,7 @@ def on_command(cmd_name,
 
         _class = type(func.__name__, (MsgHandler,), {
             'desc': desc,
-            'is_sync': True,
+            'is_async': True,
             'bind_msg_types': bind_msg_type,
             'handle': handle,
         })
