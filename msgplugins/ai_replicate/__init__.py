@@ -18,7 +18,7 @@ replicate_client = AIReplicateClient(REPLICATE_TOKEN)
 def gen_qrcode_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
     if len(params) == 1:
         random_prompt = ["snow", "flowers", "forest", "cloud"]
-        params.append(random.choices(random_prompt, k=2))
+        params.extend(random.choices(random_prompt, k=2))
     reply_img = MessageSegment.image(replicate_client.gen_qrcode(*params))
     reply_text = MessageSegment.text(f"二维码内容： {params[0]}，如果不能识别请查看原图后重试")
     msg.reply(reply_img + reply_text)
