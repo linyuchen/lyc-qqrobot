@@ -4,9 +4,9 @@
 命令解析模块
 """
 
-from typing import Callable
+from typing import Callable, Type
 
-from qqsdk.message import BaseMsg
+from qqsdk.message import BaseMsg, GroupMsg, FriendMsg
 
 
 class CMD(object):
@@ -118,13 +118,20 @@ class CMD(object):
         """
         return self.original_param
 
+    def get_original_param_list(self):
+        return self.original_param.split(self.param_sep or None, maxsplit=self.param_length)
+
 
 def on_command(cmd_name,
                sep=" ",
                int_param_index: list[int] = (),
                param_len=0,
-               alias: list[str] = (),
-               ignores: list[str] = ()):
+               alias: tuple[str, ...] = (),
+               ignores: tuple[str] = (),
+               bind_msg_type: tuple[Type[GroupMsg | FriendMsg], ...] = (GroupMsg,),
+               desc: str = "",
+               at_sep: str = ""
+               ):
     """
     装饰器，用于注册命令
     :param cmd_name: 命令名
@@ -134,17 +141,34 @@ def on_command(cmd_name,
     :param param_len: 参数个数
     :param alias: 别名
     :param ignores: 忽略的命令
+    :param bind_msg_type: 绑定的消息类型
+    :param desc: 命令描述
+    :param at_sep: at之后的命令分隔符
     :return:
     """
 
-    def decorator(func: Callable[[BaseMsg], None]):
-        cmd = CMD(cmd_name, sep, int_param_index, param_len, alias, ignores)
+    from qqsdk.message import MsgHandler
 
-        def wrapper(msg: BaseMsg):
+    def decorator(func: Callable[[BaseMsg, list[str]], None]):
+        def handle(self, msg: GroupMsg | FriendMsg):
+            cmd = CMD(cmd_name,
+                      at_sep if isinstance(msg, GroupMsg) and msg.is_at_me else sep,
+                      int_param_index,
+                      param_len,
+                      alias=list(alias),
+                      ignores=list(ignores))
             if cmd.az(msg.msg.strip()):
-                return func(msg)
+                msg.destroy()
+                return func(msg, cmd.get_original_param_list())
 
-        return wrapper
+        _class = type(func.__name__, (MsgHandler,), {
+            'desc': desc,
+            'is_sync': True,
+            'bind_msg_types': bind_msg_type,
+            'handle': handle,
+        })
+
+        return _class
 
     return decorator
 
@@ -158,3 +182,11 @@ if "__main__" == __name__:
     print(test_cmd.handle("天气 上海"))
     test_cmd = CMD("#", sep="", param_len=1, ignores=["#include"])
     print(test_cmd.az("#include <iostream>"))
+
+
+    @on_command("test")
+    def test(msg):
+        print(msg)
+
+
+    print(test)

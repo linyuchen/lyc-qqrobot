@@ -9,12 +9,10 @@ class BullFight(bullfight_base.BullFightBase):
 
     def __init__(self, group_qq, qq_client):
         """
-
         :param group_qq: 群号，str
-        :param currency_name: 货币名字
-        :param robot_name: 机器人名字
         """
 
+        self.mutex = threading.RLock()
         super(BullFight, self).__init__()
 
         self.qq_client = qq_client
@@ -29,7 +27,6 @@ class BullFight(bullfight_base.BullFightBase):
         self.rule = u"""
         """
         self.send_func = None
-        self.mutex = threading.RLock()
         self.current_second = 0
         self.master_info_dic = {}
         self.players_info_list = []  # item is dict
@@ -43,17 +40,18 @@ class BullFight(bullfight_base.BullFightBase):
 
     def reset_game_info(self):
 
-        super(BullFight, self).reset_game_info()
-        self.current_second = 0
-        self.master_info_dic = {}
-        self.players_info_list = []  # item is dict
-        self.running = False
-        self.overing = False
-        self.player_max_gold = 0  # 闲家最大下注
-        self.min_gold = 0  # 群内最小下注
-        self.master_deposit_gold = 0  # 庄家押金
-        self.player_total_gold = 0  # 闲家所有下注金额
-        self.max_multiple = 1
+        with self.mutex:
+            super(BullFight, self).reset_game_info()
+            self.current_second = 0
+            self.master_info_dic = {}
+            self.players_info_list = []  # item is dict
+            self.running = False
+            self.overing = False
+            self.player_max_gold = 0  # 闲家最大下注
+            self.min_gold = 0  # 群内最小下注
+            self.master_deposit_gold = 0  # 庄家押金
+            self.player_total_gold = 0  # 闲家所有下注金额
+            self.max_multiple = 1
 
     def add_point(self, group_qq, qq, point):
         """
@@ -99,7 +97,7 @@ class BullFight(bullfight_base.BullFightBase):
         """
 
         while self.overing:
-            pass
+            time.sleep(0.2)
 
         group_qq = self.group_qq
         __sender_info_dic = {"group_qq_number": group_qq, "qq_number": str(member_qq), "nick": member_name,
@@ -122,7 +120,8 @@ class BullFight(bullfight_base.BullFightBase):
                        (__sender_info_dic["nick"], self.currency, self.max_multiple)
                 
         if not self.running:
-            self.running = True
+            with self.mutex:
+                self.running = True
             threading.Thread(target=self.timer).start()
         self.current_second = 0
         # 庄家参与
@@ -189,8 +188,9 @@ class BullFight(bullfight_base.BullFightBase):
 
     def over_game(self):
 
-        self.overing = True
-        self.running = False
+        with self.mutex:
+            self.overing = True
+            self.running = False
         if not self.master_info_dic:
             self.get_system_mater_info_dic()
 

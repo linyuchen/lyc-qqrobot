@@ -22,6 +22,7 @@ config_data = {
     "SD_HTTP_API": "http://192.168.1.4:7860",
     "VITS_HTTP_API": "http://192.168.1.4:7862",
     "TTS_ENABLED": False,
+    "REPLICATE_TOKEN": "",
     "TUSI_TOKENS": [
 
     ],
@@ -80,6 +81,9 @@ config_data = {
         "sdxl": {
             "summary": "AI画图(sdxl版本)",
             "exclude_groups": [""]
+        },
+        "ai_replicate": {
+            "summary": "AI二维码"
         },
         "chatgpt": {
             "summary": "AI聊天功能",

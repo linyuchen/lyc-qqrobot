@@ -52,6 +52,8 @@ class MiraiQQClient(QQClientFlask):
                     msg["data"] = base64.b64encode(f.read()).decode("utf8")
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
+            elif msg["type"] == "ImageUrl":
+                msg["data"] = msg["url"]
             elif msg["type"] == "At":
                 msg["data"] = "@" + str(msg["target"])
         post_data = {
