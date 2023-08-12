@@ -16,6 +16,7 @@ replicate_client = AIReplicateClient(REPLICATE_TOKEN)
             desc="发送 二维码 +链接或内容+ 风格，生成艺术风格二维码，如 二维码 https://bilibili.com 雪地",
             param_len=1, bind_msg_type=(GroupMsg, FriendMsg))
 def gen_qrcode_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
+    msg.reply("二维码生成中...")
     if len(params) == 1:
         random_prompt = ["snow", "flowers", "forest", "cloud"]
         params.append("".join(random.choices(random_prompt, k=2)))
