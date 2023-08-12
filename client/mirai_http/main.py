@@ -70,7 +70,7 @@ class MiraiQQClient(QQClientFlask):
         if at:
             if not isinstance(content, MessageSegment):
                 content = MessageSegment.text(content)
-            content = MessageSegment.at(msg.group_member.qq) + content
+            content = MessageSegment.at(msg.group_member.qq) + MessageSegment.text("\n") + content
         self.send_msg(msg.group.qq, content, is_group=True)
 
     def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
