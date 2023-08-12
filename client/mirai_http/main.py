@@ -47,12 +47,12 @@ class MiraiQQClient(QQClientFlask):
 
     def send2tim(self, qq_group_name: str, message_chain: list[dict]):
         for msg in message_chain:
-            if msg["type"] in ["Image"]:
+            if msg["type"] in ["Image"] and msg.get("path"):
                 with open(msg["path"], "rb") as f:
                     msg["data"] = base64.b64encode(f.read()).decode("utf8")
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
-            elif msg["type"] == "ImageUrl":
+            elif msg["type"] == "Image" and msg.get("url"):
                 msg["data"] = msg["url"]
             elif msg["type"] == "At":
                 msg["data"] = "@" + str(msg["target"])
