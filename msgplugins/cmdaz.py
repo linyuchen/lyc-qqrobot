@@ -128,7 +128,7 @@ def on_command(cmd_name,
                param_len=0,
                alias: tuple[str, ...] = (),
                ignores: tuple[str] = (),
-               bind_msg_type: tuple[Type[GroupMsg | FriendMsg], ...] = (GroupMsg,),
+               bind_msg_type: tuple[Type[GroupMsg | FriendMsg], ...] = (GroupMsg, FriendMsg),
                desc: str = "",
                at_sep: str = ""
                ):

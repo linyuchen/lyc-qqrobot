@@ -11,7 +11,7 @@ class ChatGPT:
         self.api_key = api_key
         self.api_base = api_base
         self.model = model
-        self.question_max = 4000
+        self.question_max = 8000
         self.history_max = 10
         self.prompt = prompt
         self.history = []  # messages

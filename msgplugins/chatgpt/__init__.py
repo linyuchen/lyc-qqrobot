@@ -5,7 +5,19 @@ import config
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
-from ..cmdaz import CMD
+from ..cmdaz import CMD, on_command
+
+
+@on_command("百科", param_len=1, desc="发送 百科 + 词语 进行百科搜索,如:百科 猫娘")
+def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
+    res = summary_web(f"https://zh.wikipedia.org/wiki/{params[0]}")
+    msg.reply(res)
+
+
+@on_command("萌娘百科", param_len=1, desc="发送 萌娘百科 + 词语 进行萌娘百科搜索,如:萌娘百科 猫娘")
+def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
+    res = summary_web(f"https://zh.moegirl.org.cn/{params[0]}")
+    msg.reply(res)
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):
@@ -60,7 +72,8 @@ class ChatGPT(MsgHandler):
                 return
         if isinstance(msg, GroupMsg):
             robot_name = msg.group.get_member(str(config.QQ)).get_name()
-            cmd = CMD("#", alias=[f"@{robot_name}"], sep="", param_len=1, ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef"])
+            cmd = CMD("#", alias=[f"@{robot_name}"], sep="", param_len=1,
+                      ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef"])
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
                 if time.time() - self.records.setdefault(msg.group_member.qq, 0) < 5:
                     return

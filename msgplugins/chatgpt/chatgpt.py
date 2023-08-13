@@ -72,7 +72,7 @@ def trans2en(text: str) -> str:
     return chat("", f'将下面的文字翻译成英文，如果已经是英文则不翻译: {text}')
 
 
-def summary_web(link) -> str:
+def summary_web(link: str) -> str:
     url = link
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
@@ -89,5 +89,5 @@ def summary_web(link) -> str:
     except:
         return "网页分析失败"
     text = html2txt(html).replace("\n", "")
-    res = chat("", "#总结下面这段文字，总结的结果如果不是中文就翻译成中文：\n" + text)
+    res = chat("", "#总结以下内容并翻译成中文：\n" + text)
     return res

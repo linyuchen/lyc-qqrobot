@@ -22,7 +22,6 @@ config_data = {
     "SD_HTTP_API": "http://192.168.1.4:7860",
     "VITS_HTTP_API": "http://192.168.1.4:7862",
     "TTS_ENABLED": False,
-    "REPLICATE_TOKEN": "",
     "TUSI_TOKENS": [
 
     ],
