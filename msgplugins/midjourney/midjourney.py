@@ -74,12 +74,15 @@ class Sender:
         async with aiohttp.ClientSession() as session:
             retry = 3
             while retry >= 0:
-                async with session.post('https://discord.com/api/v9/interactions', json=payload, headers=header,
-                                        proxy=self.proxy) as resp:
-                    if resp.status == 204:
-                        break
+                try:
+                    async with session.post('https://discord.com/api/v9/interactions', json=payload, headers=header,
+                                            proxy=self.proxy) as resp:
+                        if resp.status == 204:
+                            break
 
-                    print(".", end="")
+                        print(".", end="")
+                except Exception as e:
+                    print(e)
                 retry -= 1
 
                 if retry < 0:
@@ -140,8 +143,9 @@ class Receiver:
         for message in message_list:
             try:
                 # 如果这条消息是由"Midjourney Bot"发送的，并且包含双星号（**），则它是一个需要处理的请求
+                print(message)
                 if (message['author']['username'] == 'Midjourney Bot') and ('**' in message['content']):
-                    # print(message)
+                    print("找到了消息")
                     if len(message['attachments']) > 0:
                         # 如果该消息包含图像附件，则获取该附件的URL和文件名，并将其添加到df DataFrame中
                         if (message['attachments'][0]['filename'][-4:] == '.png') or (
