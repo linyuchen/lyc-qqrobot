@@ -204,14 +204,17 @@ class Receiver:
             await asyncio.sleep(3)
         return None
 
-    @retry(tries=3)
     async def download_img(self, url) -> Path:
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, headers=self.headers, proxy=self.proxy) as response:
-                data = await response.read()
-                tmp_path = tempfile.mktemp(".png")
-                open(tmp_path, 'wb').write(data)
-                return Path(tmp_path)
+            for i in range(3):
+                try:
+                    async with session.get(url, headers=self.headers, proxy=self.proxy) as response:
+                        data = await response.read()
+                        tmp_path = tempfile.mktemp(".png")
+                        open(tmp_path, 'wb').write(data)
+                        return Path(tmp_path)
+                except Exception as e:
+                    print(e)
 
 
 async def __send(prompt, callback: Callable[[Path], None]):
