@@ -206,7 +206,7 @@ class Receiver:
 
     async def download_img(self, url) -> Path:
         async with aiohttp.ClientSession() as session:
-            for i in range(3):
+            for i in range(10):
                 try:
                     async with session.get(url, headers=self.headers, proxy=self.proxy) as response:
                         data = await response.read()
