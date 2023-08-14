@@ -143,9 +143,9 @@ class Receiver:
         for message in message_list:
             try:
                 # 如果这条消息是由"Midjourney Bot"发送的，并且包含双星号（**），则它是一个需要处理的请求
-                print(message)
+                # print(message)
                 if (message['author']['username'] == 'Midjourney Bot') and ('**' in message['content']):
-                    print("找到了消息")
+                    # print("找到了消息")
                     if len(message['attachments']) > 0:
                         # 如果该消息包含图像附件，则获取该附件的URL和文件名，并将其添加到df DataFrame中
                         if (message['attachments'][0]['filename'][-4:] == '.png') or (
@@ -204,6 +204,7 @@ class Receiver:
             await asyncio.sleep(3)
         return None
 
+    @retry(tries=3)
     async def download_img(self, url) -> Path:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=self.headers, proxy=self.proxy) as response:
