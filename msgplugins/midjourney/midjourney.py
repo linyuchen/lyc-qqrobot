@@ -216,7 +216,7 @@ async def __send(prompt, callback: Callable[[Path], None]):
 
     try:
         if result is not None:
-            # print(f"result=[{result}]")
+            print(f"result=[{result}]")
             result = await receiver.download_img(result)
             callback(result)
     except Exception as e:

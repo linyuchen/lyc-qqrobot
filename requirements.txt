@@ -7,3 +7,4 @@ openai>=0.27.6
 ifnude
 gradio
 replicate
+retry
