@@ -3,6 +3,8 @@ from pathlib import Path
 
 import ifnude
 
+from common.utils.baidu_translator import trans, is_chinese
+from msgplugins.midjourney.midjourney import draw
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .sd import SDDraw
@@ -25,6 +27,8 @@ class SDPlugin(MsgHandler):
            "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
 
     def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[Path]):
+        if isinstance(img_paths, Path):
+            img_paths = [img_paths]
         for img_path in img_paths:
             if img_path:
                 msg.reply(MessageSegment.image_path(str(img_path)))
@@ -41,7 +45,8 @@ class SDPlugin(MsgHandler):
         get_loras_cmd = CMD("查看lora", param_len=0)
         set_model_cmd = CMD("设置画图模型", alias=["画图模型", "设置模型", "切换模型", "切换画图模型"], param_len=1,
                             sep=sep)
-        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"], param_len=1, sep=sep)
+        draw_cmd = CMD("画图", alias=["sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"], param_len=1,
+                       sep=sep)
         draw_hd_cmd = CMD("画图hd", param_len=1, sep=sep)
         draw_txt = ""
         if get_models_cmd.az(msg.msg):
@@ -69,7 +74,10 @@ class SDPlugin(MsgHandler):
                 height = 800
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
-                error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
+                # error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
+                if is_chinese(draw_txt):
+                    draw_txt = trans(draw_txt)
+                error = draw(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
                 if error:
                     msg.reply(error)
             else:

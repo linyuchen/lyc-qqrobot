@@ -18,7 +18,7 @@ from config import GFW_PROXY
 from common.taskpool import TaskPool, Task
 from common.utils.baidu_translator import trans, is_chinese
 
-sd_url = 'https://discord.com/channels/1002292111942635562/1101178530865352815'
+sd_url = 'https://discord.com/channels/1127887388648153118/1127887388648153121'
 
 TIME_OUT = 60
 # DEFAULT_PROMPT = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
@@ -36,7 +36,8 @@ options = ChromeOptions()
 if USE_REMOTE_DEBUG:
     options.add_experimental_option("debuggerAddress", "127.0.0.1:9990")
 else:
-    tempdir = tempfile.gettempdir()
+    # tempdir = tempfile.gettempdir()
+    tempdir = tempfile.mkdtemp()
     options.add_argument(f"user-data-dir={tempdir}")
     prefs = {"profile.managed_default_content_settings.images": 2}  # 不显示图片
     options.add_experimental_option("prefs", prefs)
@@ -61,7 +62,7 @@ class SDDiscord(TaskPool[DrawTask]):
     if not USE_REMOTE_DEBUG:
         driver.get(url=sd_url)
     username = "linyuchen"
-    token = 'OTcxNjU4ODc5MzM3MzkwMTEx.Gt5JCd.iuJrUQwSSeZT9f9Tsc-u2bJy2LbhotwbeNTL3s'
+    token = 'MTAxMjQ5NTUxMTA2MTc5NDg0Ng.G0Cus3.1YfxrcY7KGqsx8_KhSUx91c2yGUNWpVyl8bdok'
     # 注入token
     js = f"""
         const token = "{token}";
