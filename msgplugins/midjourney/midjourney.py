@@ -191,7 +191,11 @@ class Receiver:
 
     async def check_result(self):
         for i in range(int(self.timeout / 3)):
-            ret = await self.collecting_results()
+            try:
+                ret = await self.collecting_results()
+            except Exception as e:
+                print(e)
+                continue
             if ret != None:
                 return ret
             # for i in self.df.index:
