@@ -52,9 +52,9 @@ class Sender:
             'authorization': self.authorization
         }
 
-        prompt = prompt.replace('_', ' ')
-        prompt = " ".join(prompt.split())
-        prompt = re.sub(r'[^a-zA-Z0-9\s]+', '', prompt)
+        # prompt = prompt.replace('_', ' ')
+        # prompt = " ".join(prompt.split())
+        # prompt = re.sub(r'[^a-zA-Z0-9\s]+', '', prompt)
         prompt = prompt.lower()
 
         payload = {'type': 2,
@@ -67,7 +67,7 @@ class Sender:
                        'id': self.id,
                        'name': 'imagine',
                        'type': 1,
-                       'options': [{'type': 3, 'name': 'prompt', 'value': str(prompt) + ' ' + self.flags}],
+                       'options': [{'type': 3, 'name': 'prompt', 'value': prompt}],
                        'attachments': []}
                    }
 
