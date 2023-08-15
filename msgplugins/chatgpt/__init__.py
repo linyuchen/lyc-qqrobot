@@ -21,6 +21,8 @@ def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):
+    if not config.TTS_ENABLED:
+        return
     from ..tts.vits import tts
     text = text.replace("喵", "")
     if len(text) <= 80:
