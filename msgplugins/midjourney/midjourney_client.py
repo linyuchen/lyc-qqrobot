@@ -37,7 +37,8 @@ class MidjourneyClient(DiscordClient):
     ERROR_WORDS = [
         "Banned prompt",
         "Invalid parameter",
-        "Action needed to continue"
+        "Action needed to continue",
+        "You have been blocked"
     ]
 
     def __init__(self, url: str, token: str = "", debug_address: str = None, http_proxy: str = ""):
