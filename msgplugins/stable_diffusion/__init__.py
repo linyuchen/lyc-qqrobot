@@ -21,7 +21,8 @@ set_model = sd.set_model
 get_loras = sd.get_loras
 use_online = isinstance(sd, TusiDraw)
 
-mj_client = MidjourneyClient(url=config.MJ_DISCORD_CHANNEL_URL, token=config.MJ_DISCORD_TOKEN)
+mj_client = MidjourneyClient(url=config.MJ_DISCORD_CHANNEL_URL, token=config.MJ_DISCORD_TOKEN,
+                             http_proxy=config.GFW_PROXY)
 
 
 class SDPlugin(MsgHandler):
