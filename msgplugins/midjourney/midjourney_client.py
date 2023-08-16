@@ -84,7 +84,7 @@ class MidjourneyClient(DiscordClient):
             if not self.tasks:
                 time.sleep(1)
                 continue
-            print("开始获取消息")
+            # print("开始获取消息")
             msgs = self.get_msgs()
             for task in self.tasks[:]:
                 reply_msgs = list(filter(lambda msg: self.__filter_msg(msg, task), msgs))
