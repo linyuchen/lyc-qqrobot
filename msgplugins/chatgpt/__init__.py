@@ -25,7 +25,7 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
         return
     from ..tts.vits import tts
     text = text.replace("喵", "")
-    if len(text) <= 80:
+    if len(text) <= 60:
         try:
             base64_data = tts(text)
             msg.reply(MessageSegment.voice_base64(base64_data))

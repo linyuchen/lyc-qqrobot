@@ -85,11 +85,13 @@ class MiraiQQClient(QQClientFlask):
         send2tim = config.SEND2TIM
         if list(filter(lambda x: x["type"] == "Voice", message_chain)):
             send2tim = False
-        res = self.api_post(path,
-                            {"target": int(qq),
-                             "messageChain": message_chain}).json()
-        if res.get("messageId") == -1 and is_group and send2tim:
+
+        if is_group and send2tim:
             res = self.send2tim(self.get_group(qq).name, message_chain)
+        else:
+            res = self.api_post(path,
+                                {"target": int(qq),
+                                 "messageChain": message_chain}).json()
 
         return res
 

@@ -3,12 +3,15 @@ from pathlib import Path
 
 import ifnude
 
+import config
+
 from common.utils.baidu_translator import trans, is_chinese
 from msgplugins.midjourney.midjourney import draw
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .sd import SDDraw
 from .tusi import TusiDraw, MultipleCountPool
+from ..midjourney import MidjourneyClient, TaskCallback, TaskCallbackParam
 from ..cmdaz import CMD
 
 sd = TusiDraw("")
@@ -18,13 +21,15 @@ set_model = sd.set_model
 get_loras = sd.get_loras
 use_online = isinstance(sd, TusiDraw)
 
+mj_client = MidjourneyClient(url=config.MJ_DISCORD_CHANNEL_URL, token=config.MJ_DISCORD_TOKEN)
+
 
 class SDPlugin(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True
-    desc = "发送 画图+空格+描述 进行AI画图\n" + \
-           "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
-           "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
+    desc = "发送 画图+空格+描述 进行AI画图\n"
+           # "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
+           # "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
 
     def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[Path]):
         if isinstance(img_paths, Path):
@@ -75,11 +80,18 @@ class SDPlugin(MsgHandler):
             msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
                 # error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
-                if is_chinese(draw_txt):
-                    draw_txt = trans(draw_txt)
-                error = draw(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
-                if error:
-                    msg.reply(error)
+                def callback(param: TaskCallbackParam):
+                    if param.error:
+                        msg.reply(param.error)
+                    else:
+                        msg.reply(
+                            MessageSegment.image_path(param.image_path[0]) +
+                            MessageSegment.text(f"提示词:{param.prompt}\n\n原图(需魔法):{param.image_urls[0]}")
+                        )
+                mj_client.draw(draw_txt, callback)
+                # error = draw(draw_txt, callback=lambda img_paths, other_info: self.send_img(msg, img_paths) or msg.reply("原图：" + other_info))
+                # if error:
+                #     msg.reply(error)
             else:
                 image_path = txt2img(draw_txt, width=1024, height=1024)
                 if ifnude.detect(image_path):
