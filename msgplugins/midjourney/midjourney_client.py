@@ -1,6 +1,7 @@
-import re
 import dataclasses
+import json
 import queue
+import re
 import threading
 import time
 from datetime import datetime
@@ -11,6 +12,9 @@ import pytz
 
 from common.discord_client import DiscordClient, Message
 from common.utils.baidu_translator import is_chinese, trans
+
+BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
+BANNED_WORDS = [word["words"].strip().lower() for word in BANNED_WORDS]
 
 
 @dataclasses.dataclass
@@ -36,6 +40,7 @@ class MidjourneyClient(DiscordClient):
     BOT_NAME = "Midjourney Bot"
     ERROR_WORDS = [
         "Banned prompt",
+        "Empty prompt",
         "Invalid parameter",
         "Action needed to continue",
         "You have been blocked"
@@ -59,6 +64,12 @@ class MidjourneyClient(DiscordClient):
                 self.tasks.append(task)
 
     def draw(self, prompt: str, callback: TaskCallback):
+        prompt = prompt.lower()
+        have_banned_words: list[str] = []
+        for banned_word in BANNED_WORDS:
+            if banned_word in prompt:
+                have_banned_words.append(banned_word)
+                prompt = prompt.replace(banned_word, "")
         prompt = prompt.replace("\n", "")
         prompt = prompt.split("--", 1)
         params = ""
@@ -74,6 +85,11 @@ class MidjourneyClient(DiscordClient):
         prompt = re.sub(r'[^a-zA-Z0-9\s]+', ' ', prompt)
         # 多个空格转成一个空格
         prompt = " ".join(prompt.split())
+        if not prompt:
+            error = "提示词不能为空"
+            if have_banned_words:
+                error = " 有违禁词" + " ".join(have_banned_words)
+            return callback(TaskCallbackParam(error=error, image_path=None, prompt=""))
 
         # 自动加上版本
         if "--v" not in params and "--niji" not in params:
