@@ -90,7 +90,7 @@ class MidjourneyClient(DiscordClient):
                 reply_msgs = list(filter(lambda msg: self.__filter_msg(msg, task), msgs))
                 if reply_msgs:
                     reply_msg = reply_msgs[0]
-                    if not reply_msg.attachment_urls and "Invalid parameter" not in reply_msg.content:
+                    if not reply_msg.attachment_urls and "Invalid parameter" in reply_msg.content:
                         callback_param = TaskCallbackParam(prompt=task.prompt, error=reply_msg.content, image_path=None)
                     else:
                         # 有在画图，需要判断一下进度

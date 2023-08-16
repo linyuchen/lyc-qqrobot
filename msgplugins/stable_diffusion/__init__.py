@@ -21,8 +21,6 @@ set_model = sd.set_model
 get_loras = sd.get_loras
 use_online = isinstance(sd, TusiDraw)
 
-mj_client = MidjourneyClient(url=config.MJ_DISCORD_CHANNEL_URL, token=config.MJ_DISCORD_TOKEN,
-                             http_proxy=config.GFW_PROXY)
 
 
 class SDPlugin(MsgHandler):
@@ -78,7 +76,7 @@ class SDPlugin(MsgHandler):
             else:
                 width = 600
                 height = 800
-            msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
+            # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
             if use_online:
                 # error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
                 def callback(param: TaskCallbackParam):
@@ -89,7 +87,7 @@ class SDPlugin(MsgHandler):
                             MessageSegment.image_path(param.image_path[0]) +
                             MessageSegment.text(f"提示词:{param.prompt}\n\n原图(需魔法):{param.image_urls[0]}")
                         )
-                mj_client.draw(draw_txt, callback)
+                # mj_client.draw(draw_txt, callback)
                 # error = draw(draw_txt, callback=lambda img_paths, other_info: self.send_img(msg, img_paths) or msg.reply("原图：" + other_info))
                 # if error:
                 #     msg.reply(error)

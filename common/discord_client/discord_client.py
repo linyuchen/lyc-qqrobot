@@ -50,7 +50,7 @@ class DiscordClient:
             options.add_experimental_option("debuggerAddress", debug_address)
         else:
             # tempdir = tempfile.gettempdir()
-            tempdir = tempfile.mkdtemp()
+            tempdir = tempfile.gettempdir()
             options.add_argument(f"user-data-dir={tempdir}")
             prefs = {"profile.managed_default_content_settings.images": 2}  # 不显示图片
             options.add_experimental_option("prefs", prefs)

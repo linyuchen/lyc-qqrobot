@@ -11,7 +11,7 @@ mj_client = MidjourneyClient(url=config.MJ_DISCORD_CHANNEL_URL, token=config.MJ_
 
 @on_command("画图", alias=("sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1,
             desc="发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞")
-def mj_draw(msg: GroupMsg | FriendMsg, draw_text: str):
+def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     def callback(param: TaskCallbackParam):
         if param.error:
             msg.reply(param.error)
@@ -21,4 +21,4 @@ def mj_draw(msg: GroupMsg | FriendMsg, draw_text: str):
                 MessageSegment.text(f"提示词:{param.prompt}\n\n原图(需魔法):{param.image_urls[0]}")
             )
 
-    mj_client.draw(draw_text, callback)
+    mj_client.draw(msg_param[0], callback)
