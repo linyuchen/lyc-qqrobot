@@ -161,6 +161,7 @@ class DiscordClient:
                 pass
             time.sleep(0.5)
         text_box.send_keys(Keys.ENTER)
+        time.sleep(0.5)
         text_box.send_keys(cmd_args)
         text_box.send_keys(Keys.ENTER)
 

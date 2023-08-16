@@ -52,14 +52,17 @@ class MidjourneyClient(DiscordClient):
                 self.tasks.append(task)
 
     def draw(self, prompt: str, callback: TaskCallback):
-        prompt = prompt.split("-", 1)
+        prompt = prompt.replace("\n", "")
+        prompt = prompt.split("--", 1)
         params = ""
         if len(prompt) > 1:
             prompt, params = prompt
-            params = " -" + params
+            params = " --" + params
 
         else:
             prompt = prompt[0]
+
+        prompt = prompt.replace("-", " ")
 
         # 自动加上版本
         if "--v" not in params and "--niji" not in params:
@@ -72,7 +75,6 @@ class MidjourneyClient(DiscordClient):
 
     def __filter_msg(self, msg: Message, task: Task) -> bool:
         if msg.datetime < task.datetime:
-            print(msg.datetime, task.datetime)
             return False
         if task.prompt.replace(" ", "") not in msg.content.replace(" ", ""):
             return False
