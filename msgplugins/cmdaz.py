@@ -60,10 +60,8 @@ class CMD(object):
             if len(original_cmd) <= cmd_name_length:  # 如果没有参数
                 return False
 
-            if self.param_sep == " ":
-                self.params = original_cmd.split()
-            elif self.param_sep:
-                self.params = original_cmd.split(self.param_sep)
+            if self.param_sep:
+                self.params = original_cmd.split(self.param_sep, maxsplit=self.param_length)
 
             if self.params:
                 cmd_name = self.params[0]
@@ -119,7 +117,7 @@ class CMD(object):
         return self.original_param
 
     def get_original_param_list(self):
-        return self.original_param.split(self.param_sep or None, maxsplit=self.param_length)
+        return self.original_param.split(self.param_sep or None, maxsplit=self.param_length-1)
 
 
 def on_command(cmd_name,

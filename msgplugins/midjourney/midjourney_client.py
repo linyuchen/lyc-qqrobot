@@ -1,4 +1,5 @@
 import dataclasses
+import queue
 import threading
 import time
 from datetime import datetime
@@ -35,9 +36,20 @@ class MidjourneyClient(DiscordClient):
 
     def __init__(self, url: str, token: str = "", debug_address: str = None, http_proxy: str = ""):
         super().__init__(url, token, debug_address, http_proxy)
+        self.__putted_tasks: queue.Queue[Task] = queue.Queue()
         self.tasks: list[Task] = []
         self.__lock = threading.Lock()
         threading.Thread(target=self.__listen_msg).start()
+        threading.Thread(target=self.__listen_cmd).start()
+
+    def __listen_cmd(self):
+        while True:
+            task = self.__putted_tasks.get()
+            self.send_cmd("/imagine", task.prompt)
+            now = datetime.now(pytz.timezone('Asia/Shanghai'))
+            task.datetime = now
+            with self.__lock:
+                self.tasks.append(task)
 
     def draw(self, prompt: str, callback: TaskCallback):
         prompt = prompt.split("-", 1)
@@ -55,11 +67,8 @@ class MidjourneyClient(DiscordClient):
         if is_chinese(prompt):
             prompt = trans(prompt)
         prompt = prompt + params
-        self.send_cmd("/imagine", prompt)
-        now = datetime.now(pytz.timezone('Asia/Shanghai'))
-        task = Task(prompt=prompt, datetime=now, callback=callback)
-        with self.__lock:
-            self.tasks.append(task)
+        task = Task(prompt=prompt, callback=callback, datetime=datetime.now())
+        self.__putted_tasks.put(task)
 
     def __filter_msg(self, msg: Message, task: Task) -> bool:
         if msg.datetime < task.datetime:
