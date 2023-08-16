@@ -95,9 +95,10 @@ class DiscordClient:
                 msg_id = None
                 continue
 
+            # 获取发送者名字
             try:
-                msg_sender_name = msg_ele.find_element(by=By.XPATH,
-                                                       value="//*[starts-with(@class,'username')]").text
+                msg_sender_ele = msg_ele.find_element(by=By.CSS_SELECTOR, value="span[id^='message-username'] > span")
+                msg_sender_name = msg_sender_ele.text
             except Exception:
                 # 没有找到的可能是消息合并，需要在上一条消息中查找
                 pass

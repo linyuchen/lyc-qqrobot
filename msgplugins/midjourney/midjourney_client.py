@@ -72,6 +72,7 @@ class MidjourneyClient(DiscordClient):
 
     def __filter_msg(self, msg: Message, task: Task) -> bool:
         if msg.datetime < task.datetime:
+            print(msg.datetime, task.datetime)
             return False
         if task.prompt.replace(" ", "") not in msg.content.replace(" ", ""):
             return False
