@@ -1,3 +1,4 @@
+import re
 import dataclasses
 import queue
 import threading
@@ -33,6 +34,11 @@ class Task:
 
 class MidjourneyClient(DiscordClient):
     BOT_NAME = "Midjourney Bot"
+    ERROR_WORDS = [
+        "Banned prompt",
+        "Invalid parameter",
+        "Action needed to continue"
+    ]
 
     def __init__(self, url: str, token: str = "", debug_address: str = None, http_proxy: str = ""):
         super().__init__(url, token, debug_address, http_proxy)
@@ -63,6 +69,10 @@ class MidjourneyClient(DiscordClient):
             prompt = prompt[0]
 
         prompt = prompt.replace("-", " ")
+        # 特殊符号转成空格
+        prompt = re.sub(r'[^a-zA-Z0-9\s]+', ' ', prompt)
+        # 多个空格转成一个空格
+        prompt = " ".join(prompt.split())
 
         # 自动加上版本
         if "--v" not in params and "--niji" not in params:
@@ -103,8 +113,7 @@ class MidjourneyClient(DiscordClient):
                 if reply_msgs:
                     reply_msg = reply_msgs[0]
                     if not reply_msg.attachment_urls and \
-                            ("Invalid parameter" in reply_msg.content or
-                             "Action needed to continue" in reply_msg.content):
+                            (list(filter(lambda word: word in reply_msg.content, self.ERROR_WORDS))):
                         callback_param = TaskCallbackParam(prompt=task.prompt, error=reply_msg.content, image_path=None)
                     else:
                         # 有在画图，需要判断一下进度
