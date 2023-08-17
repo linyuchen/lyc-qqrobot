@@ -85,7 +85,7 @@ class MidjourneyClient(DiscordClient):
         if "--v" not in params and "--niji" not in params:
             params += " --v 5.2"
         if is_chinese(prompt):
-            prompt = trans(prompt)
+            prompt = trans(prompt).lower()
 
         have_banned_words: list[str] = []
         for banned_word in BANNED_WORDS:
