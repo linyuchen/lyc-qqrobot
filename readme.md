@@ -100,7 +100,7 @@ webhook:
 
 **LISTEN_PORT**: 机器人的http api监听的端口，主要是用于mirai主动发送接收到的消息到本项目
 
-**SEND2TIM**: 是否使用Tim进行发送消息，需要运行Tim的服务端，服务端项目地址 
+**SEND2TIM**: 是否使用Tim进行发送消息，需要运行Tim的服务端，服务端项目地址 <https://github.com/linyuchen/qqrobot-server/>
 
 **SEND2TIM_HTTP_API**: Tim服务端的http api地址
 
