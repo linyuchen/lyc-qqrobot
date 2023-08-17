@@ -20,6 +20,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
                 MessageSegment.image_path(param.image_path[0]) +
                 MessageSegment.text(f"提示词:{param.prompt}\n\n原图(需魔法):{param.image_urls[0]}")
             )
+            param.image_path[0].unlink(missing_ok=True)
 
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     mj_client.draw(msg_param[0], callback)
