@@ -7,10 +7,12 @@ from typing import Callable
 import aiohttp
 import pandas as pd
 from retry import retry
+from .exceptions import MidjourneyException
+from common.utils.baidu_translator import trans, is_chinese
 
 default_json = {
     "channelid": "1127887388648153121",
-    "authorization": "MTAxMjQ5NTUxMTA2MTc5NDg0Ng.G0Cus3.1YfxrcY7KGqsx8_KhSUx91c2yGUNWpVyl8bdok",
+    "authorization": "",
     "application_id": "936929561302675456",
     "guild_id": "1127887388648153118",
     "session_id": "e7de53b801a3670887aa7cfb36d68de0",
@@ -23,16 +25,11 @@ default_json = {
 }
 
 
-class Sender:
+class MidjourneyClient:
 
     def __init__(self):
 
-        self.sender_initializer()
-
-    def sender_initializer(self):
-
         params = default_json
-
         self.channelid = params['channelid']
         self.authorization = params['authorization']
         self.application_id = params['application_id']
@@ -41,21 +38,25 @@ class Sender:
         self.version = params['version']
         self.id = params['id']
         self.flags = params['flags']
+
+        self.headers = {
+            'authorization': self.authorization
+        }
         if params['proxy'] != "":
             # 代理服务器的IP地址和端口号
             self.proxy = params['proxy']
         else:
             self.proxy = None
+        self.retry_count = 10
 
     async def send(self, prompt):
-        header = {
-            'authorization': self.authorization
-        }
 
-        # prompt = prompt.replace('_', ' ')
-        # prompt = " ".join(prompt.split())
-        # prompt = re.sub(r'[^a-zA-Z0-9\s\-]+', '', prompt)
+        prompt = prompt.replace('_', ' ')
+        prompt = " ".join(prompt.split())
+        prompt = re.sub(r'[^a-zA-Z0-9\s:-]+', '', prompt)
         prompt = prompt.lower()
+        # 多个空格变一个空格
+        prompt = re.sub(r'\s+', ' ', prompt)
 
         payload = {'type': 2,
                    'application_id': self.application_id,
@@ -72,32 +73,31 @@ class Sender:
                    }
 
         async with aiohttp.ClientSession() as session:
-            retry = 3
-            while retry >= 0:
+            for i in range(self.retry_count):
                 try:
-                    async with session.post('https://discord.com/api/v9/interactions', json=payload, headers=header,
+                    async with session.post('https://discord.com/api/v9/interactions',
+                                            json=payload, headers=self.headers,
                                             proxy=self.proxy) as resp:
                         if resp.status == 204:
                             break
-
-                        print(".", end="")
                 except Exception as e:
                     print(e)
-                retry -= 1
+            else:
+                raise MidjourneyException("发送画图请求失败！")
 
-                if retry < 0:
-                    return None
-
-        # print(r.headers)
-        # print(r.text)
-
-        # print('prompt [{}] successfully sent!'.format(prompt))
-        # prompt = prompt.replace(" ", "_")
-
-        # 多个空格变一个空格
-        prompt = re.sub(r'\s+', ' ', prompt)
         return prompt
 
+    async def retrieve_messages(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f'https://discord.com/api/v10/channels/{self.channelid}/messages?limit={10}',
+                                   headers=self.headers, proxy=self.proxy) as response:
+                jsonn = await response.json()
+        return jsonn
+
+    async def message_listener(self):
+        while True:
+            messages = await self.retrieve_messages()
+            await asyncio.sleep(1)
 
 class Receiver:
 
@@ -132,7 +132,7 @@ class Receiver:
                 jsonn = await response.json()
         return jsonn
 
-    async def collecting_results(self):
+    async def collecting_results(self) -> tuple[str, str]:
         # tmp_json = {
         #     "code": 0,
         #     "url": ""
@@ -152,7 +152,7 @@ class Receiver:
                                 '(Open on website for full quality)' in message['content']):
                             id = message['id']
                             prompt = message['content'].split('**')[1].split(' --')[0]
-                            # url = message['attachments'][0]['url']
+                            origin_url = message['attachments'][0]['proxy_url']
                             url = message['attachments'][0]['proxy_url'] + "?width=1024&height=1024"
                             filename = message['attachments'][0]['filename']
 
@@ -166,7 +166,7 @@ class Receiver:
                                     # print("filename=" + filename)
                                     # print("url=" + url)
                                     # tmp_json["url"] = url
-                                    return url
+                                    return url, origin_url
                         # 如果消息中没有图像附件，则将该请求添加到awaiting_list DataFrame中，等待下一次检索。
                         else:
                             id = message['id']
@@ -217,24 +217,37 @@ class Receiver:
                     print(e)
 
 
-async def __send(prompt, callback: Callable[[Path], None]):
-    sender = Sender()
+async def __send(prompt, callback: Callable[[Path, str], None]):
+    sender = MidjourneyClient()
     prompt = await sender.send(prompt)
 
     # print(f"prompt=[{prompt}]")
 
     receiver = Receiver(prompt)
-    result = await receiver.check_result()
+    try:
+        thumb_url, origin_url = await receiver.check_result() or (None, None)
+    except Exception as e:
+        return str(e)
 
     try:
-        if result is not None:
-            print(f"result=[{result}]")
-            result = await receiver.download_img(result)
-            callback(result)
+        if thumb_url is not None:
+            # print(f"result=[{thumb_url}]")
+            result = await receiver.download_img(thumb_url)
+            callback(result, origin_url)
     except Exception as e:
-        print(e)
+        # print(e)
         return str(e)
 
 
-def draw(prompt: str, callback: Callable[[Path], None]):
+def draw(prompt: str, callback: Callable[[Path, str], None]):
+    prompt = prompt.split("-", 1)
+    params = ""
+    if len(prompt) > 1:
+        prompt, params = prompt
+        params = " -" + params
+    else:
+        prompt = prompt[0]
+    if is_chinese(prompt):
+        prompt = trans(prompt)
+    prompt = prompt + params
     return asyncio.run(__send(prompt, callback))

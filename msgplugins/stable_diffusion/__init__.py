@@ -15,7 +15,7 @@ from ..midjourney import MidjourneyClient, TaskCallback, TaskCallbackParam
 from ..cmdaz import CMD
 
 sd = TusiDraw("")
-txt2img = MultipleCountPool().txt2img
+# txt2img = MultipleCountPool().txt2img
 get_models = sd.get_models
 set_model = sd.set_model
 get_loras = sd.get_loras
@@ -92,12 +92,13 @@ class SDPlugin(MsgHandler):
                 # if error:
                 #     msg.reply(error)
             else:
-                image_path = txt2img(draw_txt, width=1024, height=1024)
-                if ifnude.detect(image_path):
-                    msg.reply("图片违规，已被删除")
-                    os.remove(str(image_path))
-                    return
-                reply_msg = MessageSegment.image_path(str(image_path))
-                msg.reply(reply_msg)
-                os.remove(str(image_path))
+                pass
+                # image_path = txt2img(draw_txt, width=1024, height=1024)
+                # if ifnude.detect(image_path):
+                #     msg.reply("图片违规，已被删除")
+                #     os.remove(str(image_path))
+                #     return
+                # reply_msg = MessageSegment.image_path(str(image_path))
+                # msg.reply(reply_msg)
+                # os.remove(str(image_path))
             return

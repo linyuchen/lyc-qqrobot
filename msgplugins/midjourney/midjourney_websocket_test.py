@@ -25,7 +25,7 @@ class DiscordClient():
         auth = {
             "op": 2,
             "d": {
-                "token": "MTAxMjQ5NTUxMTA2MTc5NDg0Ng.G0Cus3.1YfxrcY7KGqsx8_KhSUx91c2yGUNWpVyl8bdok",
+                "token": "",
                 "properties": {
                     "$os": random.choice(["windows", "linux", "iOS"]),
                     "$browser": random.choice(["firefox", "chrome", "edge", "safari"]),
@@ -36,7 +36,7 @@ class DiscordClient():
         auth2 = {
             "op": 2,
             "d": {
-                "token": "MTAxMjQ5NTUxMTA2MTc5NDg0Ng.G0Cus3.1YfxrcY7KGqsx8_KhSUx91c2yGUNWpVyl8bdok",
+                "token": "",
                 "capabilities": 16381,
                 "properties": {
                     "os": "Windows",
