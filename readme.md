@@ -30,7 +30,7 @@ Python3.11
 
 ## 安装`mirai`
 
-下载(mcl-install)[https://github.com/iTXTech/mcl-installer/releases]
+下载[mcl-install](https://github.com/iTXTech/mcl-installer/releases)
 
 运行`mcl-install`会自动下载依赖和`mcl`
 
