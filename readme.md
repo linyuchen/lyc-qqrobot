@@ -125,7 +125,7 @@ webhook:
 
 然后实例化刚刚复写的类，并执行它的start()
 
-`mirai的话直接使用[client/mirai_http/main.py](client/mirai_http/main.py)即可`
+mirai的话直接使用[client/mirai_http/main.py](client/mirai_http/main.py)即可
 
 
 # 备份
