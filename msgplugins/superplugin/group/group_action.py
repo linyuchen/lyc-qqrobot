@@ -1,6 +1,5 @@
 # -*- coding: UTF8 -*-
 
-import datetime
 from globalconf.models import GlobalSetting
 from group.models import *
 
@@ -26,8 +25,8 @@ class GroupAction(object):
         last_record = SignRecord.objects.filter(user=self.group_user).\
             exclude(time__year=today.year, time__month=today.month, time__day=today.day).last()
         last_record_time = "无"
-        if last_record and last_record.datetime:
-            last_record_time = last_record.datetime.strftime("%Y-%m-%d")
+        if last_record and last_record.time:
+            last_record_time = last_record.time.strftime("%Y-%m-%d")
 
         info = "上次签到时间: %s" % last_record_time
         info += "\n连续签到%d次\n一共签到%d次" % (self.group_user.sign_continuous, self.group_user.total_sign)
@@ -51,8 +50,8 @@ class GroupAction(object):
             #                self.group_user.sign_continuous
             reward_point = self.group_setting.sign_least_point + 100 * self.group_user.sign_continuous
             last_record = SignRecord.objects.filter(user=self.group_user).last()
-            if last_record and last_record.datetime:
-                if (today - last_record.datetime) > timezone.timedelta(hours=48):
+            if last_record and last_record.time:
+                if (today - last_record.time) > timezone.timedelta(hours=48):
                     self.group_user.sign_continuous = 1
                 else:
                     self.group_user.sign_continuous += 1
