@@ -1,18 +1,11 @@
-import os
 from pathlib import Path
 
-import ifnude
-
-import config
-
-from common.utils.baidu_translator import trans, is_chinese
-from msgplugins.midjourney.midjourney import draw
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .sd import SDDraw
 from .tusi import TusiDraw, MultipleCountPool
-from ..midjourney import MidjourneyClient, TaskCallback, TaskCallbackParam
 from ..cmdaz import CMD
+from ..midjourney import TaskCallbackParam
 
 sd = TusiDraw("")
 # txt2img = MultipleCountPool().txt2img
@@ -22,13 +15,13 @@ get_loras = sd.get_loras
 use_online = isinstance(sd, TusiDraw)
 
 
-
 class SDPlugin(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True
     desc = "发送 画图+空格+描述 进行AI画图\n"
-           # "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
-           # "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
+
+    # "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
+    # "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
 
     def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[Path]):
         if isinstance(img_paths, Path):
