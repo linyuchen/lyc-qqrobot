@@ -1,15 +1,17 @@
-import json
 import asyncio
-import websockets
-import requests
-import time
-import socks
-import socket
+import json
 import os
+import time
+import traceback
+
+import websockets
+
 # socks.set_default_proxy(socks.PROXY_TYPE_HTTP, 'http://127.0.0.1', 7890)
 # socket.socket = socks.socksocket
-os.environ['http_proxy'] = 'http://127.0.0.1:7890'
-os.environ['https_proxy'] = 'http://127.0.0.1:7890'
+os.environ['HTTP_PROXY'] = 'http://127.0.0.1:7890'
+os.environ['HTTPS_PROXY'] = 'http://127.0.0.1:7890'
+
+
 class WebSocketConnection:
     def __init__(self):
         self.ws = None
@@ -52,6 +54,7 @@ class WebSocketConnection:
                     heartbeat_task.cancel()
 
             except Exception as e:
+                traceback.print_exc()
                 print(f"Unexpected exception: {e}")
 
             print("Reconnecting.")
@@ -87,4 +90,5 @@ class WebSocketConnection:
 
 
 if __name__ == '__main__':
-    asyncio.run(WebSocketConnection().connect(""))
+    asyncio.run(
+        WebSocketConnection().connect("MTAxMzIwMzkzNzc1MjUyNjg3OA.GTgn6w.xkzYA_kPzuhZTHqePf5o8zwZTRQNuxeREdtTAQ"))

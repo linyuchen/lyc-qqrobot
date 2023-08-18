@@ -23,6 +23,8 @@ config_data = {
     "VITS_HTTP_API": "http://192.168.1.4:7862",
     "TTS_ENABLED": False,
     "MJ_DISCORD_TOKEN": "",
+    "MJ_DISCORD_CHANNEL_ID": "",
+    "MJ_DISCORD_GUILD_ID": "",
     "MJ_DISCORD_CHANNEL_URL": "",
     "TUSI_TOKENS": [
 

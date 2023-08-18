@@ -26,6 +26,7 @@ class Message:
     datetime: datetime
     content: str = ""
     attachment_urls: list[str] = None
+    read = False
 
 
 class DiscordClient:
@@ -165,7 +166,8 @@ class DiscordClient:
         text_box.send_keys(cmd_args)
         text_box.send_keys(Keys.ENTER)
 
-    def download_imgs(self, img_urls: list[str]) -> list[Path]:
+    @staticmethod
+    def download_images(img_urls: list[str]) -> list[Path]:
         result: list[Path] = []
         for img_url in img_urls:
             img_path = tempfile.mktemp(".png")

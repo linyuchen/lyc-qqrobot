@@ -5,14 +5,10 @@ from qqsdk.message.segment import MessageSegment
 from .sd import SDDraw
 from .tusi import TusiDraw, MultipleCountPool
 from ..cmdaz import CMD
-from ..midjourney import TaskCallbackParam
+from ..midjourney import TaskCallbackResponse
 
-sd = TusiDraw("")
+
 # txt2img = MultipleCountPool().txt2img
-get_models = sd.get_models
-set_model = sd.set_model
-get_loras = sd.get_loras
-use_online = isinstance(sd, TusiDraw)
 
 
 class SDPlugin(MsgHandler):
@@ -22,6 +18,14 @@ class SDPlugin(MsgHandler):
 
     # "发送 查看画图模型 获取模型列表\n发送 设置画图模型+空格+模型名 设置模型\n" + \
     # "发送 查看lora 获取lora关键字列表, 画图时加上lora关键字可形成特定风格\n"
+
+    def __init__(self, qq_client):
+        super().__init__(qq_client)
+        self.sd = TusiDraw("")
+        self.get_models = self.sd.get_models
+        self.set_model = self.sd.set_model
+        self.get_loras = self.sd.get_loras
+        self.use_online = isinstance(sd, TusiDraw)
 
     def send_img(self, msg: GroupMsg | FriendMsg, img_paths: list[Path]):
         if isinstance(img_paths, Path):
@@ -48,17 +52,17 @@ class SDPlugin(MsgHandler):
         draw_txt = ""
         if get_models_cmd.az(msg.msg):
             msg.destroy()
-            msg.reply(get_models())
+            msg.reply(self.get_models())
             return
         elif get_loras_cmd.az(msg.msg):
             msg.destroy()
-            msg.reply(get_loras())
+            msg.reply(self.get_loras())
             return
         elif set_model_cmd.az(msg.msg):
             msg.destroy()
             model_name = set_model_cmd.get_original_param().strip()
             # msg.reply("正在设置模型，请稍等...")
-            msg.reply(set_model(model_name))
+            msg.reply(self.set_model(model_name))
         elif draw_cmd.az(msg.msg) or draw_hd_cmd.az(msg.msg):
             draw_txt = draw_cmd.get_original_param()
         if draw_txt:
@@ -70,9 +74,9 @@ class SDPlugin(MsgHandler):
                 width = 600
                 height = 800
             # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
-            if use_online:
+            if self.use_online:
                 # error = txt2img(draw_txt, callback=lambda img_paths: self.send_img(msg, img_paths))
-                def callback(param: TaskCallbackParam):
+                def callback(param: TaskCallbackResponse):
                     if param.error:
                         msg.reply(param.error)
                     else:

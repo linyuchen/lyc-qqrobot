@@ -7,17 +7,18 @@ from typing import Callable
 import aiohttp
 import pandas as pd
 from retry import retry
-from .exceptions import MidjourneyException
+
 from common.utils.baidu_translator import trans, is_chinese
+from .exceptions import MidjourneyException
 
 default_json = {
-    "channelid": "1127887388648153121",
     "authorization": "",
-    "application_id": "936929561302675456",
-    "guild_id": "1127887388648153118",
-    "session_id": "e7de53b801a3670887aa7cfb36d68de0",
-    "version": "1118961510123847772",
-    "id": "938956540159881230",
+    "channelid": "1127887388648153121",  # 当前频道浏览器上方有
+    "guild_id": "1127887388648153118",  # 当前频道浏览器上方有
+    "session_id": "e7de53b801a3670887aa7cfb36d68de0",  # 未知
+    "version": "1118961510123847772",  # 固定的
+    "id": "938956540159881230",  # command id，固定的
+    "application_id": "936929561302675456",  # 固定的
     "flags": "--v 5",
     # "http://127.0.0.1:10809"
     "proxy": "http://127.0.0.1:7890",
@@ -98,6 +99,7 @@ class MidjourneyClient:
         while True:
             messages = await self.retrieve_messages()
             await asyncio.sleep(1)
+
 
 class Receiver:
 

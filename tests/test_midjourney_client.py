@@ -1,5 +1,5 @@
 from unittest import TestCase
-from msgplugins.midjourney.midjourney_client import MidjourneyClient, TaskCallbackParam
+from msgplugins.midjourney.midjourney_client import MidjourneyClient, TaskCallbackResponse
 
 
 class TestMidjourneyClient(TestCase):
@@ -9,7 +9,7 @@ class TestMidjourneyClient(TestCase):
         self.client = MidjourneyClient(url=url, debug_address="127.0.0.1:9990")
 
     def test_draw(self):
-        def callback(param: TaskCallbackParam):
+        def callback(param: TaskCallbackResponse):
             print("prompt:", param.prompt)
             print("error:", param.error)
             print("path:", param.image_path)
