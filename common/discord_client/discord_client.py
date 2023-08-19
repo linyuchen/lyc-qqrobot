@@ -172,7 +172,7 @@ class DiscordClient:
         for img_url in img_urls:
             img_path = tempfile.mktemp(".png")
             img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
-            try_count = 3
+            try_count = 10
             data = ""
             for i in range(try_count):
                 try:
