@@ -2,8 +2,8 @@ import asyncio
 import random
 import socket
 import threading
-from datetime import datetime
 from copy import deepcopy
+from datetime import datetime
 
 import aiohttp
 import pytz
@@ -168,47 +168,52 @@ class MidjourneyClient(MidjourneyClientBase):
                 })
                 await asyncio.sleep(self.heartbeat_interval)
 
+    async def __receive_msg(self):
+        data: WSMessage = await self.ws.receive()
+        match data.type:
+            case WSMsgType.CLOSED:
+                # print("closed")
+                await self.__init_ws()
+            case WSMsgType.TEXT:
+                try:
+                    msg = data.json()
+                except Exception as e:
+                    print(e)
+                    raise e
+                op = msg.get('op')
+                data: dict = msg.get('d')
+                seq = msg.get('s')
+                event = msg.get('t')
+                match event:
+                    case "MESSAGE_CREATE" | "MESSAGE_UPDATE":
+                        content = data.get("content", "")
+                        for e in data.get("embeds", []):
+                            content += f"\n{e.get('title', '')}\n{e.get('footer', {}).get('text', '')}\n{e.get('description', '')}\n"
+                        attachment_urls = [a_data["proxy_url"] for a_data in data.get("attachments", [])]
+
+                        time_str = data.get("timestamp")
+                        if time_str:
+
+                            utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
+                            local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
+                            msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+                        else:
+                            msg_datetime = datetime.now()
+                        new_msg = Message(msg_id=data.get("id"),
+                                          content=content,
+                                          sender_name=data.get("author", {}).get("username"),
+                                          attachment_urls=attachment_urls,
+                                          datetime=msg_datetime
+                                          )
+                        self._handle_new_msg(new_msg)
+
     async def __pool_event(self):
         await asyncio.sleep(2)
         while True:
             if not self.ws:
                 await asyncio.sleep(0.2)
                 continue
-            data: WSMessage = await self.ws.receive()
-            match data.type:
-                case WSMsgType.CLOSED:
-                    # print("closed")
-                    await self.__init_ws()
-                case WSMsgType.TEXT:
-                    try:
-                        msg = data.json()
-                    except Exception as e:
-                        print(e)
-                        continue
-                    op = msg.get('op')
-                    data: dict = msg.get('d')
-                    seq = msg.get('s')
-                    event = msg.get('t')
-                    match event:
-                        case "MESSAGE_CREATE" | "MESSAGE_UPDATE":
-                            content = data.get("content", "")
-                            for e in data.get("embeds", []):
-                                content += f"\n{e.get('title', '')}\n{e.get('footer', {}).get('text', '')}\n{e.get('description', '')}\n"
-                            attachment_urls = [a_data["proxy_url"] for a_data in data.get("attachments", [])]
-
-                            time_str = data.get("timestamp")
-                            if time_str:
-                                utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
-                                local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
-                                msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
-                            else:
-                                msg_datetime = datetime.now()
-                            new_msg = Message(msg_id=data.get("id"),
-                                              content=content,
-                                              sender_name=data.get("author", {}).get("username"),
-                                              attachment_urls=attachment_urls,
-                                              datetime=msg_datetime
-                                              )
-                            self._handle_new_msg(new_msg)
-                            # print(new_msg)
-                    # print(msg)
+            try:
+                await self.__receive_msg()
+            except Exception as e:
+                print(e)

@@ -18,7 +18,7 @@ from ..cmdaz import on_command
 sd = SDDraw()
 
 
-@on_command("画图", alias=("sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1)
+@on_command("画图", alias=("sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1, auto_destroy=False)
 def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
     # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     try:

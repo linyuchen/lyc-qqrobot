@@ -43,7 +43,7 @@ class SDDraw(AIDrawBase):
             "steps": 20,
             "width": width,
             "height": height,
-            "sampler_index": "DPM++ 2M Karras"
+            "sampler_index": "DPM++ 2M Karras",
         }
         r = self._api_post("txt2img", data)
         res_paths = []
