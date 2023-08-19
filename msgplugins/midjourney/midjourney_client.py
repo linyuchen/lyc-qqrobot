@@ -12,7 +12,7 @@ from typing import Callable, NewType
 
 import pytz
 
-from common.discord_client import DiscordClient, Message
+from common.discord_client import DiscordSeleniumClient, Message, download_images
 from common.utils.baidu_translator import is_chinese, trans
 
 BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
@@ -56,7 +56,8 @@ class MidjourneyClientBase(metaclass=ABCMeta):
         "You have been blocked": "你已被封禁",
     }
 
-    def __init__(self):
+    def __init__(self, http_proxy: str):
+        self.http_proxy = http_proxy
         self._putted_tasks: queue.Queue[Task] = queue.Queue()
         self.tasks: list[Task] = []
         self._lock = threading.Lock()
@@ -158,20 +159,19 @@ class MidjourneyClientBase(metaclass=ABCMeta):
                 self.tasks.remove(task)
             threading.Thread(target=lambda: self.__handle_callback(task, callback_param)).start()
 
-    @staticmethod
-    def __handle_callback(task: Task, param: TaskCallbackResponse):
+    def __handle_callback(self, task: Task, param: TaskCallbackResponse):
         if param.image_urls:
             try:
-                param.image_path = DiscordClient.download_images(param.image_urls)
+                param.image_path = download_images(param.image_urls, self.http_proxy)
             except Exception as e:
                 param.error = str(e)
         task.callback(param)
 
 
-class MidjourneyClient(MidjourneyClientBase, DiscordClient):
+class MJSeleniumClient(MidjourneyClientBase, DiscordSeleniumClient):
     def __init__(self, url: str, token: str = "", debug_address: str = None, http_proxy: str = ""):
-        MidjourneyClientBase.__init__(self)
-        DiscordClient.__init__(self, url, token, debug_address, http_proxy)
+        MidjourneyClientBase.__init__(self, http_proxy)
+        DiscordSeleniumClient.__init__(self, url, token, debug_address, http_proxy)
         threading.Thread(target=self._listen_msg).start()
 
     def _handle_new_task(self, task: Task):

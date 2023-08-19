@@ -11,12 +11,9 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Keys, ChromeOptions
 from selenium.webdriver.common.by import By
 
-from config import GFW_PROXY
-
 # from msgplugins.stable_diffusion.sd import trans2en
 
 TIME_OUT = 60
-proxy = {"https": GFW_PROXY}
 
 
 @dataclass()
@@ -29,7 +26,7 @@ class Message:
     read = False
 
 
-class DiscordClient:
+class DiscordSeleniumClient:
 
     def __init__(self, url: str, token: str = "", debug_address: str = None, http_proxy: str = ""):
         """
@@ -38,7 +35,7 @@ class DiscordClient:
         :param debug_address: 调试地址，如127.0.0.1:9990, 启动Chrome时需要加参数，如chrome.exe --remote-debugging-port=9990 --user-data-dir=d:/
         :param http_proxy: http代理地址，如http://localhost:7890
         """
-        super().__init__()
+        self.http_proxy = http_proxy
         if http_proxy:
             webdriver.DesiredCapabilities.CHROME['proxy'] = {
                 "httpProxy": http_proxy,
@@ -135,7 +132,8 @@ class DiscordClient:
                 #                                      value=f"//*[starts-with(@class, 'mediaAttachmentsContainer')]")
                 attachment_el = msg_ele.find_element(by=By.ID, value=f"message-accessories-{msg_id}")
                 attachment_els = attachment_el.find_elements(by=By.TAG_NAME, value="a")
-                attachment_urls = [a.get_attribute("href").replace("cdn.discordapp.com", "media.discordapp.net") for a in attachment_els]
+                attachment_urls = [a.get_attribute("href").replace("cdn.discordapp.com", "media.discordapp.net") for a
+                                   in attachment_els]
                 attachment_urls = list(filter(bool, attachment_urls))
             except Exception:
                 # print(NoSuchElementException("没有找到附件"))
@@ -166,25 +164,30 @@ class DiscordClient:
         text_box.send_keys(cmd_args)
         text_box.send_keys(Keys.ENTER)
 
-    @staticmethod
-    def download_images(img_urls: list[str]) -> list[Path]:
-        result: list[Path] = []
-        for img_url in img_urls:
-            img_path = tempfile.mktemp(".png")
-            img_url = img_url.replace("cdn.discordapp.com", "media.discordapp.net") + "?width=546&height=546"
-            try_count = 10
-            data = ""
-            for i in range(try_count):
-                try:
-                    data = requests.get(img_url, proxies=proxy).content
-                    break
-                except Exception as e:
-                    continue
 
-            if not data:
-                raise Exception(f"download {img_url} failed")
-            with open(img_path, "wb") as f:
-                f.write(data)
-                f.close()
-            result.append(Path(img_path))
-        return result
+def download_images(img_urls: list[str], http_proxy="", compress_width: int = 546, compress_height: int = 546) -> list[
+    Path]:
+    result: list[Path] = []
+    for img_url in img_urls:
+        img_path = tempfile.mktemp(".png")
+        if compress_width and compress_height:
+            img_url = img_url.replace("cdn.discordapp.com",
+                                      "media.discordapp.net") + f"?width={compress_width}&height={compress_height}"
+        try_count = 10
+        data = ""
+
+        for i in range(try_count):
+            try:
+                data = requests.get(img_url,
+                                    proxies={"http": http_proxy, "https": http_proxy} if http_proxy else {}).content
+                break
+            except Exception as e:
+                continue
+
+        if not data:
+            raise Exception(f"download {img_url} failed")
+        with open(img_path, "wb") as f:
+            f.write(data)
+            f.close()
+        result.append(Path(img_path))
+    return result

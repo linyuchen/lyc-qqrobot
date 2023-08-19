@@ -23,7 +23,7 @@ class MidjourneyClient(MidjourneyClientBase):
         self.heartbeat_interval = 0
         self.proxy = proxy
         self.ws: ClientWebSocketResponse | None = None
-        super().__init__()
+        super().__init__(proxy)
         self.session = requests.Session()
         self.session.headers.update({'Authorization': self.token})
         self.session.proxies.update({'http': self.proxy, 'https': self.proxy})
@@ -127,7 +127,7 @@ class MidjourneyClient(MidjourneyClientBase):
             'compress': 0,
         }
         ws = None
-        for i in range(10):
+        while True:
             try:
                 ws = await session.ws_connect(
                     self.url,
@@ -136,6 +136,7 @@ class MidjourneyClient(MidjourneyClientBase):
                 break
             except Exception as e:
                 print(e)
+                await asyncio.sleep(1)
                 continue
         await self.__login(ws)
 

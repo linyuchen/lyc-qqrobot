@@ -4,8 +4,8 @@ from pathlib import Path
 import requests
 
 
-def download2temp(url, suffix="") -> Path:
-    res_f = requests.get(url).content
+def download2temp(url, suffix="", http_proxy="") -> Path:
+    res_f = requests.get(url, proxies={"http": http_proxy, "https": http_proxy} if http_proxy else {}).content
     tmp_path = tempfile.mktemp(suffix)
     with open(tmp_path, "wb") as f:
         f.write(res_f)
