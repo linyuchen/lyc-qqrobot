@@ -1,7 +1,8 @@
 # -*- coding: UTF-8 -*-
 
-import time
 import threading
+import time
+
 from msgplugins.bull_fight import bullfight_base
 
 
@@ -96,8 +97,9 @@ class BullFight(bullfight_base.BullFightBase):
         :return:
         """
 
-        while self.overing:
-            time.sleep(0.2)
+        with self.mutex:
+            while self.overing:
+                time.sleep(0.2)
 
         group_qq = self.group_qq
         __sender_info_dic = {"group_qq_number": group_qq, "qq_number": str(member_qq), "nick": member_name,
@@ -117,10 +119,10 @@ class BullFight(bullfight_base.BullFightBase):
                 return error
             elif player_gold / self.max_multiple < gold:
                 return u"【%s】的下注超过了自身%s总数的1/%d，无法下注！" % \
-                       (__sender_info_dic["nick"], self.currency, self.max_multiple)
-                
-        if not self.running:
-            with self.mutex:
+                    (__sender_info_dic["nick"], self.currency, self.max_multiple)
+
+        with self.mutex:
+            if not self.running:
                 self.running = True
             threading.Thread(target=self.timer).start()
         self.current_second = 0
@@ -132,7 +134,7 @@ class BullFight(bullfight_base.BullFightBase):
                 return u"【%s】已经参与了，请不要重复参与游戏" % (__sender_info_dic["nick"])
             elif self.players_info_list:
                 return u"已经有闲家参与了，不能坐庄!"
-            
+
             self.max_multiple = 8
             master_gold = self.get_point(self.group_qq, __sender_info_dic["qq_number"])
             if self.players_info_list:
@@ -140,7 +142,7 @@ class BullFight(bullfight_base.BullFightBase):
                     error = u"【%s】的%s不足当前所有闲家下注总和的%d倍, 无法坐庄！" % \
                             (__sender_info_dic["nick"], self.currency, self.max_multiple)
                     return error
-                    
+
             self.master_info_dic = __sender_info_dic
             self.master_info_dic["poker_list"] = [self.get_random_poker() for i in range(5)]
             self.master_info_dic["poker_type"] = self.get_poker_type(self.master_info_dic["poker_list"])
@@ -148,11 +150,11 @@ class BullFight(bullfight_base.BullFightBase):
             self.deposit_master_gold(self.player_total_gold * self.max_multiple)
 
             return u"【%s】参与斗牛游戏，当前庄家【%s】\n%s" % \
-                   (__sender_info_dic["nick"], __sender_info_dic["nick"], self.join_game_note)
+                (__sender_info_dic["nick"], __sender_info_dic["nick"], self.join_game_note)
         # 闲家参与
         if not [player for player in self.players_info_list if player["qq_number"] == __sender_info_dic["qq_number"]] \
                 and not (self.master_info_dic and self.master_info_dic["qq_number"] == __sender_info_dic["qq_number"]):
-            
+
             if self.master_info_dic:
                 master_gold = self.get_master_gold()
                 if gold > master_gold / self.max_multiple:
@@ -174,8 +176,8 @@ class BullFight(bullfight_base.BullFightBase):
             poker_list_str = ["".join(i) for i in player_info_dic["poker_list"]]
             poker_list_str = ",".join(poker_list_str[:3])
             return u"【%s】参与斗牛游戏，前三张牌为：%s，当前闲家:\n%s\n%s" % \
-                   (__sender_info_dic["nick"], poker_list_str,
-                    "\n".join([player["nick"] for player in self.players_info_list]), self.join_game_note)
+                (__sender_info_dic["nick"], poker_list_str,
+                 "\n".join([player["nick"] for player in self.players_info_list]), self.join_game_note)
         else:
             return u"【%s】已经参与了，请不要重复参与游戏" % (__sender_info_dic["nick"])
 
@@ -197,9 +199,9 @@ class BullFight(bullfight_base.BullFightBase):
         if not self.players_info_list:
             self.send_func(u"开牌时间到，无闲家参与斗牛游戏，此局作废\n")
             self.reset_game_info()
-            return 
+            return
 
-        # master_poker_list = self.master_info_dic["poker_list"]
+            # master_poker_list = self.master_info_dic["poker_list"]
         result = u"庄家【%s】：%s\n" % (self.master_info_dic["nick"], self.get_poker_list_info(self.master_info_dic))
         master_multiple = self.master_info_dic["poker_type"]["multiple"]
         master_win_gold = 0
@@ -244,13 +246,13 @@ class BullFight(bullfight_base.BullFightBase):
 
     @staticmethod
     def get_poker_list_info(player_info_dic):
-    
+
         poker_list = player_info_dic["poker_list"]
         poker_string = ",".join(["%s%s" % (poker[0], poker[1]) for poker in poker_list])
         result = u"牌：%s，牌型：" % poker_string
         poker_type = player_info_dic["poker_type"]["type"]
         max_poker = player_info_dic["poker_type"]["max_poker"]
-         
+
         if poker_type == 0:
             result += u"无牛,最大牌:" + max_poker[0] + max_poker[1]
         elif poker_type == 1:
@@ -276,7 +278,6 @@ class BullFight(bullfight_base.BullFightBase):
 
 
 if "__main__" == __name__:
-
     class Test(BullFight):
 
         def __init__(self, group_qq):
@@ -288,8 +289,10 @@ if "__main__" == __name__:
         def get_point(self, group_qq, qq):
             return 123
 
+
     test = Test("1234")
     old_time = time.time()
+
 
     def send_func(text):
         print(text)

@@ -1,5 +1,6 @@
 import base64
 import io
+import tempfile
 import uuid
 from pathlib import Path
 
@@ -18,13 +19,13 @@ class SDDraw(AIDrawBase):
         super().__init__()
         self.base_url = base_url
 
-    def txt2img(self, txt: str, width: int = 1024, height: int = 1024):
+    def txt2img(self, txt: str, width: int = 1024, height: int = 1024) -> list[Path]:
         """
         文字转图片
         :param txt: 文字
         :param width: 图片宽度
         :param height: 图片高度
-        :return: 图片的base64编码
+        :return: 图片路径列表
         """
 
         txt = txt.lower().replace("nsfw", "")
@@ -45,12 +46,13 @@ class SDDraw(AIDrawBase):
             "sampler_index": "DPM++ 2M Karras"
         }
         r = self._api_post("txt2img", data)
+        res_paths = []
         for i in r['images']:
             image = Image.open(io.BytesIO(base64.b64decode(i.split(",", 1)[0])))
-            image_path = Path(__file__).parent / (str(uuid.uuid4()) + ".png")
+            image_path = tempfile.mktemp(suffix=".png")
             image.save(image_path)
-            # image.show()
-            return str(image_path)
+            res_paths.append(Path(image_path))
+        return res_paths
 
     def __get_models(self):
         res = self._api_get("sd-models")
@@ -98,25 +100,5 @@ class SDDraw(AIDrawBase):
         data = {
             "sd_model_checkpoint": model_name
         }
-        r = self._api_post("options", data)
+        self._api_post("options", data)
         return f"模型已切换为：{model_name}"
-
-
-if __name__ == '__main__':
-    draw = SDDraw()
-    # print(txt2img("1girl", 1024, 768))
-    # print(txt2img("1girl,keqingdef,wake"))
-    # print(txt2img("1girl, sky, sunshine, flowers,鸟在天上飞，阴部"))
-    # print(txt2img("一个女孩在床上展示她的头发"))
-    # print(txt2img("一个女孩在床上展示她的胸部"))
-    print(draw.txt2img(
-        "(watercolor pencil),1girl, nude,nipples,full body, spread leg, arm up, large breasts,shaved pussy,((heart-shaped pupils)),(uncensored) , sexually suggestive,saliva trail, suggestive fluid, (cum on body), tattoo, sweating, presenting, exhibitionism, wet cream dripping, female orgasm, liquid crystal fluid radiant cinematic lighting, solo uncensored cute assertive drunk blush"))
-    # print(get_models())
-    # text = "(masterpiece:1,2), best quality, masterpiece, highres, original, extremely detailed wallpaper, perfect lighting,(extremely detailed CG:1.2),"
-    # pattern = re.compile(r'[\u4e00-\u9fff\uff00-\uffef]')  # Unicode范围：中文字符
-    # match = res.search(pattern, text)
-    # print(match)
-    # print(get_models())
-    # print(set_model("二次元：AbyssOrangeMix2_sfw"))
-    # print(set_model("国风4"))
-    # print(trans2en("裸体 女孩"))
