@@ -32,7 +32,7 @@ class ChatGPT:
         if len(self.history) > self.history_max:
             del self.history[:3]
         messages = self.history[:]
-        messages.append({'role': 'system', 'content': self.prompt})
+        messages.insert(0, {'role': 'system', 'content': self.prompt})
         if len(question) > self.question_max:
             question = question[0:(self.question_max // 2)] + question[-(self.question_max // 2):]
         messages.append({'role': 'user', 'content': question})
