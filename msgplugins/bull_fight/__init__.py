@@ -14,7 +14,7 @@ class BullGame(GroupPointAction, bullfight.BullFight):
 
 
 # 新建个事件类，继承于MsgEvent
-class MyEvent(MsgHandler):
+class BullFightPlugin(MsgHandler):
     __doc__ = u"""
     群游戏：斗牛
     """
@@ -22,17 +22,16 @@ class MyEvent(MsgHandler):
     bind_msg_types = (GroupMsg,)
 
     def __init__(self, qq_client):
-        super(MyEvent, self).__init__(qq_client)
+        super(BullFightPlugin, self).__init__(qq_client)
         self.name = "group_gamble"
-        self.cmdStart = CMD("斗牛", param_len=1, sep="")
-        self.groupInstances = {}  # key groupQQ, value instance
+        self.group_instances = {}  # key groupQQ, value instance
 
         # 不同的QQ群用不同的实例， 因为一个人可以在多个群里
 
     def get_game_instance(self, group_qq):
 
         group_plugin = BullGame(group_qq, self.qq_client)
-        return self.groupInstances.setdefault(group_qq, group_plugin)
+        return self.group_instances.setdefault(group_qq, group_plugin)
 
     def handle(self, msg: GroupMsg):
         """
@@ -44,12 +43,12 @@ class MyEvent(MsgHandler):
         member = msg.group_member
 
         __game = self.get_game_instance(group_qq)
-
+        cmd_start = CMD("斗牛", param_len=1, sep="")
         result = ""
-        if self.cmdStart.az(msg.msg):
-            param = self.cmdStart.get_param_list()[0]
+        if cmd_start.az(msg.msg):
+            msg.destroy()
+            param = cmd_start.get_param_list()[0]
             result += __game.start_game(member.qq, member.get_name(), msg.reply, param)
 
         if result:
             msg.reply(result)
-            msg.destroy()
