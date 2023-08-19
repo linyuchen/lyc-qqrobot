@@ -196,12 +196,15 @@ class MidjourneyClient(MidjourneyClientBase):
                             attachment_urls = [a_data["proxy_url"] for a_data in data.get("attachments", [])]
 
                             time_str = data.get("timestamp")
-                            utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
-                            local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
-                            msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+                            if time_str:
+                                utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
+                                local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
+                                msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+                            else:
+                                msg_datetime = datetime.now()
                             new_msg = Message(msg_id=data.get("id"),
                                               content=content,
-                                              sender_name=data.get("author").get("username"),
+                                              sender_name=data.get("author", {}).get("username"),
                                               attachment_urls=attachment_urls,
                                               datetime=msg_datetime
                                               )
