@@ -42,8 +42,11 @@ class ChatGPT(MsgHandler):
     is_async = True
     bind_msg_types = (GroupMsg, FriendMsg)
     records = {}
+    ignore_username = ["Q群管家"]
 
     def handle(self, msg: GroupMsg | FriendMsg):
+        if isinstance(msg, GroupMsg) and msg.group_member.get_name() in self.ignore_username:
+            return
         context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
         set_prompt_cmd = CMD("设置人格", param_len=1)
         clear_prompt_cmd = CMD("清除人格", alias=["恢复人格", "清空人格", "重置人格"])
