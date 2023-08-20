@@ -1,4 +1,5 @@
 # coding=UTF8
+import threading
 from dataclasses import dataclass
 from .segment import MessageSegment
 
@@ -13,8 +14,9 @@ class BaseMsg:
     msg: str = ""
     time: int = 0  # 发送时的时间戳
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
-    paused: bool = False
+    is_paused: bool = False
     MSG_TYPE: str = ""
+    thread_lock = threading.Lock()
 
     def reply(self, content: str | MessageSegment, at=True):
         """
@@ -28,19 +30,20 @@ class BaseMsg:
         """
         暂停向下一个event传播
         """
-
-        self.paused = True
+        with self.thread_lock:
+            self.is_paused = True
 
     def resume(self):
         """
         与pause相反，恢复向下一个event传播
         """
-
-        self.paused = False
+        with self.thread_lock:
+            self.is_paused = False
 
     def destroy(self):
         """
         销毁此消息，不再让其他event处理
         """
-        self.paused = False
-        self.is_over = True
+        with self.thread_lock:
+            self.is_paused = False
+            self.is_over = True

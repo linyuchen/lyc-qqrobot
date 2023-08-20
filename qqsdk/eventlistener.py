@@ -21,23 +21,30 @@ class EventListener(Thread):
 
     def __init__(self):
         self.msgs = Queue()
+        self.thread_lock = threading.Lock()
         super(EventListener, self).__init__()
 
     def add_msg(self, msg: BaseMsg):
         self.msgs.put(msg)
 
     def pause(self):
-        self.running = False
+        with self.thread_lock:
+            self.running = False
 
     def restore(self):
-        self.running = True
+        with self.thread_lock:
+            self.running = True
 
     def run(self):
         while self.running:
             msg: BaseMsg = self.msgs.get()
             for handler in self.msg_handlers:
-                while msg.paused:
-                    pass
+                paused_secs = 0
+                while msg.is_paused:
+                    paused_secs += 1
+                    if paused_secs >= 30:
+                        break
+                    time.sleep(1)
                 if msg.is_over:
                     break
                 handler: MsgHandler
