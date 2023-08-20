@@ -127,7 +127,7 @@ class MidjourneyClient(MidjourneyClientBase):
             'compress': 0,
         }
         ws = None
-        while True:
+        for i in range(30):
             try:
                 ws = await session.ws_connect(
                     self.url,
