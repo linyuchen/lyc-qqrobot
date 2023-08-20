@@ -176,8 +176,8 @@ def on_command(cmd_name,
                       alias=list(alias),
                       ignores=list(ignores))
             if cmd.az(msg.msg.strip()):
-                if auto_destroy:
-                    msg.destroy()
+                # if auto_destroy:
+                msg.destroy()
                 return func(msg, cmd.get_original_param_list())
 
         _class = type(func.__name__, (MsgHandler,), {
