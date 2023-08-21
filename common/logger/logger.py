@@ -11,7 +11,7 @@ error_handler = logging.FileHandler(base_dir / f'error-{datetime.datetime.now().
 error_handler.setLevel(logging.ERROR)
 
 # 创建一个用于写入所有级别日志的handler
-all_handler = logging.FileHandler('all.log')
+all_handler = logging.FileHandler(base_dir / 'all.log')
 all_handler.setLevel(logging.DEBUG)
 
 # 定义日志格式
