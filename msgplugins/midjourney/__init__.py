@@ -43,7 +43,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             msg.reply(
                 MessageSegment.image_path(res.image_path[0]) +
                 MessageSegment.text(f"提示词:{res.task.prompt}\n\n原图(需魔法):{res.image_urls[0]}\n"
-                                    f"回复u+数字取图,上面两张为1、2，下面为3、4")
+                                    f"回复u+数字取图,如u1,上面两张为1、2，下面为3、4")
             )
             res.image_path[0].unlink(missing_ok=True)
 
