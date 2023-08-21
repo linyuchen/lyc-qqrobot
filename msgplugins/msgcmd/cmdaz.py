@@ -3,26 +3,17 @@
 """
 命令解析模块
 """
-
+import threading
 from typing import Callable, Type
 
-from qqsdk.message import BaseMsg, GroupMsg, FriendMsg
-
-
-class CmdGroup:
-    name: str
-    cmds: dict[str, list["CMD"]]
-
-    def registry(self, cmd: "CMD"):
-        group = self.cmds.setdefault(cmd.cmd_group, [])
-        if not list(filter(lambda x: x.cmd_id == cmd.cmd_id, group)):
-            group.append(cmd)
+from qqsdk.message import BaseMsg, GroupMsg, FriendMsg, MsgHandler
+from .permission import CMDPermissions, CMDPermissionGroup, check_permission
 
 
 class CMD(object):
 
     def __init__(self, cmd_name, sep=" ", int_param_index: list[int] = (), param_len=0, handle_func=None,
-                 alias: list[str] = (), ignores: list[str] = (), cmd_id: str = "", cmd_group: str = ""):
+                 alias: list[str] = (), ignores: list[str] = ()):
         """
         sep: 命令与参数的分隔符，同时也是多个参数之间的分隔符
             如果为None 或者 False则不分割
@@ -43,14 +34,6 @@ class CMD(object):
         self.original_cmd = ""
         self.original_param = ""
         self.ignores = ignores
-
-        self.cmd_id = cmd_id  # 命令id，用于唯一标识命令
-        self.cmd_group = cmd_group  # 命令组名
-        # 注册到命令组便于管理
-        if not cmd_id:
-            self.cmd_id = cmd_name
-        if not cmd_group:
-            self.cmd_group = cmd_name
 
     def az(self, original_cmd):
         """
@@ -148,6 +131,11 @@ def on_command(cmd_name,
                desc: str = "",
                at_sep: str = "",
                auto_destroy: bool = True,
+               cmd_group_name: str = "",
+               permission: CMDPermissions | CMDPermissionGroup = None,
+               is_async: bool = False,
+               priority: int = 1,
+               ignore_at_other: bool = True,
                ):
     """
     装饰器，用于注册命令
@@ -162,10 +150,15 @@ def on_command(cmd_name,
     :param desc: 命令描述
     :param at_sep: at之后的命令分隔符
     :param auto_destroy: 是否自动销毁消息
+    :param cmd_group_name: 命令组名
+    :param permission: 命令权限
+    :param is_async: 是否异步
+    :param priority: 优先级, 数字越大优先级越高
+    :param ignore_at_other: 是否忽略at其他人的消息
     :return:
     """
-
-    from qqsdk.message import MsgHandler
+    if not cmd_group_name:
+        cmd_group_name = cmd_name
 
     def decorator(func: Callable[[BaseMsg, list[str]], None]):
         def handle(self, msg: GroupMsg | FriendMsg):
@@ -174,38 +167,30 @@ def on_command(cmd_name,
                       int_param_index,
                       param_len,
                       alias=list(alias),
-                      ignores=list(ignores))
+                      ignores=list(ignores),
+                      )
             if cmd.az(msg.msg.strip()):
+                if permission:
+                    if not check_permission(msg, permission):
+                        return msg.reply(f"您没有权限使用 {cmd_name} 命令")
                 if auto_destroy:
                     msg.destroy()
-                return func(msg, cmd.get_original_param_list())
+                if ignore_at_other and isinstance(msg, GroupMsg) and msg.is_at_other:
+                    return
+                if is_async:
+                    threading.Thread(target=func, args=(msg, cmd.get_original_param_list())).start()
+                else:
+                    func(msg, cmd.get_original_param_list())
 
         _class = type(func.__name__, (MsgHandler,), {
             'desc': desc,
-            'is_async': True,
+            'is_async': is_async,
             'bind_msg_types': bind_msg_type,
             'handle': handle,
+            'name': cmd_group_name,
+            'priority': priority,
         })
 
         return _class
 
     return decorator
-
-
-if "__main__" == __name__:
-    def handle_test(*args):
-        return ",".join(args)
-
-
-    test_cmd = CMD("天气", param_len=1, int_param_index=[], handle_func=handle_test)
-    print(test_cmd.handle("天气 上海"))
-    test_cmd = CMD("#", sep="", param_len=1, ignores=["#include"])
-    print(test_cmd.az("#include <iostream>"))
-
-
-    @on_command("test")
-    def test(msg):
-        print(msg)
-
-
-    print(test)

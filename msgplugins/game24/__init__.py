@@ -1,13 +1,13 @@
 # coding=UTF8
 
-from ..import cmdaz
+from ..msgcmd import cmdaz
 from .import game24point
 from ..superplugins import GroupPointAction
 from qqsdk.message import MsgHandler, GroupMsg
 CMD = cmdaz.CMD
 
 
-class Game(GroupPointAction, game24point.Game):
+class Game24Plugin(GroupPointAction, game24point.Game):
     
     def __init__(self):
         GroupPointAction.__init__(self)
@@ -15,24 +15,24 @@ class Game(GroupPointAction, game24point.Game):
         self.currency = "活跃度"
 
 
-class MyEvent(MsgHandler):
+class Game24(MsgHandler):
     __doc__ = """
     群游戏：21点
     """
+    name = "24点"
     desc = "发送 24点 开始24点游戏"
     bind_msg_types = (GroupMsg, )
     
-    def __init__(self, qq_client):
+    def __init__(self, **kwargs):
 
-        super(MyEvent, self).__init__(qq_client)
-        self.name = "group_gamble"
+        super(Game24, self).__init__(**kwargs)
         self.cmdAnswer = CMD("答24点", param_len=1)
         self.cmdStart = CMD("24点")
         # 不同的QQ群用不同的实例， 因为每个人想要的数据都不一样
         self.groupInstances = {}  # key groupQQ, value instance
 
     def get_game_instance(self, group_qq):
-        return self.groupInstances.setdefault(group_qq, Game())
+        return self.groupInstances.setdefault(group_qq, Game24Plugin())
 
     def handle(self, msg: GroupMsg):
         """

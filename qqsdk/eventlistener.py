@@ -6,9 +6,8 @@ import traceback
 from queue import Queue
 from typing import List
 
-import config
-from qqsdk.message import GroupMsg
-from qqsdk.message.friendmsg import BaseMsg
+from common.logger import logger
+from qqsdk.message import GeneralMsg, GroupMsg
 from qqsdk.message.msghandler import MsgHandler
 
 Thread = threading.Thread
@@ -24,7 +23,8 @@ class EventListener(Thread):
         self.thread_lock = threading.Lock()
         super(EventListener, self).__init__()
 
-    def add_msg(self, msg: BaseMsg):
+    def add_msg(self, msg: GeneralMsg):
+        msg.qq_client = self
         self.msgs.put(msg)
 
     def pause(self):
@@ -37,8 +37,13 @@ class EventListener(Thread):
 
     def run(self):
         while self.running:
-            msg: BaseMsg = self.msgs.get()
+            msg: GeneralMsg = self.msgs.get()
             for handler in self.msg_handlers:
+                if not handler.check_enabled():
+                    continue
+                if isinstance(msg, GroupMsg):
+                    if not handler.check_enabled(msg.group.qq):
+                        continue
                 paused_secs = 0
                 while msg.is_paused:
                     paused_secs += 1
@@ -47,24 +52,14 @@ class EventListener(Thread):
                     time.sleep(1)
                 if msg.is_over:
                     break
-                handler: MsgHandler
-                handler_plugin_name = handler.get_module_name()
-                enabled = config.plugins[handler_plugin_name].get("enabled", True)
-                if not enabled:
-                    continue
-                if isinstance(msg, GroupMsg):
-                    exclude_groups = config.plugins[handler_plugin_name].get("exclude_groups", [])
-                    exclude_groups = map(str, exclude_groups)
-                    if msg.group.qq in exclude_groups:
-                        continue
                 if handler.check_type(msg):
                     try:
                         if handler.is_async:
                             threading.Thread(target=lambda: handler.handle(msg)).start()
                         else:
                             handler.handle(msg)
-                    except Exception:
+                    except Exception as e:
+                        logger.error(f"处理消息时出现异常 {e}：{traceback.format_exc()}")
                         msg.resume()
-                        traceback.print_exc()
 
             time.sleep(self.interval)

@@ -1,14 +1,15 @@
 # coding=UTF8
 import importlib
-import imp
 import os
 import pathlib
 import sys
 import traceback
 from abc import ABCMeta, abstractmethod, ABC
+
 from flask import Flask
 
 import config
+from common.logger import logger
 from qqsdk import entity
 from qqsdk.eventlistener import EventListener
 from qqsdk.message import MsgHandler
@@ -21,25 +22,30 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         super(QQClientBase, self).__init__()
         self.qq_user = entity.QQUser(friends=[], groups=[])
         self.online = True
-        self.msg_handlers = self.get_plugins()
+        self.msg_handlers = self.setup_plugins()
 
-    def get_plugins(self) -> list[MsgHandler]:
-        handlers_class = []
+    def setup_plugins(self) -> list[MsgHandler]:
         plugins_path = pathlib.PurePath(__file__).parent.parent / "msgplugins"
         sys.path.append(str(plugins_path))
-        for module_name in config.plugins:
-            try:
-                module = importlib.import_module(f".{module_name}", "msgplugins")
-            except:
-                traceback.print_exc()
+        for p in os.listdir(plugins_path):
+            module_path = pathlib.Path(plugins_path) / p
+            if module_path.is_file() and module_path.suffix == ".py" and module_path.stem != "__init__":
+                module_name = module_path.stem
+            elif (module_path / "__init__.py").exists():
+                module_name = p
+            else:
                 continue
-            for name in dir(module):
-                obj = getattr(module, name)
-                # 判断是否是MsgHandler的子类
-                if isinstance(obj, type) and issubclass(obj, MsgHandler) and obj is not MsgHandler:
-                    handlers_class.append(obj(self))
-
-        return handlers_class
+            try:
+                importlib.import_module(f".{module_name}", "msgplugins")
+            except Exception as e:
+                logger.error(f"加载插件{module_name}时出现异常：{e}, \n{traceback.format_exc()}")
+                continue
+        for i in MsgHandler.__subclasses__():
+            i(qq_client=self)
+        self.msg_handlers = MsgHandler.instances
+        # 按照优先级排序
+        self.msg_handlers.sort(key=lambda x: x.priority, reverse=True)
+        return self.msg_handlers
 
     def start(self) -> None:
         super().start()

@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from enum import StrEnum
 
 
-class MessageTypes:
+class MessageTypes(StrEnum):
     FRIEND = "FriendMsg"
     FRIEND_SIGNATURE = "FriendSignatureChanged"
     FRIEND_STATUS = "FriendStatusChanged"

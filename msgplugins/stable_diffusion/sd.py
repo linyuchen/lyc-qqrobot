@@ -7,7 +7,7 @@ from pathlib import Path
 from PIL import Image
 
 import config
-from common.utils.baidu_translator import trans, is_chinese
+from common.utils.translator import trans, is_chinese
 from .base import AIDrawBase
 
 base_url = config.SD_HTTP_API + "/sdapi/v1/"

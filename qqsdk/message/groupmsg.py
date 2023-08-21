@@ -10,10 +10,12 @@ from qqsdk.message.types import MessageTypes
 class GroupMsg(BaseMsg):
     """
     """
-    MSG_TYPE = MessageTypes.GROUP
+    msg_type = MessageTypes.GROUP
     group: Group = None
     group_member: GroupMember = None
     is_at_me: bool = False
+    is_at_other: bool = False
+    is_from_admin: bool = False
 
 
 @dataclass
@@ -23,7 +25,7 @@ class GroupAdminChangeMsg(GroupMsg):
     self.groupMember : GroupMember实例
     """
 
-    MSG_TYPE = MessageTypes.GROUP_ADMIN_CHANGE
+    msg_type = MessageTypes.GROUP_ADMIN_CHANGE
 
 
 @dataclass
@@ -31,7 +33,7 @@ class GroupMemberCardChangedMsg(BaseMsg):
     """
     """
     old_name: str = ""  # 群成员之前的群名片
-    MSG_TYPE = MessageTypes.GROUP_MEMBER_CARD_CHANGE
+    msg_type = MessageTypes.GROUP_MEMBER_CARD_CHANGE
 
 
 @dataclass
@@ -40,7 +42,7 @@ class RequestJoinGroupMsg(BaseMsg):
     有人申请加群，只有管理员才能收到此消息
     msg: 验证消息
     """
-    MSG_TYPE = MessageTypes.GROUP_REQUEST_JOIN
+    msg_type = MessageTypes.GROUP_REQUEST_JOIN
     group: Group = None
     request_qq: str = ""
     request_name: str = ""
@@ -62,7 +64,7 @@ class NewGroupMemberMsg(GroupMsg):
     """
     新成员入群
     """
-    MSG_TYPE = MessageTypes.GROUP_NEW_MEMBER
+    msg_type = MessageTypes.GROUP_NEW_MEMBER
 
 
 @dataclass
@@ -71,7 +73,7 @@ class MeJoinedGroupMsg(GroupMsg):
     我成功加入一个群
     group_member: 同意我进群的管理员
     """
-    MSG_TYPE = MessageTypes.GROUP_JOINED
+    msg_type = MessageTypes.GROUP_JOINED
 
 
 @dataclass

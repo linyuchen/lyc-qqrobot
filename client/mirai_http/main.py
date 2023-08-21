@@ -123,10 +123,14 @@ class MiraiQQClient(QQClientFlask):
         message_type = data.get("type")
         msg = ""
         is_at_me = False
+        is_at_other = False
         for c in data.get("messageChain", []):
             msg += c.get("text", "")
-            if c.get("type") == "At" and c.get("target") == self.qq_user.qq:
-                is_at_me = True
+            if c.get("type") == "At":
+                if c.get("target") == self.qq_user.qq:
+                    is_at_me = True
+                else:
+                    is_at_other = True
             elif c.get("type") == "App":
                 content = json.loads(c.get("content"))
                 qq_doc_url = content["meta"]["detail_1"]["qqdocurl"]
@@ -138,7 +142,7 @@ class MiraiQQClient(QQClientFlask):
 
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
-            msg = FriendMsg(friend=friend, msg=msg)
+            msg = FriendMsg(friend=friend, msg=msg, is_from_super_admin=str(friend.qq) == config.ADMIN_QQ)
             msg.reply = lambda _msg: self.send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":
@@ -153,7 +157,15 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            msg = GroupMsg(group=group, msg=msg, group_member=group_member, is_at_me=is_at_me)
+            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == config.ADMIN_QQ
+            msg = GroupMsg(group=group,
+                           msg=msg,
+                           group_member=group_member,
+                           is_at_me=is_at_me,
+                           is_at_other=is_at_other,
+                           is_from_admin=is_from_admin,
+                           is_from_super_admin=str(group_member.qq) == config.ADMIN_QQ
+                           )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
             self.add_msg(msg)
         return {}

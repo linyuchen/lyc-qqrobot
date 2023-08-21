@@ -1,6 +1,6 @@
 # coding=UTF8
 
-from msgplugins.cmdaz import CMD
+from msgplugins.msgcmd.cmdaz import CMD
 from qqsdk.message import MsgHandler, GroupMsg
 from msgplugins.bull_fight import bullfight
 from msgplugins.superplugins import GroupPointAction
@@ -18,12 +18,12 @@ class BullFightPlugin(MsgHandler):
     __doc__ = u"""
     群游戏：斗牛
     """
+    name = "斗牛"
     desc = "发送 斗牛 + 数字 开始斗牛游戏，数字为下注金额\n下注金额0可坐庄"
     bind_msg_types = (GroupMsg,)
 
-    def __init__(self, qq_client):
-        super(BullFightPlugin, self).__init__(qq_client)
-        self.name = "group_gamble"
+    def __init__(self, **kwargs):
+        super(BullFightPlugin, self).__init__(**kwargs)
         self.group_instances = {}  # key groupQQ, value instance
 
         # 不同的QQ群用不同的实例， 因为一个人可以在多个群里

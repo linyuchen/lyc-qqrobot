@@ -2,18 +2,18 @@ import json
 from pathlib import Path
 
 import config
-from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
-from qqsdk.message.segment import MessageSegment
-from ..cmdaz import CMD
+from qqsdk.message import MsgHandler, GroupMsg
+from msgplugins.msgcmd.cmdaz import CMD
 
 
 class BlackListPlugin(MsgHandler):
+    name = "黑名单"
     bind_msg_types = (GroupMsg, )
     config_path = Path(__file__).parent / "config.json"
     config = []
 
-    def __init__(self, qq_client=None):
-        super().__init__(qq_client)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.read()
 
     def save(self):
@@ -36,6 +36,8 @@ class BlackListPlugin(MsgHandler):
         no_c = CMD("noignore", int_param_index=[0], param_len=1)
         if c.az(msg.msg):
             black_qq = c.get_param_list()[0]
+            if black_qq == config.ADMIN_QQ:
+                return msg.reply("不能屏蔽超级管理员")
             self.config.append(black_qq)
             self.save()
             msg.reply(f"用户{c.get_param_list()[0]}已屏蔽")

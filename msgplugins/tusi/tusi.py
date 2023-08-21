@@ -10,7 +10,7 @@ import ifnude
 import requests
 
 from common.taskpool import TaskPool, Task
-from common.utils.baidu_translator import is_chinese, trans
+from common.utils.translator import is_chinese, trans
 from common.utils.downloader import download2temp
 
 logger = logging.getLogger(__name__)
@@ -67,13 +67,23 @@ class TusiDraw(TaskPool[TusiTask]):
         self.session.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
                           "Chrome/83.0.4103.106 Safari/537.36"}
+        self.token = token
         self.session.cookies.set("ta_token_prod", token)
         # 余额，生成一张图片扣除一次
         self.balance = 0
         # 多久(秒)检查一次余额
         self.balance_check_interval = 60 * 10
         # 首次启动时获取一次余额
-        self.__get_balance()
+        while True:
+            try:
+                self.session.get("https://tusi.art/")
+                self.__get_balance()
+                logger.info(f"吐司初始化成功")
+                break
+            except Exception as e:
+                logger.error(f"吐司初始化失败，正在重试：{e}")
+                time.sleep(0.5)
+                continue
         threading.Thread(target=self.__get_balance_thread).start()
         self.start()
 
@@ -121,7 +131,10 @@ class TusiDraw(TaskPool[TusiTask]):
             self._lock.release()
 
     def __get_balance(self):
-        data = self._api_get("/user-web/v1/user/credits")
+        try:
+            data = self._api_get("/user-web/v1/user/credits")
+        except Exception as e:
+            return
         data = data["data"]
         if not data:
             return
@@ -228,12 +241,18 @@ class TusiDraw(TaskPool[TusiTask]):
         return "暂无lora"
 
 
-class MultipleCountPool:
+class TusiMultipleCountPool:
     from config import TUSI_TOKENS
     tokens = TUSI_TOKENS
 
     def __init__(self):
-        self.threads = [TusiDraw(token) for token in self.tokens]
+        self.threads = []
+        for token in self.tokens:
+            try:
+                self.threads.append(TusiDraw(token))
+            except Exception as e:
+                print("初始化tusi失败，请检查token", e)
+                traceback.print_exc()
 
     def txt2img(self, txt: str, callback: Callable[[list[Path]], None]) -> str:
         # threads进行排序，按照任务数从小到大排序

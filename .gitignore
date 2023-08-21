@@ -2,8 +2,7 @@
 *.pyc
 nohup.out
 qqsdkplugins/sqlite_sserver/*.db
-log_helper/*.log
-log_helper/*.log.*
+logs/*.log
 .idea/
 .DS_Store
 db.sqlite3
@@ -21,3 +20,4 @@ msgplugins/bilicard/cookie.txt
 msgplugins/blacklist/config.json
 msgplugins/stable_diffusion/*.png
 config.json
+qqsdk/message/cmd_config.json

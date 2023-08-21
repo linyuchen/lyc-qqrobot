@@ -12,7 +12,7 @@ class FriendMsg(BaseMsg):
     """
     """
     friend: Friend = None
-    MSG_TYPE = MessageTypes.FRIEND
+    msg_type = MessageTypes.FRIEND
 
 
 @dataclass
@@ -20,7 +20,7 @@ class FriendSignatureChangedMsg(FriendMsg):
     """
     好友签名修改消息
     """
-    MSG_TYPE = MessageTypes.FRIEND_SIGNATURE
+    msg_type = MessageTypes.FRIEND_SIGNATURE
 
 
 @dataclass
@@ -28,12 +28,12 @@ class FriendStatusChangeMsg(FriendMsg):
     """
     好友状态改变消息
     """
-    MSG_TYPE = MessageTypes.FRIEND_STATUS
+    msg_type = MessageTypes.FRIEND_STATUS
 
 
 @dataclass
 class FriendVoiceMsg(FriendMsg):
-    MSG_TYPE = MessageTypes.FRIEND_VOICE
+    msg_type = MessageTypes.FRIEND_VOICE
     url: str = ""  # 语音的url
 
 
@@ -44,7 +44,7 @@ class TempMsg(BaseMsg):
     self.qq : int,发送者的QQ
     self.group: Group实例，如果是群里发起的则有，否则为None
     """
-    MSG_TYPE = MessageTypes.TEMP
+    msg_type = MessageTypes.TEMP
 
     qq: str = ""
     group: Group = None
@@ -59,7 +59,7 @@ class AddedMeFriendMsg(FriendMsg):
     对方已经添加了我为好友
     self.friend: Friend实例
     """
-    MSG_TYPE = MessageTypes.ADDED_ME_FRIEND
+    msg_type = MessageTypes.ADDED_ME_FRIEND
 
 
 @dataclass
@@ -75,7 +75,7 @@ class RequestAddMeFriend(BaseMsg):
     """
     对方请求添加我为好友
     """
-    MSG_TYPE = MessageTypes.REQUEST_ADD_ME_FRIEND
+    msg_type = MessageTypes.REQUEST_ADD_ME_FRIEND
     request_qq: str = ""
 
     def allow(self):
@@ -100,7 +100,7 @@ class AddFriendResultMsg(BaseMsg):
     self.name: string, 对方昵称
     self.msg: string, 消息结果
     """
-    MSG_TYPE = MessageTypes.ADD_ME_FRIEND_RESULT
+    msg_type = MessageTypes.ADD_ME_FRIEND_RESULT
 
     qq: str = ""
     name: str = ""

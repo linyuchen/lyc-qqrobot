@@ -4,13 +4,14 @@ from qqsdk.message.segment import MessageSegment
 from .midjourney_client import TaskCallbackResponse, TaskCallback, TaskType
 from .midjourney_websocket_client import MidjourneyClient
 
-from ..cmdaz import on_command
+from msgplugins.msgcmd.cmdaz import on_command
 
 mj_client = MidjourneyClient(token=config.MJ_DISCORD_TOKEN,
                              channel_id=config.MJ_DISCORD_CHANNEL_ID,
                              guild_id=config.MJ_DISCORD_GUILD_ID,
                              proxy=config.GFW_PROXY)
 
+CMD_GROUP_NAME = "MJ画图"
 
 class LastDrawRes:
     def __init__(self, res: TaskCallbackResponse):
@@ -30,7 +31,8 @@ def get_user_id(msg: GroupMsg | FriendMsg):
 
 
 @on_command("画图", alias=("sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1,
-            desc="发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞")
+            desc="发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
+            cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     def callback(res: TaskCallbackResponse):
         if res.error:
@@ -48,7 +50,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     mj_client.draw(msg_param[0], callback)
 
 
-@on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="")
+@on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="", cmd_group_name=CMD_GROUP_NAME)
 def mj_upscale(msg: GroupMsg | FriendMsg, msg_param: list[str]):
     last_res: LastDrawRes = last_task_res.get(get_user_id(msg))
     if not msg_param[0].isnumeric():

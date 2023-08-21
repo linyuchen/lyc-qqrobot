@@ -15,8 +15,10 @@ class BaseMsg:
     time: int = 0  # 发送时的时间戳
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
     is_paused: bool = False
-    MSG_TYPE: str = ""
+    msg_type: str = ""
+    is_from_super_admin: bool = False
     thread_lock = threading.Lock()
+    qq_client: "qqsdk.qqclient.QQClientBase" = None
 
     def reply(self, content: str | MessageSegment, at=True):
         """

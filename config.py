@@ -35,64 +35,7 @@ config_data = {
             "api": "https://",
             "model": "gpt-3.5-turbo-0613"
         }
-    ],
-    "plugins": {
-        "group_plugin_manager": {
-            "exclude_groups": [""],  # 列表中的群号将不会启用此插件
-            "can_group_manage": False,  # 是否可以被群插件管理器管理,默认为True
-            "enable": True,  # 是否启用,默认为True，这个是全局的
-        },
-        "global_plugin_manager": {
-            "can_group_manage": False,
-        },
-        "blacklist": {
-            "can_group_manage": False
-        },
-        "menu": {
-            "summary": "显示菜单功能",
-            "exclude_groups": [""]
-        },
-        "bilicard": {
-            "summary": "显示B站视频信息",
-            "exclude_groups": [""]
-        },
-        "bull_fight": {
-            "exclude_groups": [""]
-        },
-        "dailynews": {
-            "summary": "每日新闻",
-            "exclude_groups": [""]
-        },
-        "game21": {
-            "exclude_groups": [""]
-        },
-        "game24": {
-            "exclude_groups": [""]
-        },
-        "running_time": {
-            "summary": "显示机器人运行时间",
-            "exclude_groups": [""]
-        },
-        "superplugins": {
-            "summary": "活跃度功能",
-            "exclude_groups": [""]
-        },
-        "stable_diffusion": {
-            "summary": "AI画图",
-            "exclude_groups": [""]
-        },
-        "sdxl": {
-            "summary": "AI画图(sdxl版本)",
-            "exclude_groups": [""]
-        },
-        "ai_replicate": {
-            "summary": "AI二维码"
-        },
-        "chatgpt": {
-            "summary": "AI聊天功能",
-            "exclude_groups": [""]
-        }
-    },
+    ]
 }
 
 if config_path.exists():

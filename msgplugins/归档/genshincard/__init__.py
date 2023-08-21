@@ -1,9 +1,8 @@
 # coding=UTF8
 
-import os
 from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
-from msgplugins.cmdaz import CMD
+from msgplugins.msgcmd.cmdaz import CMD
 from qqsdk.message.segment import MessageSegment
 from ..superplugins import GroupPointAction
 from .card import gacha

@@ -1,6 +1,6 @@
 # coding=UTF8
 
-from ..import cmdaz
+from ..msgcmd import cmdaz
 from .import game21point
 from ..superplugins import GroupPointAction
 from qqsdk.message import MsgHandler, GroupMsg
@@ -18,18 +18,18 @@ class Game(GroupPointAction, Game21):
 
 
 # 新建个事件类，继承于MsgEvent
-class MyEvent(MsgHandler):
+class Game21Plugin(MsgHandler):
     __doc__ = u"""
     群游戏：21点
     """
+    name = "21点"
+    desc = "发送 21点 + 数字 开始21点游戏，数字为下注金额, 不填数字默认下注100"
     bind_msg_types = (GroupMsg, )
 
-    def __init__(self, qq_client):
+    def __init__(self, **kwargs):
 
-        super(MyEvent, self).__init__(qq_client)
-        self.name = "group_gamble"
-        self.cmdStart = CMD("21点", param_len=1, sep="")
-        self.cmdUpdate = CMD("21点换牌")
+        super(Game21Plugin, self).__init__(**kwargs)
+
         self.groupInstances = {}  # key groupQQ, value instanvc
 
         # 不同的QQ群用不同的实例， 因为每个人想要的数据都不一样
@@ -47,17 +47,23 @@ class MyEvent(MsgHandler):
         member = msg.group_member
 
         game = self.get_game_instance(group_qq)
-
+        cmd_start = CMD("21点")
+        cmd_start_param = CMD("21点", param_len=1)
+        cmd_update = CMD("21点换牌")
         result = ""
-        if self.cmdStart.az(msg.msg):
-            param = self.cmdStart.get_param_list()[0]
+        param = ""
+        if cmd_start.az(msg.msg):
+            param = "100"
+        elif cmd_start_param.az(msg.msg):
+            param = cmd_start_param.get_param_list()[0]
+        if param:
+            msg.destroy()
             result += game.start_game(group_qq, member.qq, member.get_name(), param, msg.reply)
             result += "\n\n发送“21点换牌”可以换牌，换牌需要下注的十分之一费用\n"
-        elif self.cmdUpdate.az(msg.msg):
-
+        elif cmd_update.az(msg.msg):
+            msg.destroy()
             result += game.update_poker_list(group_qq, member.qq, member.get_name())
  
         if result:
             msg.reply(result)
-            msg.destroy()
 

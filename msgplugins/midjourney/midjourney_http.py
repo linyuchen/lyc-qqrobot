@@ -8,7 +8,7 @@ import aiohttp
 import pandas as pd
 from retry import retry
 
-from common.utils.baidu_translator import trans, is_chinese
+from common.utils.translator import trans, is_chinese
 from .exceptions import MidjourneyException
 
 default_json = {

@@ -1,23 +1,34 @@
 import re
+import threading
 import time
 
 import config
+from msgplugins.msgcmd.cmdaz import CMD, on_command
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
-from ..cmdaz import CMD, on_command
 
 
 @on_command("百科", param_len=1, desc="发送 百科 + 词语 进行百科搜索,如:百科 猫娘")
 def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
-    res = summary_web(f"https://zh.wikipedia.org/wiki/{params[0]}")
-    msg.reply(res)
+    msg.reply("正在为您搜索维基百科...")
+
+    def reply():
+        res = summary_web(f"https://zh.wikipedia.org/wiki/{params[0]}")
+        msg.reply(res)
+
+    threading.Thread(target=reply).start()
 
 
 @on_command("萌娘百科", param_len=1, desc="发送 萌娘百科 + 词语 进行萌娘百科搜索,如:萌娘百科 猫娘")
 def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
-    res = summary_web(f"https://zh.moegirl.org.cn/{params[0]}")
-    msg.reply(res)
+    msg.reply("正在为您搜索萌娘百科...")
+
+    def reply():
+        res = summary_web(f"https://zh.moegirl.org.cn/{params[0]}")
+        msg.reply(res)
+
+    threading.Thread(target=reply).start()
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):
@@ -34,12 +45,14 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
 
 
 class ChatGPT(MsgHandler):
+    name = "ChatGPT"
     desc = "发送 #+消息 或者 @机器人+消息 进行AI对话\n\n" \
            "@机器人发送 网址(如:http://qq.com) 进行AI总结网页\n\n" \
            "发送 设置人格 + 空格 + 人格提示语 进行AI人格设置\n" \
            "发送 清除人格 进行AI人格清除\n" \
            "发送 查看人格 进行AI人格查看\n"
     is_async = True
+    priority = -1
     bind_msg_types = (GroupMsg, FriendMsg)
     records = {}
     ignore_username = ["Q群管家"]
@@ -78,16 +91,23 @@ class ChatGPT(MsgHandler):
         if isinstance(msg, GroupMsg):
             robot_name = msg.group.get_member(str(config.QQ)).get_name()
             cmd = CMD("#", alias=[f"@{robot_name}"], sep="", param_len=1,
-                      ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef"])
+                      ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"])
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
                 if time.time() - self.records.setdefault(msg.group_member.qq, 0) < 5:
                     return
                 self.records[msg.group_member.qq] = time.time()
-                use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
-                res = chat(context_id, cmd.original_cmd or msg.msg)
-                msg.reply(res)
-                send_voice(msg, res)
+
+                # use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
+                def reply():
+                    res = chat(context_id, cmd.original_cmd or msg.msg)
+                    msg.reply(res)
+                    send_voice(msg, res)
+
+                threading.Thread(target=reply).start()
         elif isinstance(msg, FriendMsg):
+            if time.time() - self.records.setdefault(msg.friend.qq, 0) < 5:
+                return
+            self.records[msg.friend.qq] = time.time()
             res = chat(context_id, msg.msg)
             send_voice(msg, res)
             msg.reply(res)

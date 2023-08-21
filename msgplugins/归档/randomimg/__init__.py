@@ -1,7 +1,7 @@
 from qqsdk.message import MsgHandler, GroupMsg
 from qqsdk.message.segment import MessageSegment
 from .randomimg import random_img
-from ..cmdaz import CMD
+from msgplugins.msgcmd.cmdaz import CMD
 from ..superplugins import GroupPointAction
 
 

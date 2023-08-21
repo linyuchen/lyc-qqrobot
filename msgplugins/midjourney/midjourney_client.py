@@ -13,7 +13,7 @@ from typing import Callable, NewType
 import pytz
 
 from common.discord_client import DiscordSeleniumClient, Message, download_images
-from common.utils.baidu_translator import is_chinese, trans
+from common.utils.translator import is_chinese, trans
 
 BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
 BANNED_WORDS = [word["words"].strip().lower() for word in BANNED_WORDS]

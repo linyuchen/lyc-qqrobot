@@ -4,26 +4,28 @@
 运行时间
 """
 import time
-from qqsdk.message import MsgHandler, GroupMsg, FriendMsg, BaseMsg
+
+import psutil
+
+from msgplugins.msgcmd.cmdaz import CMD
+from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from .runningtime import Time
-from ..cmdaz import CMD
 
 mod = runningtime.Time()
 
 
-class MyEvent(MsgHandler):
+class RunStatePlugin(MsgHandler):
     __doc__ = u"""
     运行时间查询
     命令：运行时间
     """
-    desc = "发送 运行时间 查看机器人运行了多久"
+    name = "运行状态"
+    desc = "发送 运行状态 查看机器人状态"
     bind_msg_types = (FriendMsg, GroupMsg)
-    
-    def __init__(self, qq_client):
 
-        super(MyEvent, self).__init__(qq_client)
-        self.name = "running_time"
-        self.cmd = CMD("运行时间")
+    def __init__(self, **kwargs):
+        super(RunStatePlugin, self).__init__(**kwargs)
+        self.cmd = CMD("运行时间", alias=["运行状态"])
         self.start_time = time.time()
 
     def handle(self, msg: FriendMsg | GroupMsg):
@@ -33,6 +35,8 @@ class MyEvent(MsgHandler):
         """
         if self.cmd.az(msg.msg):
             result = mod(self.start_time)
+            cpu_percent = psutil.cpu_percent(interval=1)
+            memory = psutil.virtual_memory()
+            result += f"\nCPU使用率：{cpu_percent}%\n内存使用率：{memory.percent}%\n"
             msg.reply(result)
             msg.destroy()
-

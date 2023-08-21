@@ -1,10 +1,11 @@
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
-from ..cmdaz import CMD
+from msgplugins.msgcmd.cmdaz import CMD
 from .news import get_news2
 
 
 class ExamplePlugin(MsgHandler):
+    name = "每日新闻"
     desc = "发送 今日新闻 查看今日重大新闻"
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True

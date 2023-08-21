@@ -13,11 +13,12 @@ django.setup()
 from msgplugins.superplugin.group.group_action import GroupAction, GroupPointAction
 from msgplugins.superplugin.account.user_action import UserAction
 from msgplugins.superplugin.globalconf.admin_action import AdminAction
-from msgplugins.cmdaz import CMD
+from msgplugins.msgcmd.cmdaz import CMD
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 
 
 class GroupMsgEvent(MsgHandler):
+    name = "群活跃度"
     desc = "发送 签到 获得活跃度\n\n发送 活跃度 查看自己的活跃度\n\n发送 活跃度排名 查看排行榜"
     bind_msg_types = (GroupMsg,)
 
@@ -58,10 +59,11 @@ class GroupMsgEvent(MsgHandler):
 
 
 class AdminMsgEvent(MsgHandler):
+    name = "群活跃度"
     bind_msg_types = (FriendMsg,)
 
-    def __init__(self, qq_client):
-        super(AdminMsgEvent, self).__init__(qq_client)
+    def __init__(self, **kwargs):
+        super(AdminMsgEvent, self).__init__(**kwargs)
         self.cmds = [CMD("查活跃度", handle_func=AdminAction.get_point, param_len=1),
                      CMD("加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
                          int_param_index=[2]),
