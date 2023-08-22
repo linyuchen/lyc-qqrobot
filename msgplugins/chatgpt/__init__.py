@@ -99,15 +99,21 @@ class ChatGPT(MsgHandler):
 
                 # use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
                 def reply():
-                    res = chat(context_id, cmd.original_cmd or msg.msg)
-                    msg.reply(res)
-                    send_voice(msg, res)
+                    _chat_text = cmd.original_cmd or msg.msg
+                    if msg.quote_msg:
+                        _chat_text = msg.quote_msg.msg + '\n' + _chat_text
+                    _res = chat(context_id, _chat_text)
+                    msg.reply(_res)
+                    send_voice(msg, _res)
 
                 threading.Thread(target=reply).start()
         elif isinstance(msg, FriendMsg):
             if time.time() - self.records.setdefault(msg.friend.qq, 0) < 5:
                 return
             self.records[msg.friend.qq] = time.time()
-            res = chat(context_id, msg.msg)
+            chat_text = msg.msg
+            if msg.quote_msg:
+                chat_text = msg.quote_msg.msg + '\n' + chat_text
+            res = chat(context_id, chat_text)
             send_voice(msg, res)
             msg.reply(res)

@@ -126,7 +126,7 @@ class MiraiQQClient(QQClientFlask):
             group = super().get_group(group_qq)
         return group
 
-    def __get_msg_chain(self, data: list[dict]):
+    def __get_msg_chain(self, data: list[dict]) -> MessageSegment:
         msg_chain = []
         for c in data:
             match c["type"]:
@@ -172,12 +172,15 @@ class MiraiQQClient(QQClientFlask):
                     """
                     send_qq = c.get("senderId")
                     group_qq = c.get("groupId")
+                    msg_chain = self.__get_msg_chain(c.get("origin"))
                     if group_qq:
                         group = self.get_group(str(group_qq))
                         group_member = group.get_member(str(send_qq))
-                        msg_chain = self.__get_msg_chain(c.get("origin"))
                         quote_msg = GroupMsg(group=group, group_member=group_member,
                                              msg=msg_chain.get_text(), msg_chain=msg_chain)
+                    else:
+                        quote_msg = FriendMsg(friend=self.get_friend(str(send_qq)),
+                                              msg=msg_chain.get_text(), msg_chain=msg_chain)
                 case "Image":
                     # 图片处理
                     """
@@ -193,7 +196,9 @@ class MiraiQQClient(QQClientFlask):
 
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
-            msg = FriendMsg(friend=friend, msg=msg, is_from_super_admin=str(friend.qq) == str(config.ADMIN_QQ))
+            msg = FriendMsg(friend=friend, msg=msg,
+                            quote_msg=quote_msg,
+                            is_from_super_admin=str(friend.qq) == str(config.ADMIN_QQ))
             msg.reply = lambda _msg: self.send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":

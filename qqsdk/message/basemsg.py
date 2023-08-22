@@ -13,7 +13,7 @@ class BaseMsg:
     self.time : int, 发送时间
     """
     msg: str = ""
-    msg_chain: list[MessageSegment] = field(default_factory=list)
+    msg_chain: MessageSegment = None
     time: int = 0  # 发送时的时间戳
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
     is_paused: bool = False
