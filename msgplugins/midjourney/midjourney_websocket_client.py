@@ -10,6 +10,7 @@ import pytz
 import requests
 from aiohttp import ClientWebSocketResponse, WSMessage, WSMsgType
 
+from common.logger import logger
 from .midjourney_client import MidjourneyClientBase, Task, Message, TaskCallbackResponse, TaskType
 
 
@@ -47,7 +48,7 @@ class MidjourneyClient(MidjourneyClientBase):
                 if resp.status_code == 204:
                     break
             except Exception as e:
-                print(e)
+                logger.error(e)
 
         else:
             with self._lock:
@@ -126,19 +127,18 @@ class MidjourneyClient(MidjourneyClientBase):
             },
             'compress': 0,
         }
-        ws = None
         for i in range(30):
             try:
                 ws = await session.ws_connect(
                     self.url,
                     **kwargs
                 )
+                await self.__login(ws)
                 break
             except Exception as e:
-                print(e)
+                logger.error(e)
                 await asyncio.sleep(1)
                 continue
-        await self.__login(ws)
 
     async def __login(self, ws: ClientWebSocketResponse):
         auth = {
@@ -162,23 +162,24 @@ class MidjourneyClient(MidjourneyClientBase):
     async def __heart(self):
         while True:
             if self.heartbeat_interval and self.ws:
-                await self.ws.send_json({
-                    "op": 1,
-                    "d": "null"
-                })
+                try:
+                    await self.ws.send_json({
+                        "op": 1,
+                        "d": "null"
+                    })
+                except Exception as e:
+                    logger.error(e)
                 await asyncio.sleep(self.heartbeat_interval)
 
     async def __receive_msg(self):
         data: WSMessage = await self.ws.receive()
         match data.type:
             case WSMsgType.CLOSED:
-                # print("closed")
                 await self.__init_ws()
             case WSMsgType.TEXT:
                 try:
                     msg = data.json()
                 except Exception as e:
-                    print(e)
                     raise e
                 op = msg.get('op')
                 data: dict = msg.get('d')
@@ -216,4 +217,4 @@ class MidjourneyClient(MidjourneyClientBase):
             try:
                 await self.__receive_msg()
             except Exception as e:
-                print(e)
+                logger.error(e)
