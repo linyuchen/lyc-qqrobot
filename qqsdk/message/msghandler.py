@@ -48,12 +48,12 @@ class MsgHandler:
     instances: ClassVar[list['MsgHandler']] = []
     priority = 1  # 优先级，越大越先执行
     # __exclude_groups: list[str] = field(default_factory=list)  # 不处理的群号
-    __enabled = True
+    global_enabled = True
 
     def __init__(self, **kwargs):
         self.instances.append(self)
         data = get_config(kwargs.get("name", self.name))
-        self.__enabled = data["enabled"]
+        self.global_enabled = data["enabled"]
         self.__exclude_groups = data["exclude_groups"]
 
     @classmethod
@@ -66,12 +66,12 @@ class MsgHandler:
             self.set_group_enabled(group_qq, enabled)
             data["exclude_groups"] = self.__exclude_groups
         else:
-            self.__enabled = enabled
-        data["enabled"] = self.__enabled
+            self.global_enabled = enabled
+        data["enabled"] = self.global_enabled
         save_config()
 
     def check_enabled(self, group_qq: str = ""):
-        enabled = self.__enabled
+        enabled = self.global_enabled
         if group_qq:
             enabled = enabled and group_qq not in self.__exclude_groups
         return enabled
@@ -95,5 +95,11 @@ class MsgHandler:
 
 
 def set_msg_handler_enabled(name: str, enabled: bool, group_qq: str = ""):
-    for handler in MsgHandler.get_handlers(name):
+    handlers = MsgHandler.get_handlers(name)
+    if not handlers:
+        raise Exception(f"插件 {name} 不存在")
+    for handler in handlers:
+        if group_qq:
+            if not handler.global_enabled:
+                raise Exception(f"插件 {name} 已被机器人主人禁用，无法在群内启用")
         handler.set_enabled(enabled, group_qq)

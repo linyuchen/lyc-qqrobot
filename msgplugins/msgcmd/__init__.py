@@ -97,7 +97,7 @@ def list_cmd_group(msg: GroupMsg | FriendMsg, params: list[str]):
         exists_name.append(handler.name)
         enabled = handler.check_enabled(msg.group.qq if is_group_msg else "")
         if is_group_msg:
-            enabled_text = "已开启" if enabled else ("已关闭" if not enabled else "已被机器人主人关闭")
+            enabled_text = "已开启" if enabled else ("已关闭" if handler.global_enabled else "已被机器人主人关闭")
         else:
             enabled_text = "已开启" if handler.check_enabled() else "已关闭"
         reply_text += f"{handler.name} {enabled_text}\n"
