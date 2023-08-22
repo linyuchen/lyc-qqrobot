@@ -31,6 +31,8 @@ class MenuPlugin(MsgHandler):
 
     def handle(self, msg: GroupMsg | FriendMsg):
         if CMD("菜单", alias=["功能", "帮助"]).az(msg.msg) or (not msg.msg.strip() and getattr(msg, "is_at_me", False)):
+            if msg.quote_msg and not msg.msg.strip():
+                return
             msg.destroy()
             res = "命令列表：\n\n" + "\n\n".join(self.collect_cmd(msg))
             msg.reply(res)
