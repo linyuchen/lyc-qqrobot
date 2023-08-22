@@ -16,6 +16,7 @@ class GroupMsg(BaseMsg):
     is_at_me: bool = False
     is_at_other: bool = False
     is_from_admin: bool = False
+    quote_msg: 'GroupMsg' = None
 
 
 @dataclass

@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import sys
+from functools import reduce
 from pathlib import PurePath
 from typing import List, Union
 
@@ -11,7 +12,7 @@ from flask import request
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg, BaseMsg
+from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
@@ -63,7 +64,7 @@ class MiraiQQClient(QQClientFlask):
             "data": message_chain
         }
         res = requests.post(config.SEND2TIM_HTTP_API, json=post_data)
-        
+
         return res
 
     def reply_group_msg(self, content: str | MessageSegment, msg: GroupMsg, at=True):
@@ -118,31 +119,81 @@ class MiraiQQClient(QQClientFlask):
             self.qq_user.groups.append(group)
         return self.qq_user.groups
 
+    def get_group(self, group_qq: str) -> entity.Group:
+        group = super().get_group(group_qq)
+        if not group:
+            self.get_groups()
+            group = super().get_group(group_qq)
+        return group
+
+    def __get_msg_chain(self, data: list[dict]):
+        msg_chain = []
+        for c in data:
+            match c["type"]:
+                case "Plain":
+                    msg_chain.append(MessageSegment.text(c["text"]))
+                case "At":
+                    msg_chain.append(MessageSegment.at(c["target"]))
+                case "Image":
+                    msg_chain.append(MessageSegment.image(c["url"]))
+
+        return reduce(lambda a, b: a + b, msg_chain)
+
     def get_msg(self):
         data = request.json
         message_type = data.get("type")
         msg = ""
         is_at_me = False
         is_at_other = False
+        quote_msg = None
         for c in data.get("messageChain", []):
             msg += c.get("text", "")
-            if c.get("type") == "At":
-                if c.get("target") == self.qq_user.qq:
-                    is_at_me = True
-                else:
-                    is_at_other = True
-            elif c.get("type") == "App":
-                content = json.loads(c.get("content"))
-                qq_doc_url = content["meta"]["detail_1"]["qqdocurl"]
-                msg += qq_doc_url
-            elif c.get("type") == "Xml":
-                url = re.findall("url=\"(.*?)\"", c.get("xml"))
-                if url:
-                    msg += url[0]
+            match c.get("type"):
+                case "At":
+                    if c.get("target") == self.qq_user.qq:
+                        is_at_me = True
+                    else:
+                        is_at_other = True
+                case "App":
+                    content = json.loads(c.get("content"))
+                    qq_doc_url = content["meta"].get("detail_1", {}).get("qqdocurl", "")
+                    msg += qq_doc_url
+                case "Xml":
+                    url = re.findall("url=\"(.*?)\"", c.get("xml"))
+                    if url:
+                        msg += url[0]
+                case "Quote":
+                    """
+                    {'groupId': 149443938, 'id': 1953, 
+                    'origin': [{'text': '？', 'type': 'Plain'}], 
+                    'senderId': 379450326, 
+                    'targetId': 149443938, 
+                    'type': 'Quote'}
+                    """
+                    send_qq = c.get("senderId")
+                    group_qq = c.get("groupId")
+                    if group_qq:
+                        group = self.get_group(str(group_qq))
+                        group_member = group.get_member(str(send_qq))
+                        msg_chain = self.__get_msg_chain(c.get("origin"))
+                        quote_msg = GroupMsg(group=group, group_member=group_member,
+                                             msg=msg_chain.get_text(), msg_chain=msg_chain)
+                case "Image":
+                    # 图片处理
+                    """
+                    {'type': 'Image', 
+                    'imageId': '{F90E0572-CDCE-C75B-2C45-D4B67509E027}.jpg', 
+                    'url': 'http://gchat.qpic.cn/gchatpic_new/1577491075/2154461995-2161929192-F90E0572CDCEC75B2C45D4B67509E027/0?term=2&is_origin=0', 
+                    'path': None, 
+                    'base64': None, 
+                    'width': 546, 'height': 546, 'size': 49433, 
+                    'imageType': 'PNG', 'isEmoji': False}
+                    """
+                    pass
 
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
-            msg = FriendMsg(friend=friend, msg=msg, is_from_super_admin=str(friend.qq) == config.ADMIN_QQ)
+            msg = FriendMsg(friend=friend, msg=msg, is_from_super_admin=str(friend.qq) == str(config.ADMIN_QQ))
             msg.reply = lambda _msg: self.send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":
@@ -157,14 +208,15 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == config.ADMIN_QQ
+            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == str(config.ADMIN_QQ)
             msg = GroupMsg(group=group,
                            msg=msg,
+                           quote_msg=quote_msg,
                            group_member=group_member,
                            is_at_me=is_at_me,
                            is_at_other=is_at_other,
                            is_from_admin=is_from_admin,
-                           is_from_super_admin=str(group_member.qq) == config.ADMIN_QQ
+                           is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
                            )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
             self.add_msg(msg)
