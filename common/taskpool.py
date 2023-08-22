@@ -6,6 +6,8 @@ import traceback
 from abc import abstractmethod
 from typing import TypeVar, Generic
 
+from common.logger import logger
+
 
 class Task:
     callback: callable
@@ -52,8 +54,8 @@ class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
                 with self._lock:
                     self.handling_tasks.append(task)
                     self._on_handling_putted(task)
-            except:
-                traceback.print_exc()
+            except Exception as e:
+                logger.error(f"处理任务失败：{e}")
 
     @abstractmethod
     def _on_handling_putted(self, task: TaskT):
