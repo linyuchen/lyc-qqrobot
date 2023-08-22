@@ -19,7 +19,7 @@ class MenuPlugin(MsgHandler):
             if FriendMsg in handler.bind_msg_types:
                 friend_cmds.append(handler.desc)
             if GroupMsg in handler.bind_msg_types and isinstance(msg, GroupMsg):
-                if handler.check_enabled(msg.group.qq):
+                if not handler.check_enabled(msg.group.qq):
                     continue
                 group_cmds.append(handler.desc)
 

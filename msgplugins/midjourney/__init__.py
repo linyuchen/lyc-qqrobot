@@ -1,10 +1,9 @@
 import config
+from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .midjourney_client import TaskCallbackResponse, TaskCallback, TaskType
 from .midjourney_websocket_client import MidjourneyClient
-
-from msgplugins.msgcmd.cmdaz import on_command
 
 mj_client = MidjourneyClient(token=config.MJ_DISCORD_TOKEN,
                              channel_id=config.MJ_DISCORD_CHANNEL_ID,
@@ -12,6 +11,7 @@ mj_client = MidjourneyClient(token=config.MJ_DISCORD_TOKEN,
                              proxy=config.GFW_PROXY)
 
 CMD_GROUP_NAME = "MJ画图"
+
 
 class LastDrawRes:
     def __init__(self, res: TaskCallbackResponse):
@@ -43,7 +43,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             msg.reply(
                 MessageSegment.image_path(res.image_path[0]) +
                 MessageSegment.text(f"提示词:{res.task.prompt}\n\n原图(需魔法):{res.image_urls[0]}\n"
-                                    f"回复u+数字取图,如u1,上面两张为1、2，下面为3、4")
+                                    f"回复u+数字取图,如u1\n上面两张为1、2，下面为3、4")
             )
             res.image_path[0].unlink(missing_ok=True)
 
