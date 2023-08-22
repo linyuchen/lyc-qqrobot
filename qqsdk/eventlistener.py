@@ -37,29 +37,44 @@ class EventListener(Thread):
 
     def run(self):
         while self.running:
-            msg: GeneralMsg = self.msgs.get()
-            for handler in self.msg_handlers:
-                if not handler.check_enabled():
-                    continue
-                if isinstance(msg, GroupMsg):
-                    if not handler.check_enabled(msg.group.qq):
-                        continue
-                paused_secs = 0
-                while msg.is_paused:
-                    paused_secs += 1
-                    if paused_secs >= 30:
-                        break
-                    time.sleep(1)
-                if msg.is_over:
-                    break
-                if handler.check_type(msg):
-                    try:
-                        if handler.is_async:
-                            threading.Thread(target=lambda: handler.handle(msg)).start()
-                        else:
-                            handler.handle(msg)
-                    except Exception as e:
-                        logger.error(f"处理消息时出现异常 {e}：{traceback.format_exc()}")
-                        msg.resume()
+            try:
+                self.__run()
+            except Exception as e:
+                logger.error(f"EventListener出现异常 {e}：{traceback.format_exc()}")
 
-            time.sleep(self.interval)
+    def __run(self):
+        logger.info("等待消息")
+        msg: GeneralMsg = self.msgs.get()
+        logger.info(f"收到消息 {msg.msg}")
+        for handler in self.msg_handlers:
+            logger.info(f"检查消息处理器 {handler.name}")
+            if not handler.check_enabled():
+                logger.info(f"消息处理器未启用 {handler.name}")
+                continue
+            if isinstance(msg, GroupMsg):
+                if not handler.check_enabled(msg.group.qq):
+                    logger.info(f"消息处理器未在群{msg.group.name}启用 {handler.name}")
+                    continue
+            paused_secs = 0
+            while msg.is_paused:
+                paused_secs += 1
+                if paused_secs >= 30:
+                    break
+                time.sleep(1)
+            if msg.is_over:
+                logger.info(f"消息已经处理完毕 {msg.msg}")
+                break
+            if handler.check_type(msg):
+                logger.info(f"消息处理器 {handler.name} 符合消息类型，开始处理消息 {msg.msg}")
+                try:
+                    if handler.is_async:
+                        threading.Thread(target=lambda: handler.handle(msg)).start()
+                    else:
+                        handler.handle(msg)
+                except Exception as e:
+                    logger.error(f"处理消息时出现异常 {e}：{traceback.format_exc()}")
+                    msg.resume()
+            else:
+                logger.info(f"消息处理器 {handler.name} 不符合消息类型 {msg.msg_type}")
+
+        time.sleep(self.interval)

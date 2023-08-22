@@ -169,6 +169,7 @@ class MidjourneyClient(MidjourneyClientBase):
                     })
                 except Exception as e:
                     logger.error(e)
+                    await self.__init_ws()
                 await asyncio.sleep(self.heartbeat_interval)
 
     async def __receive_msg(self):

@@ -1,5 +1,4 @@
-﻿
-__doc__ = """
+﻿__doc__ = """
 A convenient module for handle html
 @author: LinYuChen
 @version:1.5
@@ -135,7 +134,7 @@ def _get_tag_attrs(tag: str, tag_html: str) -> dict:
     return _attrs
 
 
-def get_start_tag(html, tag, attrs=None | dict) -> list[str]:
+def get_start_tag(html, tag, attrs: None | dict = None) -> list[str]:
     if attrs is None:
         attrs = {}
     result = re.findall("<%s[^>]*?>" % tag, html)
@@ -158,7 +157,7 @@ def get_start_tag(html, tag, attrs=None | dict) -> list[str]:
     return start_tag_list
 
 
-def get_tag_html(html: str, tag: str, attrs=None | dict) -> list[str]:
+def get_tag_html(html: str, tag: str, attrs: None | dict = None, end_tag="") -> list[str]:
     """
     @param html: html string
     @type: str
@@ -191,13 +190,20 @@ def get_tag_html(html: str, tag: str, attrs=None | dict) -> list[str]:
     for i in start_tag:
         start_tag_pos = html.find(i, start_tag_pos + 1)
         end_tag_pos = html.find(end_tag, start_tag_pos + 1)
-        end_pos = get_end_tag_pos(start_tag_pos, end_tag_pos)
+        if end_tag_pos != -1:
+            end_pos = get_end_tag_pos(start_tag_pos, end_tag_pos)
+        else:
+            # 如果找不到</tag，则找/>
+            end_pos = html.find("/>", start_tag_pos + 1)
+            # 如果找不到/>，则找>
+            if end_pos == -1:
+                end_pos = html.find(">", start_tag_pos + 1)
         result_list.append(html[start_tag_pos:end_pos + len(end_tag)])
 
     return result_list
 
 
-def get_tag_attrs(html: str, tag: str, attrs=None | dict) -> list[dict]:
+def get_tag_attrs(html: str, tag: str, attrs: None | dict = None) -> list[dict]:
     """
     @param html:html
     @type html:string

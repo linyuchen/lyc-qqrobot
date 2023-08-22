@@ -126,42 +126,42 @@ class MiraiQQClient(QQClientFlask):
             group = super().get_group(group_qq)
         return group
 
+    def __get_msg_history(self, msg_id: int | str, target: int | str) -> MessageSegment:
+        """
+        获取消息历史
+        :param msg_id: 消息id
+        :param target: 好友QQ或者群号
+        """
+        res = self.api_get("/messageFromId", {"messageId": msg_id, "target": target}).json()
+        res = res.get("data", {}).get("messageChain", [])
+        res = self.__get_msg_chain(res)
+        return res
+
     def __get_msg_chain(self, data: list[dict]) -> MessageSegment:
         msg_chain = []
+        quote_msg = None
+        is_at_me = False
+        is_at_other = False
         for c in data:
             match c["type"]:
                 case "Plain":
                     msg_chain.append(MessageSegment.text(c["text"]))
                 case "At":
-                    msg_chain.append(MessageSegment.at(c["target"]))
-                case "Image":
-                    msg_chain.append(MessageSegment.image(c["url"]))
-
-        return reduce(lambda a, b: a + b, msg_chain)
-
-    def get_msg(self):
-        data = request.json
-        message_type = data.get("type")
-        msg = ""
-        is_at_me = False
-        is_at_other = False
-        quote_msg = None
-        for c in data.get("messageChain", []):
-            msg += c.get("text", "")
-            match c.get("type"):
-                case "At":
                     if c.get("target") == self.qq_user.qq:
                         is_at_me = True
                     else:
                         is_at_other = True
+                    msg_chain.append(MessageSegment.at(c["target"], is_at_me, is_at_other))
+                case "Image":
+                    msg_chain.append(MessageSegment.image(c["url"]))
                 case "App":
                     content = json.loads(c.get("content"))
                     qq_doc_url = content["meta"].get("detail_1", {}).get("qqdocurl", "")
-                    msg += qq_doc_url
+                    msg_chain.append(MessageSegment.text(qq_doc_url))
                 case "Xml":
                     url = re.findall("url=\"(.*?)\"", c.get("xml"))
                     if url:
-                        msg += url[0]
+                        msg_chain.append(MessageSegment.text(url[0]))
                 case "Quote":
                     """
                     {'groupId': 149443938, 'id': 1953, 
@@ -172,15 +172,15 @@ class MiraiQQClient(QQClientFlask):
                     """
                     send_qq = c.get("senderId")
                     group_qq = c.get("groupId")
-                    msg_chain = self.__get_msg_chain(c.get("origin"))
+                    quote_msg_chain = self.__get_msg_history(c.get("id"), c.get("targetId"))
                     if group_qq:
                         group = self.get_group(str(group_qq))
                         group_member = group.get_member(str(send_qq))
                         quote_msg = GroupMsg(group=group, group_member=group_member,
-                                             msg=msg_chain.get_text(), msg_chain=msg_chain)
+                                             msg=quote_msg_chain.get_text(), msg_chain=quote_msg_chain)
                     else:
                         quote_msg = FriendMsg(friend=self.get_friend(str(send_qq)),
-                                              msg=msg_chain.get_text(), msg_chain=msg_chain)
+                                              msg=quote_msg_chain.get_text(), msg_chain=quote_msg_chain)
                 case "Image":
                     # 图片处理
                     """
@@ -192,14 +192,30 @@ class MiraiQQClient(QQClientFlask):
                     'width': 546, 'height': 546, 'size': 49433, 
                     'imageType': 'PNG', 'isEmoji': False}
                     """
-                    pass
+                    msg_chain.append(MessageSegment.image(c["url"]))
+        if msg_chain:
+            msg_chain = reduce(lambda a, b: a + b, msg_chain)
+        else:
+            msg_chain = MessageSegment.text("")
+        msg_chain.quote_msg = quote_msg
+        return msg_chain
+
+    def get_msg(self):
+        data = request.json
+        message_type = data.get("type")
+        is_at_me = False
+        is_at_other = False
+        msg_chain = self.__get_msg_chain(data["messageChain"])
+        quote_msg = msg_chain.quote_msg
+        msg = msg_chain.get_text()
 
         if message_type == "FriendMessage":
             friend = self.get_friend(str(data["sender"]["id"]))
             msg = FriendMsg(friend=friend, msg=msg,
                             quote_msg=quote_msg,
+                            msg_chain=msg_chain,
                             is_from_super_admin=str(friend.qq) == str(config.ADMIN_QQ))
-            msg.reply = lambda _msg: self.send_msg(friend.qq, _msg)
+            msg.reply = lambda _msg, at=False: self.send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":
             group_qq = str(data["sender"]["group"]["id"])
@@ -213,9 +229,11 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == str(config.ADMIN_QQ)
+            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == str(
+                config.ADMIN_QQ)
             msg = GroupMsg(group=group,
                            msg=msg,
+                           msg_chain=msg_chain,
                            quote_msg=quote_msg,
                            group_member=group_member,
                            is_at_me=is_at_me,

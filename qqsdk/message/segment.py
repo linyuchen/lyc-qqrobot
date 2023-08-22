@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
+# from .friendmsg import FriendMsg
+# from .groupmsg import GroupMsg
 
 
 class MessageSegment:
@@ -10,7 +12,11 @@ class MessageSegment:
     def __init__(self, msg_type: Optional[str] = None, content: Optional[str] = None):
         self.msg_type = msg_type
         self.content = content
+        self.quote_msg = None  # FriendMsg or GroupMsg
         self.origin_data: List[Tuple[str, str]] = []
+        self.is_at_me = False
+        self.is_at_other = False
+        self.is_at_all = False
         if msg_type and content:
             self.origin_data.append((msg_type, content))
 
@@ -37,8 +43,12 @@ class MessageSegment:
         return MessageSegment("VoiceBase64", base64_data)
 
     @staticmethod
-    def at(qq: str):
-        return MessageSegment("At", qq)
+    def at(qq: str, is_at_me: bool = False, is_at_other=False, is_at_all=False):
+        ms = MessageSegment("At", qq)
+        ms.is_at_me = is_at_me
+        ms.is_at_other = is_at_other
+        ms.is_at_all = is_at_all
+        return ms
 
     @staticmethod
     def to_data(msg_type: str, content: str):

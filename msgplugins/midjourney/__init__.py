@@ -1,4 +1,8 @@
+import asyncio
+import threading
+
 import config
+from common.utils.postimg import postimg_cc
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
@@ -48,7 +52,33 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             res.image_path[0].unlink(missing_ok=True)
 
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
-    mj_client.draw(msg_param[0], callback)
+    # 获取图片
+    img_urls = []
+    if msg.quote_msg:
+        urls = msg.quote_msg.msg_chain.get_image_urls()
+        img_urls.extend(urls)
+    msg_chain = msg.msg_chain
+    if msg_chain:
+        urls = msg_chain.get_image_urls()
+        img_urls.extend(urls)
+    # 批量上传到图床,这里要用异步
+    img_post_urls = []
+
+    async def post_img():
+        async def task(__url):
+            res_url = await postimg_cc(__url)
+            img_post_urls.append(res_url)
+        tasks = []
+        for url in img_urls:
+            tasks.append(asyncio.create_task(task(url)))
+        await asyncio.gather(*tasks)
+
+    def reply_thread():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(post_img())
+        mj_client.draw(msg_param[0], callback, img_post_urls)
+    threading.Thread(target=reply_thread).start()
 
 
 @on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="", cmd_group_name=CMD_GROUP_NAME)

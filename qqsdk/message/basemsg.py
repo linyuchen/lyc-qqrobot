@@ -1,6 +1,6 @@
 # coding=UTF8
 import threading
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from .segment import MessageSegment
 

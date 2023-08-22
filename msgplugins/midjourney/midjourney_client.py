@@ -80,7 +80,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
                 self.tasks.append(task)
                 self._handle_new_task(task)
 
-    def draw(self, prompt: str, callback: TaskCallback):
+    def draw(self, prompt: str, callback: TaskCallback, urls: list[str] = None):
         prompt = prompt.lower()
 
         prompt = prompt.replace("\n", "")
@@ -118,6 +118,8 @@ class MidjourneyClientBase(metaclass=ABCMeta):
         # 特殊符号转成空格
         prompt = re.sub(r'[^a-zA-Z0-9\s]+', ' ', prompt)
         prompt = prompt + params
+        if urls:
+            prompt = " ".join(urls) + " " + prompt
         task.prompt = prompt
         self._putted_tasks.put(task)
 
@@ -129,7 +131,12 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             return False
         if msg.datetime < task.datetime:
             return False
-        if task.prompt.replace(" ", "") not in msg.content.replace(" ", ""):
+        prompt = task.prompt
+        # 去掉链接
+        prompt = re.sub(r"http\S+", "", prompt).replace(" ", "")
+        msg_content = re.sub(r"http\S+", "", msg.content).replace(" ", "")
+
+        if prompt not in msg_content:
             return False
         if msg.sender_name != self.BOT_NAME:
             return False

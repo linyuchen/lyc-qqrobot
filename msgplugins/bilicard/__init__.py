@@ -49,7 +49,10 @@ class BiliCardPlugin(MsgHandler):
                 reply_msg = MessageSegment.image_path(img_path) + \
                             MessageSegment.text("简介：" + video_info["desc"] + "\n\n" + summary +
                                                 "\n\n" + url)
-                msg.reply(reply_msg, at=False)
+                if isinstance(msg, GroupMsg):
+                    msg.reply(reply_msg, at=False)
+                else:
+                    msg.reply(reply_msg)
                 os.remove(img_path)
 
         else:

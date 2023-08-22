@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from qqsdk.entity.friend import Friend
 from qqsdk.entity.group import Group
 from qqsdk.message.basemsg import BaseMsg
-from qqsdk.message.segment import MessageSegment
 from qqsdk.message.types import MessageTypes
 
 
