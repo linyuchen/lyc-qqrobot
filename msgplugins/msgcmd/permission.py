@@ -50,7 +50,7 @@ class CMDPermissionGroup:
 
 def check_permission(msg: GroupMsg | FriendMsg, permissions: CMDPermissions | CMDPermissionGroup):
     if isinstance(permissions, CMDPermissions):
-        permissions = CMDPermissionGroup() | permissions
+        permissions = CMDPermissionGroup() & permissions
 
     # or权限只要有一个满足就行
     for permission in permissions.or_permissions:
@@ -62,6 +62,8 @@ def check_permission(msg: GroupMsg | FriendMsg, permissions: CMDPermissions | CM
                 return True
     # or权限没有符合的就检查and权限
     # and权限必须全部满足
+    if len(permissions.and_permissions) == 0:
+        return False
     for permission in permissions.and_permissions:
         if permission == CMDPermissions.GROUP_ADMIN:
             if not isinstance(msg, GroupMsg):
