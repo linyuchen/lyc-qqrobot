@@ -85,7 +85,7 @@ def summary_web(link: str) -> str:
         # "Connection:"keep-alive"
     }
     try:
-        html = requests.get(url, headers=headers).text
+        html = requests.get(url, headers=headers, timeout=30).text
     except:
         return "网页分析失败"
     text = html2txt(html).replace("\n", "")

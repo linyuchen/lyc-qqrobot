@@ -1,6 +1,6 @@
 import tempfile
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, fields, field
 from datetime import datetime
 from pathlib import Path
 
@@ -17,12 +17,23 @@ TIME_OUT = 60
 
 
 @dataclass()
+class Attachment:
+    url: str  # cnd.discordapp.com开头的，不能分享给别人查看
+    proxy_url: str  # media.discordapp.net开头的，可以分享给别人查看
+    filename: str
+    size: int  # 字节
+    height: int | None = None
+    width: int | None = None
+
+
+@dataclass()
 class Message:
     msg_id: str
     sender_name: str
     datetime: datetime
     content: str = ""
-    attachment_urls: list[str] = None
+    attachment_urls: list[str] = field(default_factory=list)
+    attachments: list[Attachment] = field(default_factory=list)
     read = False
 
 

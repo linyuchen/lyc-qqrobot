@@ -169,7 +169,12 @@ class MidjourneyClientBase(metaclass=ABCMeta):
     def __handle_callback(self, task: Task, param: TaskCallbackResponse):
         if param.image_urls:
             try:
-                param.image_path = download_images(param.image_urls, self.http_proxy)
+                attachments = param.reply_msg.attachments
+                downloaded_paths = [
+                    download_images([attachment.proxy_url], self.http_proxy, attachment.width // 2,
+                                    attachment.height // 2)[0]
+                    for attachment in attachments]
+                param.image_path = downloaded_paths
             except Exception as e:
                 param.error = str(e)
         task.callback(param)

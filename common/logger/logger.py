@@ -24,3 +24,4 @@ info_handler.setFormatter(formatter)
 # 将handler添加到logger对象中
 logger.addHandler(error_handler)
 logger.addHandler(info_handler)
+logger.addHandler(logging.StreamHandler())

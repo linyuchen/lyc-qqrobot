@@ -9,7 +9,6 @@ from typing import List, Union
 import requests
 from flask import request
 
-
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
@@ -17,6 +16,7 @@ from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 from common.logger import logger
+
 
 class MiraiQQClient(QQClientFlask):
     __api_url = config.MIRAI_HTTP_API
@@ -238,8 +238,8 @@ class MiraiQQClient(QQClientFlask):
                            msg_chain=msg_chain,
                            quote_msg=quote_msg,
                            group_member=group_member,
-                           is_at_me=is_at_me,
-                           is_at_other=is_at_other,
+                           is_at_me=msg_chain.is_at_me,
+                           is_at_other=msg_chain.is_at_other,
                            is_from_admin=is_from_admin,
                            is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
                            )

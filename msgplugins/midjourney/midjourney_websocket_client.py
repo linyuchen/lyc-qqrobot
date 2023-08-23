@@ -10,6 +10,7 @@ import pytz
 import requests
 from aiohttp import ClientWebSocketResponse, WSMessage, WSMsgType
 
+from common.discord_client.discord_client import Attachment
 from common.logger import logger
 from .midjourney_client import MidjourneyClientBase, Task, Message, TaskCallbackResponse, TaskType
 
@@ -191,11 +192,33 @@ class MidjourneyClient(MidjourneyClientBase):
                         content = data.get("content", "")
                         for e in data.get("embeds", []):
                             content += f"\n{e.get('title', '')}\n{e.get('footer', {}).get('text', '')}\n{e.get('description', '')}\n"
-                        attachment_urls = [a_data["proxy_url"] for a_data in data.get("attachments", [])]
+
+                        attachment_urls = []
+                        attachments = []
+                        attachment_datas = data.get("attachments", [])
+                        """
+                        {'width': 256, 
+                        'url': 'https://cdn.discordapp.com/attachments/1127887388648153121/1143808736423596042/2cc56801-852a-417d-b9fc-cbe355b4ea0f_grid_0.webp', 
+                        'size': 17676, 
+                        'proxy_url': 'https://media.discordapp.net/attachments/1127887388648153121/1143808736423596042/2cc56801-852a-417d-b9fc-cbe355b4ea0f_grid_0.webp', 
+                        'id': '1143808736423596042', 
+                        'height': 512, 
+                        'filename': '2cc56801-852a-417d-b9fc-cbe355b4ea0f_grid_0.webp', 
+                        'content_type': 'image/webp'}
+                        """
+                        for attachment_data in attachment_datas:
+                            attachments.append(Attachment(
+                                url=attachment_data.get("url", ""),
+                                proxy_url=attachment_data.get("proxy_url", ""),
+                                filename=attachment_data.get("filename", ""),
+                                size=attachment_data.get("size", 0),
+                                height=attachment_data.get("height"),
+                                width=attachment_data.get("width"),
+                            ))
+                            attachment_urls.append(attachment_data["proxy_url"])
 
                         time_str = data.get("timestamp")
                         if time_str:
-
                             utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
                             local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
                             msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
@@ -205,8 +228,10 @@ class MidjourneyClient(MidjourneyClientBase):
                                           content=content,
                                           sender_name=data.get("author", {}).get("username"),
                                           attachment_urls=attachment_urls,
+                                          attachments=attachments,
                                           datetime=msg_datetime
                                           )
+                        logger.info(f"MJ收到新消息{new_msg.content}")
                         self._handle_new_msg(new_msg)
 
     async def __pool_event(self):
