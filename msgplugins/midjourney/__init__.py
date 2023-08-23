@@ -1,7 +1,9 @@
 import asyncio
 import threading
+import time
 
 import config
+from common.logger import logger
 from common.utils.postimg import postimg_cc
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg
@@ -66,7 +68,16 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
 
     async def post_img():
         async def task(__url):
-            res_url = await postimg_cc(__url)
+            try:
+                logger.info(f"上传图片{__url}到图床")
+                start_time = time.time()
+                res_url = await postimg_cc(__url)
+                end_time = time.time()
+                used_time = end_time - start_time
+                logger.info(f"上传图片{__url}到图床成功,耗时{int(used_time)}秒")
+            except Exception as e:
+                logger.error(f"上传图片到图床失败:{e}")
+                return
             img_post_urls.append(res_url)
         tasks = []
         for url in img_urls:

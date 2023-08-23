@@ -67,15 +67,15 @@ def close_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启他群插件",
-            param_len=1,
+            param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
 def open_group_cmd(msg: GroupMsg, params: list[str]):
-    manage_cmd_group(False, msg, params[0], params[1])
+    manage_cmd_group(True, msg, params[0], params[1])
 
 
 @on_command("关闭他群插件",
-            param_len=1,
+            param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
 def close_group_cmd(msg: GroupMsg, params: list[str]):

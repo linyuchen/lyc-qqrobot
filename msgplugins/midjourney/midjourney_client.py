@@ -13,6 +13,7 @@ from typing import Callable, NewType
 import pytz
 
 from common.discord_client import DiscordSeleniumClient, Message, download_images
+from common.logger import logger
 from common.utils.translator import is_chinese, trans
 
 BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
@@ -177,6 +178,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
                 param.image_path = downloaded_paths
             except Exception as e:
                 param.error = str(e)
+        logger.debug(f"处理回调 {task.prompt}")
         task.callback(param)
 
 
