@@ -98,8 +98,10 @@ class BullFight(bullfight_base.BullFightBase):
         """
 
         with self.mutex:
-            while self.overing:
-                time.sleep(0.2)
+            if self.overing:
+                for i in range(10):
+                    time.sleep(1)
+                self.overing = False
 
         group_qq = self.group_qq
         __sender_info_dic = {"group_qq_number": group_qq, "qq_number": str(member_qq), "nick": member_name,

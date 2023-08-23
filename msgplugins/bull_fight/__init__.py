@@ -1,9 +1,10 @@
 # coding=UTF8
+import threading
 
-from msgplugins.msgcmd.cmdaz import CMD
-from qqsdk.message import MsgHandler, GroupMsg
 from msgplugins.bull_fight import bullfight
+from msgplugins.msgcmd.cmdaz import CMD
 from msgplugins.superplugins import GroupPointAction
+from qqsdk.message import MsgHandler, GroupMsg
 
 
 class BullGame(GroupPointAction, bullfight.BullFight):
@@ -44,11 +45,14 @@ class BullFightPlugin(MsgHandler):
 
         __game = self.get_game_instance(group_qq)
         cmd_start = CMD("斗牛", param_len=1, sep="")
-        result = ""
         if cmd_start.az(msg.msg):
             msg.destroy()
             param = cmd_start.get_param_list()[0]
-            result += __game.start_game(member.qq, member.get_name(), msg.reply, param)
 
-        if result:
-            msg.reply(result)
+            def func():
+                result = __game.start_game(member.qq, member.get_name(), msg.reply, param)
+
+                if result:
+                    msg.reply(result)
+
+            threading.Thread(target=func).start()
