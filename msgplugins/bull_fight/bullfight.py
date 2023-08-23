@@ -32,7 +32,7 @@ class BullFight(bullfight_base.BullFightBase):
         self.master_info_dic = {}
         self.players_info_list = []  # item is dict
         self.running = False
-        self.overing = False
+        self.overing = False  # 结算中
         self.player_max_gold = 0  # 闲家最大下注
         self.min_gold = 0  # 群内最小下注
         self.master_deposit_gold = 0  # 庄家押金
@@ -101,7 +101,10 @@ class BullFight(bullfight_base.BullFightBase):
             if self.overing:
                 for i in range(10):
                     time.sleep(1)
-                self.overing = False
+                    if not self.overing:
+                        break
+                else:
+                    self.overing = False
 
         group_qq = self.group_qq
         __sender_info_dic = {"group_qq_number": group_qq, "qq_number": str(member_qq), "nick": member_name,
