@@ -1,7 +1,7 @@
-# 自写的一套QQ机器人框架
+# 使用Python自写的一套QQ机器人框架
 
 ## 目前已经实现的功能
-- [x] 调用Tim官方客户端发送消息，避免风控发不出消息
+- [x] 调用Tim官方客户端发送群消息，避免风控发不出消息
 - [x] 调用Midjourney实现AI绘画
 - [x] 调用StableDiffusion实现AI绘画
 - [x] 调用吐司在线画图实现AI绘画
@@ -56,7 +56,6 @@ webhook:
     - 'localhost:5000/'
 ```
 
-
 ## 启动mirai
 
 ```bash
@@ -64,71 +63,26 @@ webhook:
 ```
 
 如果提示需要滑动验证码，复制验证码链接，浏览器打开调试控制台，
+
 粘贴验证码链接访问，验证通过之后，在控制台能看到一个`cap_union_new_verify`的请求，
+
 它的response有一个**ticket**，复制下来，粘贴到mirai控制台回车即可。
 
-# 对接第三方QQapi
+## 配置自带的插件参数
 
-这里我已经写好了一个对接mirai的，如果想使用mirai的http api直接使用[client/mirai_http/main.py](client/mirai_http/main.py)即可
+运行一次[config.py](config.py)会在同级目录生成一个`config.json`,最终拿到的参数配置就是在`config.json`里面
 
-一般第三方QQ框架都提供http api，
+打开`config.json`修改对应参数
 
-新建个类 继承`qqsdk\qqclient`，复写`get_friends`、`get_groups`, `send_msg`, 
-这个三方法里调用第三方的http api
+[参数文档](doc/config.md)
 
-## 接受消息
-复写 `get_msg`方法，
-`get_msg`实际上是个`flask route`，路径是`/`，绑定的端口为config.json中的`listen_port`
+## 启动本框架
 
-在`get_msg`方法中, 当收到消息时，调用`qqclient.add_msg`添加消息
-
-
-## 配置参数
-
-所有参数可以在`config.py`看到，首次运行一下`config.py`会在同级目录生成一个`config.json`,最终拿到的参数配置就是在`config.json`里面
-
-### 参数说明
-
-**MIRAI_HTTP_API**: mirai端的http api地址
-
-**MIRAI_HTTP_API_VERIFY_KEY**: mirai端http api的密钥
-
-
-**QQ**: 机器人的QQ号
-
-**ADMIN_QQ**: 机器人的管理员(主人)QQ号
-
-**LISTEN_PORT**: 机器人的http api监听的端口，主要是用于mirai主动发送接收到的消息到本项目
-
-**SEND2TIM**: 是否使用Tim进行发送消息，需要运行Tim的服务端，服务端项目地址 <https://github.com/linyuchen/qqrobot-server/>
-
-**SEND2TIM_HTTP_API**: Tim服务端的http api地址
-
-**SD_HTTP_API**: StableDiffusion的http api地址
-
-**VITS_HTTP_API**: 文字转语音的VITS http api地址
-
-**TTS_ENABLED**: 是否启用文字转语音，启用的时候机器人会在回复消息时加上语音，触发条件详见[msgplugins/chatgpt/__init__.py](msgplugins/chatgpt/__init__.py)
-
-**MJ_DISCORD_TOKEN**: 开通了Midjourney的discord账号token，获取方式：打开浏览器登录到discord，跳出网络控制台，随便发送个消息然后查看请求头部的Authorization值
-
-**MJ_DISCORD_CHANNEL_URL**: 添加了MJ机器人的频道地址
-
-**TUSI_TOKENS**: 吐司在线画图的token
-
-**CHATGPT**: chatgpt的相关配置
-
-**GFW_PROXY**: 科学上网的HTTP代理服务器
-
-
-## 启动
-
-然后实例化刚刚复写的类，并执行它的start()
-
-mirai的话直接使用[client/mirai_http/main.py](client/mirai_http/main.py)即可
+运行[client/mirai_http/main.py](client/mirai_http/main.py)即可
 
 
 # 备份
+
 需要备份`msgplugins/superplugin/db.sqlite3`,`config.json`
 
 # 相关文档
@@ -137,11 +91,15 @@ mirai的话直接使用[client/mirai_http/main.py](client/mirai_http/main.py)即
 
 [mirai-http-api接口请求和返回数据文档](https://docs.mirai.mamoe.net/mirai-api-http/api/API.html)
 
+# 插件开发
+
+参考[msgplugins/example.py](msgplugins/example.py)
+
 # TODO
 - [ ] ~~mirai也使用docker~~
 - [ ] ~~mirai和qqrobot使用docker network通信~~
 - [x] 不同环境不同的配置文件
 - [x] docker build脚本，自动识别cpu架构
-- [ ] midjourney选图放大功能
-- [ ] midjourney生成图功能
+- [x] midjourney选图放大功能
+- [x] midjourney生成图功能
 - [ ] 完善本文档
