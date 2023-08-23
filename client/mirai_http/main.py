@@ -9,7 +9,6 @@ from typing import List, Union
 import requests
 from flask import request
 
-from common.logger import logger
 
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
@@ -17,7 +16,7 @@ from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
-
+from common.logger import logger
 
 class MiraiQQClient(QQClientFlask):
     __api_url = config.MIRAI_HTTP_API
