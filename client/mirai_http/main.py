@@ -9,6 +9,8 @@ from typing import List, Union
 import requests
 from flask import request
 
+from common.logger import logger
+
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
@@ -202,10 +204,11 @@ class MiraiQQClient(QQClientFlask):
 
     def get_msg(self):
         data = request.json
+        logger.info(f"收到mirai消息：{data}")
         message_type = data.get("type")
         is_at_me = False
         is_at_other = False
-        msg_chain = self.__get_msg_chain(data["messageChain"])
+        msg_chain = self.__get_msg_chain(data.get("messageChain", []))
         quote_msg = msg_chain.quote_msg
         msg = msg_chain.get_text()
 
