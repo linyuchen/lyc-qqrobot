@@ -102,16 +102,16 @@ class DiscordWebsocketClientBase:
         }
         while True:
             try:
-                logger.debug(f"mj重连...")
+                logger.debug(f"discord重连...")
                 ws = await session.ws_connect(
                     self.url,
                     **kwargs
                 )
                 await self.__login(ws)
-                logger.debug(f"mj重连成功")
+                logger.debug(f"discord重连成功")
                 break
             except Exception as e:
-                logger.debug(f"mj重连失败{e}")
+                logger.debug(f"discord重连失败{e}")
                 await asyncio.sleep(1)
 
     async def __login(self, ws: ClientWebSocketResponse):
