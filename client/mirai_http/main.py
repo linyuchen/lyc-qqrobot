@@ -148,7 +148,7 @@ class MiraiQQClient(QQClientFlask):
                 case "Plain":
                     msg_chain.append(MessageSegment.text(c["text"]))
                 case "At":
-                    if c.get("target") == self.qq_user.qq:
+                    if str(c.get("target")) == str(self.qq_user.qq):
                         is_at_me = True
                     else:
                         is_at_other = True
@@ -198,6 +198,8 @@ class MiraiQQClient(QQClientFlask):
             msg_chain = reduce(lambda a, b: a + b, msg_chain)
         else:
             msg_chain = MessageSegment.text("")
+        msg_chain.is_at_me = is_at_me
+        msg_chain.is_at_other = is_at_other
         msg_chain.quote_msg = quote_msg
         return msg_chain
 
