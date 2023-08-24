@@ -133,11 +133,15 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             return False
         if msg.datetime < task.datetime:
             return False
+        msg_content = msg.content
+        status_content = msg_content.split("**")[-1]
+        if "(Waiting to start)" in status_content or "(paused)" in status_content:
+            return False
         prompt = task.prompt
         # 去掉链接
         prompt = prompt.replace("\n", " ")
         prompt = re.sub(r"http\S+", "", prompt).replace(" ", "")
-        msg_content = msg.content.replace("\n", " ")
+        msg_content = msg_content.replace("\n", " ")
         msg_content = re.sub(r"http\S+", "", msg_content).replace(" ", "")
 
         if prompt not in msg_content:
