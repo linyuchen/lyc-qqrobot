@@ -2,8 +2,8 @@ import random
 from copy import deepcopy
 from datetime import datetime
 
-from common.discord_client import Message
-from common.discord_client.discord_client import DiscordWebsocketClientBase
+from common.discord_client.discord_client import DiscordWebsocketClientBase, Message
+from common.logger import logger
 from .midjourney_client import MidjourneyClientBase, Task, TaskCallbackResponse, TaskType
 
 
@@ -20,6 +20,31 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
             with self._lock:
                 self.tasks.remove(task)
                 task.callback(TaskCallbackResponse(task=task, error=f'提交任务失败 {e}'))
+
+    def _action_continue(self, msg: Message):
+        try:
+            custom_id = msg.origin_data["components"][0]["components"][0]["custom_id"]
+        except Exception as e:
+            logger.error(f"出现了不良内容提示后提交继续画图失败 {e}")
+            return
+        payload = {
+            "type": 3,
+            "nonce": f"{random.randint(1134276220909715456, 1144276220909715456)}",
+            "guild_id": self.guild_id,
+            "channel_id": self.channel_id,
+            "message_flags": 64,
+            "message_id": msg.msg_id,
+            "application_id": "936929561302675456",
+            "session_id": "cc1789f5fba05b9af65c7f0c6033986c",
+            "data": {
+                "component_type": 2,
+                "custom_id": custom_id
+            }
+        }
+        try:
+            super()._post_interaction(payload)
+        except Exception as e:
+            logger.error(f"出现了不良内容提示后提交继续画图失败 {e}")
 
     def __post_draw(self, task: Task):
         payload = {

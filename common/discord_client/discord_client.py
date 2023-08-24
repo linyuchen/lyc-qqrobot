@@ -37,6 +37,7 @@ class Attachment:
 
 @dataclass()
 class Message:
+    origin_data: dict  # 原始消息数据
     msg_id: str
     sender_name: str
     datetime: datetime
@@ -201,7 +202,8 @@ class DiscordWebsocketClientBase:
                                           sender_name=data.get("author", {}).get("username"),
                                           attachment_urls=attachment_urls,
                                           attachments=attachments,
-                                          datetime=msg_datetime
+                                          datetime=msg_datetime,
+                                          origin_data=data
                                           )
                         logger.debug(f"MJ收到新消息{new_msg.content}")
                         self._handle_new_msg(new_msg)

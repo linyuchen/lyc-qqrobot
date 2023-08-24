@@ -55,6 +55,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
         "Invalid parameter": "参数错误",
         "Action needed to continue": "提示词可能有不良内容",
         "You have been blocked": "你已被封禁",
+        "Request cancelled": "请求被取消",
     }
 
     def __init__(self, http_proxy: str):
@@ -156,16 +157,33 @@ class MidjourneyClientBase(metaclass=ABCMeta):
                                                       reply_msg=reply_msg,
                                                       error="", image_urls=reply_msg.attachment_urls,
                                                       image_path=[])
-            elif error := list(filter(lambda word: word in reply_msg.content, self.ERROR_WORDS)):
-                error_msg = self.ERROR_WORDS[error[0]] + reply_msg.content
-                reply_msg.read = True
-                callback_param = TaskCallbackResponse(task=task, error=error_msg, image_path=None, reply_msg=reply_msg)
+            # elif error := list(filter(lambda word: word in reply_msg.content, self.ERROR_WORDS)):
+            #     error_msg = self.ERROR_WORDS[error[0]] + reply_msg.content
+            #     reply_msg.read = True
+            #     callback_param = TaskCallbackResponse(task=task, error=error_msg, image_path=None, reply_msg=reply_msg)
+            # 有错误信息
             else:
-                continue
+                error_msg = reply_msg.content
+                reply_msg.read = True
+                if "Action needed to continue" in error_msg:
+                    # 需要自动点击下一步按钮
+                    self._action_continue(reply_msg)
+                    continue
+                # 错误信息翻译成中文
+                try:
+                    error_msg = trans(error_msg, from_lang="en", to_lang="zh")
+                except Exception as e:
+                    logger.error("翻译MJ错误信息失败" + str(e))
+                callback_param = TaskCallbackResponse(task=task, error=error_msg, image_path=None, reply_msg=reply_msg)
 
             with self._lock:
                 self.tasks.remove(task)
             threading.Thread(target=lambda: self.__handle_callback(task, callback_param)).start()
+
+    @abstractmethod
+    def _action_continue(self, reply_msg: Message):
+        # 出现了警告内容，自动点击下一步按钮
+        pass
 
     def __handle_callback(self, task: Task, param: TaskCallbackResponse):
         if param.image_urls:
@@ -201,3 +219,6 @@ class MJSeleniumClient(MidjourneyClientBase, DiscordSeleniumClient):
                 self._handle_new_msg(msg)
 
             time.sleep(1)
+
+    def _action_continue(self, reply_msg: Message):
+        pass
