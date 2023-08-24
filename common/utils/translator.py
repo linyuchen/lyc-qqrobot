@@ -33,11 +33,13 @@ def trans(text: str, from_lang="zh", to_lang: str = "en"):
 
     if res.get("error_code") == "52001":
         return res.get("error_msg")
-
-    return res["trans_result"][0]["dst"]
+    result = ""
+    for line_data in res["trans_result"]:
+        result += line_data["dst"] + "\n"
+    return result
 
 
 if __name__ == "__main__":
-    r = trans("你好,世界，我在干嘛")
+    r = trans("你好,世界\n我在干嘛")
     print(r)
 
