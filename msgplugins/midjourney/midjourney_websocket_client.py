@@ -22,11 +22,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
                 task.callback(TaskCallbackResponse(task=task, error=f'提交任务失败 {e}'))
 
     def _action_continue(self, msg: Message):
-        try:
-            custom_id = msg.origin_data["components"][0]["components"][0]["custom_id"]
-        except Exception as e:
-            logger.error(f"出现了不良内容提示后提交继续画图失败 {e}")
-            return
+        custom_id = msg.origin_data["components"][0]["components"][0]["custom_id"]
         payload = {
             "type": 3,
             "nonce": f"{random.randint(1134276220909715456, 1144276220909715456)}",
@@ -41,10 +37,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
                 "custom_id": custom_id
             }
         }
-        try:
-            super()._post_interaction(payload)
-        except Exception as e:
-            logger.error(f"出现了不良内容提示后提交继续画图失败 {e}")
+        super()._post_interaction(payload)
 
     def __post_draw(self, task: Task):
         payload = {

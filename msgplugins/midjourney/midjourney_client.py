@@ -135,8 +135,10 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             return False
         prompt = task.prompt
         # 去掉链接
+        prompt = prompt.replace("\n", " ")
         prompt = re.sub(r"http\S+", "", prompt).replace(" ", "")
-        msg_content = re.sub(r"http\S+", "", msg.content).replace(" ", "")
+        msg_content = msg.content.replace("\n", " ")
+        msg_content = re.sub(r"http\S+", "", msg_content).replace(" ", "")
 
         if prompt not in msg_content:
             return False
@@ -164,16 +166,23 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             # 有错误信息
             else:
                 error_msg = reply_msg.content
-                reply_msg.read = True
                 if "Action needed to continue" in error_msg:
                     # 需要自动点击下一步按钮
-                    self._action_continue(reply_msg)
-                    continue
-                # 错误信息翻译成中文
-                try:
-                    error_msg = trans(error_msg, from_lang="en", to_lang="zh")
-                except Exception as e:
-                    logger.error("翻译MJ错误信息失败" + str(e))
+                    try:
+                        self._action_continue(reply_msg)
+                        continue
+                    except Exception as e:
+                        error_msg = f"出现了不良内容提示后提交继续画图失败 {e}"
+                        logger.error(error_msg)
+                else:
+                    if "Job queued" in error_msg:
+                        continue
+                    # 错误信息翻译成中文
+                    reply_msg.read = True
+                    try:
+                        error_msg = trans(error_msg, from_lang="en", to_lang="zh")
+                    except Exception as e:
+                        logger.error("翻译MJ错误信息失败" + str(e))
                 callback_param = TaskCallbackResponse(task=task, error=error_msg, image_path=None, reply_msg=reply_msg)
 
             with self._lock:
