@@ -205,7 +205,7 @@ class MiraiQQClient(QQClientFlask):
 
     def get_msg(self):
         data = request.json
-        logger.debug(f"收到mirai消息：{data}")
+        # logger.debug(f"收到mirai消息：{data}")
         message_type = data.get("type")
         is_at_me = False
         is_at_other = False
