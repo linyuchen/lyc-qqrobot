@@ -26,6 +26,8 @@ config_data = {
     "MJ_DISCORD_CHANNEL_ID": "",
     "MJ_DISCORD_GUILD_ID": "",
     "MJ_DISCORD_CHANNEL_URL": "",
+    "BAIDU_TRANSLATE_APPID": "",
+    "BAIDU_TRANSLATE_SECRETKEY": "",
     "TUSI_TOKENS": [
 
     ],

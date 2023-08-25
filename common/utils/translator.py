@@ -4,6 +4,8 @@ import re
 
 import requests
 
+import config
+
 
 def sign(appid: str, q: str, salt: str, app_key):
     sign_str = appid + q + salt + app_key
@@ -21,8 +23,8 @@ def trans(text: str, from_lang="zh", to_lang: str = "en"):
     # 百度翻译api
     # http://api.fanyi.baidu.com/api/trans/product/apidoc
     url = "http://api.fanyi.baidu.com/api/trans/vip/translate"
-    app_id = "20191117000357769"
-    app_key = "wKoSEHQiHenBgjfxJP5g"
+    app_id = config.BAIDU_TRANSLATE_APPID
+    app_key = config.BAIDU_TRANSLATE_SECRETKEY
     res = requests.post(url, data={
         "q": text,
         "from": from_lang,
