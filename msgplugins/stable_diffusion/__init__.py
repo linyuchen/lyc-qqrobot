@@ -1,3 +1,4 @@
+import threading
 from functools import reduce
 
 import ifnude
@@ -47,20 +48,18 @@ def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
         msg.destroy()
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
-        img2img(msg, args, url[0])
+        threading.Thread(target=img2img, args=(msg, args, url[0])).start()
     else:
-        txt2img(msg, args)
+        threading.Thread(target=txt2img, args=(msg, args)).start()
 
 
 @on_command("sd",
             param_len=0,
-            auto_destroy=False,
             priority=2,
-            is_async=True,
             cmd_group_name="SD画图")
 def sd_img2img(msg: GroupMsg | FriendMsg, args: list[str]):
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
-        img2img(msg, [""], url[0])
+        threading.Thread(target=img2img, args=(msg, [""], url[0])).start()
     else:
         msg.reply("请附带图片或输入提示词")
