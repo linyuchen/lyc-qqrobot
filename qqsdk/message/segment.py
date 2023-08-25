@@ -1,5 +1,7 @@
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
+
+
 # from .friendmsg import FriendMsg
 # from .groupmsg import GroupMsg
 
@@ -33,6 +35,10 @@ class MessageSegment:
         return MessageSegment("ImagePath", str(path))
 
     @staticmethod
+    def image_b64(data: str):
+        return MessageSegment("ImageBase64", data)
+
+    @staticmethod
     def voice_path(path: str | Path):
         return MessageSegment("VoicePath", str(path))
 
@@ -62,6 +68,8 @@ class MessageSegment:
             data.update({"type": "Image", "url": content})
         elif msg_type == "ImagePath":
             data.update({"type": "Image", "path": content})
+        elif msg_type == "ImageBase64":
+            data.update({"type": "Image", "base64": content})
         elif msg_type == "VoicePath":
             data.update({"type": "Voice", "path": content})
         elif msg_type == "VoiceBase64":
@@ -93,7 +101,6 @@ class MessageSegment:
 
 
 if __name__ == '__main__':
-    
     msg = MessageSegment.text("123")
     print(msg.data)
     msg += MessageSegment.text("123")
@@ -101,4 +108,3 @@ if __name__ == '__main__':
     print(msg.data)
     msg = MessageSegment.at("123") + msg
     print(msg.data)
-    

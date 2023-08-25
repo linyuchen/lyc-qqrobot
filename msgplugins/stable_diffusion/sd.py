@@ -1,12 +1,14 @@
 import base64
 import io
 import tempfile
-import uuid
 from pathlib import Path
 
+import aiohttp
+import requests
 from PIL import Image
 
 import config
+from common.sdwebuiapi import WebUIApi, raw_b64_img
 from common.utils.translator import trans, is_chinese
 from .base import AIDrawBase
 
@@ -18,6 +20,15 @@ class SDDraw(AIDrawBase):
     def __init__(self):
         super().__init__()
         self.base_url = base_url
+        self.host = self.base_url.split(":")[1].split("/")[2]
+        self.port = self.base_url.split(":")[2].split("/")[0]
+        self.webui_api = WebUIApi(host=self.host, port=self.port)
+
+    def trans_prompt(self, txt):
+        txt = txt.lower().replace("nsfw", "")
+        if is_chinese(txt):
+            txt = trans(txt)
+        return txt
 
     def txt2img(self, txt: str, width: int = 1024, height: int = 1024) -> list[Path]:
         """
@@ -28,9 +39,7 @@ class SDDraw(AIDrawBase):
         :return: 图片路径列表
         """
 
-        txt = txt.lower().replace("nsfw", "")
-        if is_chinese(txt):
-            txt = trans(txt)
+        txt = self.trans_prompt(txt)
         # if "I'm sorry" in txt:
         #     txt = ""
         # 添加lora
@@ -53,6 +62,25 @@ class SDDraw(AIDrawBase):
             image.save(image_path)
             res_paths.append(Path(image_path))
         return res_paths
+
+    def img2img(self, img_url: str, prompt: str) -> str:
+        prompt = self.trans_prompt(prompt)
+        data = requests.get(img_url).content
+        fp = io.BytesIO(data)
+        image = Image.open(fp)
+        size = image.size
+        if size[0] > 768 or size[1] > 768:
+            size = (768, int(size[1] / size[0] * 768))
+        resp = self.webui_api.img2img([image],
+                                      prompt=self.base_prompt + prompt,
+                                      negative_prompt=self.negative_prompt,
+                                      width=size[0],
+                                      height=size[1],
+                                      )
+        image = resp.images[0]
+        return image
+        #
+        # return raw_b64_img(image)
 
     def __get_models(self):
         res = self._api_get("sd-models")
