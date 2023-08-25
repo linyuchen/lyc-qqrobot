@@ -52,6 +52,8 @@ class MiraiQQClient(QQClientFlask):
             if msg["type"] in ["Image"] and msg.get("path"):
                 with open(msg["path"], "rb") as f:
                     msg["data"] = base64.b64encode(f.read()).decode("utf8")
+            elif msg["type"] == "ImageBase64":
+                msg["data"] = msg["base64"]
             elif msg["type"] == "Plain":
                 msg["data"] = msg["text"]
             elif msg["type"] == "Image" and msg.get("url"):
