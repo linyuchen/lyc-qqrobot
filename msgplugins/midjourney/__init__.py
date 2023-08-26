@@ -1,6 +1,8 @@
 import asyncio
+import re
 import threading
 import time
+from collections import OrderedDict
 
 import config
 from common.logger import logger
@@ -25,14 +27,15 @@ class LastDrawRes:
         self.already_upscale_index = []
 
 
-last_task_res = {}  # key: userid, value: TaskCallbackResponse
+last_task_res = {}  # key: userid, value: LastDrawRes
+msg_task_res = OrderedDict()  # key: img_url, value: LastDrawRes
 
 
 def get_user_id(msg: GroupMsg | FriendMsg):
     if isinstance(msg, GroupMsg):
-        user_id = f"{msg.group.qq}-{msg.group_member.qq}"
+        user_id = f"g{msg.group_member.qq}"
     else:
-        user_id = msg.friend.qq
+        user_id = f"q{msg.friend.qq}"
     return user_id
 
 
@@ -44,13 +47,19 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         if res.error:
             msg.reply(res.error)
         elif res.image_path:
+            img_url = res.image_urls[0]
+            img_url = asyncio.run(postimg_cc(img_url))
+            reply_msg = MessageSegment.image_path(res.image_path[0])
+            reply_msg += MessageSegment.text(f"提示词:{res.task.prompt}\n\n原图(复制到浏览器打开):{img_url}\n\n")
             if res.task.task_type == TaskType.DRAW:
-                last_task_res[get_user_id(msg)] = LastDrawRes(res)
-            msg.reply(
-                MessageSegment.image_path(res.image_path[0]) +
-                MessageSegment.text(f"提示词:{res.task.prompt}\n\n原图(需魔法):{res.image_urls[0]}\n"
-                                    f"回复u+数字取图,如u1\n上面两张为1、2，下面为3、4")
-            )
+                last_draw_res = LastDrawRes(res)
+                last_task_res[get_user_id(msg)] = last_draw_res
+                msg_task_res[img_url] = last_draw_res
+                if len(msg_task_res) > 100:
+                    msg_task_res.pop(list(msg_task_res.keys())[0])
+                reply_msg += MessageSegment.text("回复u+数字取图,如u1\n上面两张为1、2，下面为3、4")
+
+            msg.reply(reply_msg)
             res.image_path[0].unlink(missing_ok=True)
 
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
@@ -69,16 +78,17 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     async def post_img():
         async def task(__url):
             try:
-                logger.info(f"上传图片{__url}到图床")
+                logger.debug(f"上传图片{__url}到图床")
                 start_time = time.time()
-                res_url = await postimg_cc(__url)
+                res_url = await postimg_cc(__url, resp_short=False)
                 end_time = time.time()
                 used_time = end_time - start_time
-                logger.info(f"上传图片{__url}到图床成功,耗时{int(used_time)}秒")
+                logger.debug(f"上传图片{__url}到图床成功,耗时{int(used_time)}秒")
             except Exception as e:
                 logger.error(f"上传图片到图床失败:{e}")
                 return
             img_post_urls.append(res_url)
+
         tasks = []
         for url in img_urls:
             tasks.append(asyncio.create_task(task(url)))
@@ -89,12 +99,21 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         asyncio.set_event_loop(loop)
         loop.run_until_complete(post_img())
         mj_client.draw(msg_param[0], callback, img_post_urls)
+
     threading.Thread(target=reply_thread).start()
 
 
 @on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="", cmd_group_name=CMD_GROUP_NAME)
 def mj_upscale(msg: GroupMsg | FriendMsg, msg_param: list[str]):
     last_res: LastDrawRes = last_task_res.get(get_user_id(msg))
+    if msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls():
+        img_url = re.findall(r"(http\S+)", msg.quote_msg.msg)
+        if img_url:
+            img_url = img_url[0]
+            _ = msg_task_res.get(img_url)
+            if _:
+                last_res = _
+
     if not msg_param[0].isnumeric():
         return
     upscale_index = int(msg_param[0])
@@ -102,7 +121,7 @@ def mj_upscale(msg: GroupMsg | FriendMsg, msg_param: list[str]):
         msg.reply("你还没有画图哦")
         return
     if upscale_index in last_res.already_upscale_index:
-        msg.reply(f"你已经取过图{upscale_index}啦")
+        msg.reply(f"已经取过图{upscale_index}啦")
         return
     if upscale_index < 1 or upscale_index > 4:
         msg.reply("取图序号必须在1-4之间")

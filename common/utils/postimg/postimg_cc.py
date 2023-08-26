@@ -13,16 +13,17 @@ class PostImagCC:
     def __init__(self):
         pass
 
-    async def post(self, url: str):
+    async def post(self, url: str, resp_short: bool = True):
         """
         通过url发送图片
         :param url: 图片的url
+        :param resp_short: 是否返回短链接，短链接无法直接用于MJ
         :return:
         """
         async with aiohttp.ClientSession() as session:
             async with session.get("https://postimages.org/web") as resp:
                 html = await resp.text()
-        # open("test.html", "w", encoding="utf-8").write(html)
+            # open("test.html", "w", encoding="utf-8").write(html)
             token = re.findall(r"'token':'(\w+)'", html)
             if not token:
                 raise Exception("获取token失败")
@@ -53,10 +54,13 @@ class PostImagCC:
             if res["status"] != "OK":
                 raise Exception("上传失败")
             res_url = res["url"]
-            direct_url = await self.get_direct_url(res_url)
+            if resp_short:
+                return res_url
+            direct_url = await self.__get_direct_url(res_url)
             return direct_url
 
-    async def get_direct_url(self, url):
+    @staticmethod
+    async def __get_direct_url(url):
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 html = await resp.text()
