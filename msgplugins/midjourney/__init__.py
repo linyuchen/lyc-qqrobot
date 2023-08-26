@@ -33,7 +33,7 @@ msg_task_res = OrderedDict()  # key: img_url, value: LastDrawRes
 
 def get_user_id(msg: GroupMsg | FriendMsg):
     if isinstance(msg, GroupMsg):
-        user_id = f"g{msg.group_member.qq}"
+        user_id = f"g{msg.group.qq}"
     else:
         user_id = f"q{msg.friend.qq}"
     return user_id
