@@ -37,14 +37,10 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 @on_command("sd",
             param_len=1,
-            auto_destroy=False,
-            priority=2,
-            is_async=True,
+            priority=3,
             cmd_group_name="SD画图")
 def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
     # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
-    if msg.msg.strip().startswith("sd"):
-        msg.destroy()
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
         threading.Thread(target=img2img, args=(msg, args, url[0])).start()
