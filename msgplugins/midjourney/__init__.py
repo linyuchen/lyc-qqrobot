@@ -98,9 +98,10 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(post_img())
-        prompt = msg_param[0]
-        if not prompt and img_post_urls:
+        if not msg_param and img_post_urls:
             prompt = "8k "
+        else:
+            prompt = msg_param[0]
         mj_client.draw(prompt, callback, img_post_urls)
 
     threading.Thread(target=reply_thread).start()
