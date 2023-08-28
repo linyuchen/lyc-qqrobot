@@ -20,7 +20,7 @@ config_data = {
     "SEND2TIM": True,
     "SEND2TIM_HTTP_API": "http://localhost:8088/",
     "SD_HTTP_API": "http://192.168.1.4:7860",
-    "VITS_HTTP_API": "http://192.168.1.4:7862",
+    "VITS_GRADIO_SPACE": "zomehwh/vits-uma-genshin-honkai",
     "TTS_ENABLED": False,
     "MJ_DISCORD_TOKEN": "",
     "MJ_DISCORD_CHANNEL_ID": "",

@@ -20,7 +20,7 @@ class CMD(object):
         int_param_index:[int, ...]，第几个参数是数字, 如果不符合，不会调用handle_func
         handle_func: 处理命令的函数,
             如果有参数：handle_func(*参数)
-        param_len: 参数个数
+        param_len: 参数个数, -1表示不限制
         """
 
         self.cmd_name = cmd_name
@@ -31,54 +31,44 @@ class CMD(object):
         self.params = []
         self.param_length = param_len
 
-        self.original_cmd = ""
-        self.original_param = ""
+        self.input_text = ""
+        self.input_param_text = ""
         self.ignores = ignores
 
-    def az(self, original_cmd):
+    def az(self, input_text):
         """
         解析命令
         成功返回True，反之False
         """
 
-        self.original_cmd = original_cmd
-        original_cmd = original_cmd.strip()
+        self.input_text = input_text
+        input_text = input_text.strip()
 
         for i in self.ignores:
-            if original_cmd.startswith(i):
+            if input_text.startswith(i):
                 return False
         cmd_name = ""
         cmds = list(self.alias) + [self.cmd_name]
         cmds.sort(key=len)
+        # 检查输入是不是以命令开头
         for i in cmds:
-            if original_cmd.startswith(i):
+            if input_text.startswith(i):
                 cmd_name = i
         if not cmd_name:
             return False
 
-        if self.param_length:  # 需要参数，进行参数分割
-            cmd_name_length = len(cmd_name)
-            if len(original_cmd) <= cmd_name_length:  # 如果没有参数
+        # 切割参数
+        params_str = input_text[len(cmd_name):].strip()
+        self.input_param_text = params_str
+        if self.param_length > 0:
+            params = params_str.split(self.param_sep or None, maxsplit=self.param_length - 1)
+            if len(params) < self.param_length:
                 return False
-
-            if self.param_sep:
-                self.params = original_cmd.split(self.param_sep, maxsplit=self.param_length)
-
-            if self.params:
-                cmd_name = self.params[0]
-                self.params.pop(0)
-                if not self.params:
-                    return False
-                self.original_param = self.param_sep.join(self.params)
-
-            if not self.param_sep:  # 无分隔符
-                self.params = [original_cmd[cmd_name_length:].strip()]
-                # cmd_name = original_cmd[:cmd_name_length]
-                self.original_param = self.params[0]
+            self.params = params[:self.param_length]
         else:
-            cmd_name = original_cmd
+            self.params = params_str.split(self.param_sep or None)
 
-        return cmd_name in self.alias or cmd_name == self.cmd_name
+        return self.params
 
     def handle(self, cmd_content):
         """
@@ -109,16 +99,13 @@ class CMD(object):
         :return: 参数列表
         """
 
-        return self.params
+        return list(filter(bool, self.params))
 
     def get_original_param(self):
         """
         :return: 除了命令部分剩下的参数字符串
         """
-        return self.original_param
-
-    def get_original_param_list(self):
-        return self.original_param.split(self.param_sep or None, maxsplit=self.param_length - 1)
+        return self.input_param_text
 
 
 def on_command(cmd_name,
@@ -178,9 +165,9 @@ def on_command(cmd_name,
                 if ignore_at_other and isinstance(msg, GroupMsg) and msg.is_at_other:
                     return
                 if is_async:
-                    threading.Thread(target=func, args=(msg, cmd.get_original_param_list())).start()
+                    threading.Thread(target=func, args=(msg, cmd.get_param_list())).start()
                 else:
-                    func(msg, cmd.get_original_param_list())
+                    func(msg, cmd.get_param_list())
 
         _class = type(func.__name__, (MsgHandler,), {
             'desc': desc,

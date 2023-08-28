@@ -3,6 +3,7 @@ import threading
 import time
 
 import config
+from common.logger import logger
 from msgplugins.msgcmd.cmdaz import CMD, on_command
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
@@ -34,14 +35,14 @@ def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
 def send_voice(msg: GroupMsg | FriendMsg, text):
     if not config.TTS_ENABLED:
         return
-    from ..tts.vits import tts
-    text = text.replace("喵", "")
-    if len(text) <= 60:
+    from ..tts.genshinvoice_top import tts
+    # text = text.replace("喵", "")
+    if len(text) <= 40:
         try:
             base64_data = tts(text)
             msg.reply(MessageSegment.voice_base64(base64_data))
         except Exception as e:
-            pass
+            logger.error(e)
 
 
 class ChatGPT(MsgHandler):
@@ -99,7 +100,7 @@ class ChatGPT(MsgHandler):
 
                 # use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
                 def reply():
-                    _chat_text = cmd.original_cmd or msg.msg
+                    _chat_text = cmd.input_text or msg.msg
                     if msg.quote_msg:
                         _chat_text = msg.quote_msg.msg + '\n' + _chat_text
                     _res = chat(context_id, _chat_text)

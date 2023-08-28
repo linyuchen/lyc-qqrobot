@@ -6,5 +6,6 @@ from qqsdk.message.friendmsg import FriendMsg
 from qqsdk.message.groupmsg import GroupMsg
 from qqsdk.message.msghandler import MsgHandler
 from qqsdk.message.types import MessageTypes
+from qqsdk.message.segment import MessageSegment
 
 GeneralMsg = Type[GroupMsg | FriendMsg]

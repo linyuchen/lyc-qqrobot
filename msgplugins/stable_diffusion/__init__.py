@@ -35,8 +35,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
     msg.reply(MessageSegment.image_b64(base64_data))
 
 
-@on_command("画图",
-            alias=("sd", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"),
+@on_command("sd",
             param_len=1,
             auto_destroy=False,
             priority=2,
