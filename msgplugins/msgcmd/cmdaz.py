@@ -65,11 +65,12 @@ class CMD(object):
             if len(params) < self.param_length:
                 return False
             self.params = params[:self.param_length]
-        elif self.param_length == 0:
-            return not bool(self.params)
+
         else:
             self.params = params_str.split(self.param_sep or None)
 
+        if self.param_length == 0:
+            return self.params == [""]
         return self.params
 
     def handle(self, cmd_content):
