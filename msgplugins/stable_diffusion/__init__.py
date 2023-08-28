@@ -40,6 +40,9 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
             priority=3,
             cmd_group_name="SD画图")
 def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
+    if isinstance(msg, GroupMsg):
+        if not msg.is_at_me:
+            return
     # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
@@ -57,4 +60,7 @@ def sd_img2img(msg: GroupMsg | FriendMsg, args: list[str]):
     if url:
         threading.Thread(target=img2img, args=(msg, [""], url[0])).start()
     else:
+        if isinstance(msg, GroupMsg):
+            if not msg.is_at_me:
+                return
         msg.reply("请附带图片或输入提示词")

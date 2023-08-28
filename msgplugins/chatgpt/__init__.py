@@ -90,8 +90,7 @@ class ChatGPT(MsgHandler):
                 msg.destroy()
                 return
         if isinstance(msg, GroupMsg):
-            robot_name = msg.group.get_member(str(config.QQ)).get_name()
-            cmd = CMD("#", alias=[f"@{robot_name}"], sep="", param_len=1,
+            cmd = CMD("#", sep="", param_len=1,
                       ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"])
             if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
                 if time.time() - self.records.setdefault(msg.group_member.qq, 0) < 5:

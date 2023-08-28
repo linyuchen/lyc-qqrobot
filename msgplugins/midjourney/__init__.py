@@ -43,6 +43,10 @@ def get_user_id(msg: GroupMsg | FriendMsg):
             desc="发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
+    if isinstance(msg, GroupMsg):
+        if not msg.is_at_me:
+            return
+
     def callback(res: TaskCallbackResponse):
         if res.error:
             msg.reply(res.error)

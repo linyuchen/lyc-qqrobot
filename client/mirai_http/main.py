@@ -237,6 +237,10 @@ class MiraiQQClient(QQClientFlask):
                     group.members.append(group_member)
             is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == str(
                 config.ADMIN_QQ)
+            robot_name = group.get_member(str(config.QQ)).get_name()
+            if msg.strip().startswith(f"@{robot_name}"):
+                msg_chain.is_at_me = True
+                msg = msg.replace(f"@{robot_name}", "", 1)
             msg = GroupMsg(group=group,
                            msg=msg,
                            msg_chain=msg_chain,
