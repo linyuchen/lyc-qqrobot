@@ -40,7 +40,7 @@ def get_user_id(msg: GroupMsg | FriendMsg):
 
 
 @on_command("画图", alias=("mj", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1,
-            desc="发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
+            desc="@机器人后发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     if isinstance(msg, GroupMsg):
@@ -62,8 +62,9 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
                 if len(msg_task_res) > 100:
                     msg_task_res.pop(list(msg_task_res.keys())[0])
                 reply_msg += MessageSegment.text("回复u+数字取图,如u1\n上面两张为1、2，下面为3、4")
-
-            msg.reply(reply_msg)
+                msg.reply(reply_msg)
+            elif res.task.task_type == TaskType.UPSCALE:
+                msg.reply(reply_msg, at=False)
             res.image_path[0].unlink(missing_ok=True)
 
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
