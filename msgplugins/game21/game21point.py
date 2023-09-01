@@ -253,4 +253,4 @@ class Game(game21pointbase.Game):
 
     def start_timer(self):
 
-        threading.Thread(target=self.__timer).start()
+        threading.Thread(target=self.__timer, daemon=True).start()

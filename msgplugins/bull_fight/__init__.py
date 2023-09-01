@@ -55,4 +55,4 @@ class BullFightPlugin(MsgHandler):
                 if result:
                     msg.reply(result)
 
-            threading.Thread(target=func).start()
+            threading.Thread(target=func, daemon=True).start()

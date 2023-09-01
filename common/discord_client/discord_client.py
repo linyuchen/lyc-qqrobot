@@ -62,7 +62,7 @@ class DiscordWebsocketClientBase:
         self.session.proxies.update({'http': self.proxy, 'https': self.proxy})
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        thread = threading.Thread(target=loop.run_until_complete, args=(self.start(),))
+        thread = threading.Thread(target=loop.run_until_complete, args=(self.start(),), daemon=True)
         thread.start()
 
     async def start(self):

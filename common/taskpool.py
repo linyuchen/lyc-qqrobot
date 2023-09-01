@@ -26,11 +26,12 @@ class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
     def __init__(self):
         super(threading.Thread, self).__init__()
         super().__init__()
+        self.daemon = True
         self._lock = threading.Lock()
         self.tasks: queue.Queue[TaskT] = queue.Queue()
         self.handling_tasks: list[TaskT] = []
-        threading.Thread(target=self.__put_task_thread).start()
-        threading.Thread(target=self.__check_task_finished_thread).start()
+        threading.Thread(target=self.__put_task_thread, daemon=True).start()
+        threading.Thread(target=self.__check_task_finished_thread, daemon=True).start()
     
     def _join_task(self, task: TaskT):
         task.create_time = time.time()
@@ -75,7 +76,7 @@ class TaskPool(threading.Thread, Generic[TaskT], metaclass=abc.ABCMeta):
                     continue
                 if task.finished:
                     self.handling_tasks.remove(task)
-                    threading.Thread(target=self._on_task_finished, args=(task,)).start()
+                    threading.Thread(target=self._on_task_finished, args=(task,), daemon=True).start()
             self._lock.release()
     
     @abstractmethod

@@ -21,7 +21,7 @@ class EventListener(Thread):
     def __init__(self):
         self.msgs = Queue()
         self.thread_lock = threading.Lock()
-        super(EventListener, self).__init__()
+        super(EventListener, self).__init__(daemon=True)
 
     def add_msg(self, msg: GeneralMsg):
         msg.qq_client = self
@@ -68,7 +68,7 @@ class EventListener(Thread):
                 # logger.debug(f"消息处理器 {handler.name} 符合消息类型，开始处理消息 {msg.msg}")
                 try:
                     if handler.is_async:
-                        threading.Thread(target=lambda: handler.handle(msg)).start()
+                        threading.Thread(target=lambda: handler.handle(msg), daemon=True).start()
                     else:
                         handler.handle(msg)
                 except Exception as e:

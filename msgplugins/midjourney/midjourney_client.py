@@ -63,7 +63,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
         self._putted_tasks: queue.Queue[Task] = queue.Queue()
         self.tasks: list[Task] = []
         self._lock = threading.Lock()
-        threading.Thread(target=self.__listen_cmd).start()
+        threading.Thread(target=self.__listen_cmd, daemon=True).start()
 
     @abstractmethod
     def _handle_new_task(self, task: Task):

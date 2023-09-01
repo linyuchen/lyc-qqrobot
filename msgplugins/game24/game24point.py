@@ -39,7 +39,7 @@ class Game(game24point_base.Game24PointBase):
             return "24点游戏已经开始了,请勿重复！\n"
         else:
             self.running = True
-            threading.Thread(target=self.timer).start()
+            threading.Thread(target=self.timer, daemon=True).start()
 
         self.send_func = send_func
         super(Game, self).start_game()

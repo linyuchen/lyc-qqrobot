@@ -129,7 +129,7 @@ class BullFight(bullfight_base.BullFightBase):
         with self.mutex:
             if not self.running:
                 self.running = True
-            threading.Thread(target=self.timer).start()
+            threading.Thread(target=self.timer, daemon=True).start()
         self.current_second = 0
         # 庄家参与
         if gold == 0:

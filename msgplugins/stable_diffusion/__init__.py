@@ -46,9 +46,9 @@ def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
     # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
-        threading.Thread(target=img2img, args=(msg, args, url[0])).start()
+        threading.Thread(target=img2img, args=(msg, args, url[0]), daemon=True).start()
     else:
-        threading.Thread(target=txt2img, args=(msg, args)).start()
+        threading.Thread(target=txt2img, args=(msg, args), daemon=True).start()
 
 
 @on_command("sd",
@@ -58,7 +58,7 @@ def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
 def sd_img2img(msg: GroupMsg | FriendMsg, args: list[str]):
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
     if url:
-        threading.Thread(target=img2img, args=(msg, [""], url[0])).start()
+        threading.Thread(target=img2img, args=(msg, [""], url[0]), daemon=True).start()
     else:
         if isinstance(msg, GroupMsg):
             if not msg.is_at_me:

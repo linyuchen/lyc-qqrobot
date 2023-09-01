@@ -109,7 +109,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             prompt = msg_param[0]
         mj_client.draw(prompt, callback, img_post_urls)
 
-    threading.Thread(target=reply_thread).start()
+    threading.Thread(target=reply_thread, daemon=True).start()
 
 
 @on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="", cmd_group_name=CMD_GROUP_NAME)

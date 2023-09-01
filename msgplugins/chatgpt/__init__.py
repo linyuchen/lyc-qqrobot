@@ -18,7 +18,7 @@ def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
         res = summary_web(f"https://zh.wikipedia.org/wiki/{params[0]}")
         msg.reply(res)
 
-    threading.Thread(target=reply).start()
+    threading.Thread(target=reply, daemon=True).start()
 
 
 @on_command("萌娘百科", param_len=1, desc="发送 萌娘百科 + 词语 进行萌娘百科搜索,如:萌娘百科 猫娘")
@@ -29,7 +29,7 @@ def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
         res = summary_web(f"https://zh.moegirl.org.cn/{params[0]}")
         msg.reply(res)
 
-    threading.Thread(target=reply).start()
+    threading.Thread(target=reply, daemon=True).start()
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):
@@ -106,7 +106,7 @@ class ChatGPT(MsgHandler):
                     msg.reply(_res)
                     send_voice(msg, _res)
 
-                threading.Thread(target=reply).start()
+                threading.Thread(target=reply, daemon=True).start()
         elif isinstance(msg, FriendMsg):
             if time.time() - self.records.setdefault(msg.friend.qq, 0) < 5:
                 return

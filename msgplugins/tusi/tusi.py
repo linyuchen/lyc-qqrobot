@@ -84,7 +84,7 @@ class TusiDraw(TaskPool[TusiTask]):
                 logger.error(f"吐司初始化失败，正在重试：{e}")
                 time.sleep(0.5)
                 continue
-        threading.Thread(target=self.__get_balance_thread).start()
+        threading.Thread(target=self.__get_balance_thread, daemon=True).start()
         self.start()
 
     def _api_get(self, url_path: str, params: dict = None):

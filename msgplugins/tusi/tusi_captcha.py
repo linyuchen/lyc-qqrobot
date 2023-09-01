@@ -58,4 +58,4 @@ def start(token):
 
 
 for token in TUSI_TOKENS:
-    threading.Thread(target=lambda: start(token)).start()
+    threading.Thread(target=lambda: start(token), daemon=True).start()
