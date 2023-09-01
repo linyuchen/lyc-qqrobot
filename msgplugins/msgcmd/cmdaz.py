@@ -58,7 +58,11 @@ class CMD(object):
             return False
 
         # 切割参数
-        params_str = input_text[len(cmd_name):].strip()
+        params_str = input_text[len(cmd_name):]
+        if self.param_sep and self.param_length != 0:  # 检查是参数是否是对应的分隔符开头
+            if not params_str.startswith(self.param_sep):
+                return False
+        params_str = params_str.strip()
         self.input_param_text = params_str
         if self.param_length > 0:
             params = params_str.split(self.param_sep or None, maxsplit=self.param_length - 1)
@@ -168,7 +172,7 @@ def on_command(cmd_name,
                 if ignore_at_other and isinstance(msg, GroupMsg) and msg.is_at_other:
                     return
                 if is_async:
-                    threading.Thread(target=func, args=(msg, cmd.get_param_list())).start()
+                    threading.Thread(target=func, args=(msg, cmd.get_param_list()), daemon=True).start()
                 else:
                     func(msg, cmd.get_param_list())
 

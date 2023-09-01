@@ -17,11 +17,13 @@ class TestCMDCase(unittest.TestCase):
         test_cmd = CMD("mj", param_len=1)
         result = test_cmd.az("mj <lora:op>,keqing --ar 16:9")
         self.assertEqual(result, ["<lora:op>,keqing --ar 16:9"])
+        result = test_cmd.az("mja")
+        self.assertFalse(result)
 
     def test_az_args(self):
         test_cmd = CMD("mj", param_len=-1)
         result = test_cmd.az("mj")
-        self.assertEqual(result, [""])
+        self.assertEqual(result, False)
         result = test_cmd.az("mj a")
         self.assertEqual(result, ["a"])
         result = test_cmd.az("mj a \nb")
