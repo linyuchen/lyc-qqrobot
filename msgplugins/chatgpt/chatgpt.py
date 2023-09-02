@@ -1,15 +1,19 @@
+import json
 import traceback
+from pathlib import Path
+from threading import Lock
 
 import requests
 
 from common.utils.htmlhelper import html2txt
 from config import CHATGPT
 from .base import ChatGPT
-from config import CHAT_GPT
 
 # openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
 # openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
 # openai.api_base = "https://api.chatanywhere.cn/v1"
+
+thread_lock = Lock()
 
 context = {}  # key: user_id, value: [ChatGPT instances]
 
@@ -23,6 +27,20 @@ cat_prompt_text = """遵循以下规则：
 10.每次回答都要加上“喵”或“喵~”。
 11.你的名字叫喵喵
     """
+
+save_path = Path(__file__).parent / "prompts.json"
+prompt_dict = {}  # context_id: prompt_str
+
+
+def __read():
+    try:
+        prompt_dict.update(json.load(open(save_path)))
+    except Exception as e:
+        print("read chatgpt prompts failed ", e)
+
+
+def __save():
+    json.dump(prompt_dict, open(save_path, "w"))
 
 
 def __get_chatgpt(context_id: str) -> list[ChatGPT]:
@@ -58,10 +76,13 @@ def set_prompt(context_id: str, prompt: str):
         gpt.set_prompt(prompt)
         gpt.clear_history()
 
+    with thread_lock:
+        prompt_dict[context_id] = prompt
+        __save()
+
 
 def clear_prompt(context_id: str):
-    for gpt in __get_chatgpt(context_id):
-        gpt.set_prompt(cat_prompt_text)
+    set_prompt(context_id, cat_prompt_text)
 
 
 def get_prompt(context_id: str) -> str:
@@ -91,3 +112,13 @@ def summary_web(link: str) -> str:
     text = html2txt(html).replace("\n", "")
     res = chat("", "#总结以下内容并翻译成中文：\n" + text)
     return res
+
+
+def __init():
+    __read()
+    for context_id, prompt in prompt_dict.items():
+        if prompt:
+            set_prompt(context_id, prompt)
+
+
+__init()

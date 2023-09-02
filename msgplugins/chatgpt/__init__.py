@@ -1,6 +1,7 @@
 import re
 import threading
 import time
+from pathlib import Path
 
 import config
 from common.logger import logger
@@ -57,6 +58,8 @@ class ChatGPT(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
     records = {}
     ignore_username = ["Q群管家"]
+
+
 
     def handle(self, msg: GroupMsg | FriendMsg):
         if isinstance(msg, GroupMsg) and msg.group_member.get_name() in self.ignore_username:
