@@ -21,6 +21,8 @@ class BiliCardPlugin(MsgHandler):
 
     def handle(self, msg: GroupMsg | FriendMsg):
         msg_text = msg.msg
+        # 是否是QQ卡片分享，由于卡片附带了预览效果，如果没有简介或者字幕总结，没必要用机器人再发送一次
+        is_from_card = "__from__card" in msg_text
         b32_url = bilicard.check_is_b23(msg_text)
         if b32_url:
             msg.pause()  # 因为b32链接有可能是不是视频链接，比如是专栏，用于被其他插件使用，所以这里先暂停
@@ -28,6 +30,7 @@ class BiliCardPlugin(MsgHandler):
 
         bvid = bilicard.get_bv_id(msg_text)
         avid = bilicard.get_av_id(msg_text)
+
         if bvid or avid:
             msg.destroy()
             msg.resume()
@@ -38,11 +41,16 @@ class BiliCardPlugin(MsgHandler):
             if bvid and self.check_in_cache(bvid):
                 return
             video_info = bilicard.get_video_info(bvid, avid)
-            bvid = video_info.get("bvid")
-            if self.check_in_cache(bvid):
+
+            bvid = video_info.get("bvid", "")
+            if self.check_in_cache(bvid + msg.group.qq if isinstance(msg, GroupMsg) else msg.friend.qq):
                 return
             img_path = bilicard.gen_image(video_info)
             summary = bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
+            # 没有简介内容或者简介等于标题的，且是卡片分享的，而且AI无法总结的就不需要发送了
+            if ((len(video_info["desc"]) < 4 or video_info["desc"] == video_info["title"])
+                    and is_from_card and not summary):
+                return
             summary = "AI总结：" + (summary if summary else "此视频不支持")
             url = f"https://bilibili.com/video/{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
             if img_path:

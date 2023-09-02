@@ -160,11 +160,18 @@ class MiraiQQClient(QQClientFlask):
                 case "App":
                     content = json.loads(c.get("content"))
                     qq_doc_url = content["meta"].get("detail_1", {}).get("qqdocurl", "")
+                    if "?" not in qq_doc_url:
+                        qq_doc_url += "?"
+                    qq_doc_url += "&__from__card"
                     msg_chain.append(MessageSegment.text(qq_doc_url))
                 case "Xml":
                     url = re.findall("url=\"(.*?)\"", c.get("xml"))
                     if url:
-                        msg_chain.append(MessageSegment.text(url[0]))
+                        url = url[0]
+                        if "?" not in url:
+                            url += "?"
+                        url += "&__from__card"
+                        msg_chain.append(MessageSegment.text(url))
                 case "Quote":
                     """
                     {'groupId': 149443938, 'id': 1953, 
