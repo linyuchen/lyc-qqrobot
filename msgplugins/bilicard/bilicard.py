@@ -85,6 +85,9 @@ def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
     return video_info
 
 
+# 获取评论，https://api.bilibili.com/x/v2/reply/wbi/main?oid=683107021&type=1&mode=3
+# todo: 获取指定评论，然后判断是否是up的评论，将此评论也放到ai总结里面去
+
 def gen_text(bv_id: str) -> str:
     video_info = get_video_info(bv_id)
     if not video_info:
