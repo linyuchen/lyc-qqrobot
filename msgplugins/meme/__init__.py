@@ -88,7 +88,7 @@ nudge_memes = (
     create_meme_func("douyin", texts=["{target_name}"], images_len=0),  # 让xx告诉你吧
     create_meme_func("fanatic", texts=["{target_name}"], images_len=0),  # 狂热粉
     create_meme_func("follow", texts=["{target_name}"]),  # 关注了你
-    create_meme_func("chanshenzi", texts=["你那叫喜欢吗？", "你那是馋她身子", "{target_name}下贱！"]),  # 馋身子
+    create_meme_func("chanshenzi", texts=["你那叫喜欢吗？", "你那是馋她身子", "{target_name}下贱！"], images_len=0),  # 馋身子
 )
 
 
