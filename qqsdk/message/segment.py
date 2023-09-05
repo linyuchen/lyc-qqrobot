@@ -31,8 +31,17 @@ class MessageSegment:
         return MessageSegment("ImageUrl", image_url)
 
     @staticmethod
-    def image_path(path: str | Path):
-        return MessageSegment("ImagePath", str(path))
+    def image_path(path: str | Path | list[Path]):
+        paths = []
+        if not isinstance(path, list):
+            paths = [path]
+        else:
+            paths = path
+        _msg = MessageSegment("ImagePath", str(paths[0]))
+        for path in paths[1:]:
+            _msg += MessageSegment("ImagePath", str(path))
+        return _msg
+
 
     @staticmethod
     def image_b64(data: str):

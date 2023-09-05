@@ -20,6 +20,18 @@ class GroupMsg(BaseMsg):
 
 
 @dataclass
+class GroupNudgeMsg(BaseMsg):
+    """
+    群戳一戳
+    """
+    action: str = ""
+    group: Group = None
+    from_member: GroupMember = None
+    target_member: GroupMember = None
+    msg_type = MessageTypes.GROUP_NUDGE
+
+
+@dataclass
 class GroupAdminChangeMsg(GroupMsg):
     """
     self.group : Group实例

@@ -12,7 +12,7 @@ from flask import request
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg
+from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
@@ -242,7 +242,7 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            is_from_admin = group_member.isAdmin or group_member.isCreator or str(group_member.qq) == str(
+            is_from_admin = group_member.is_admin or group_member.is_creator or str(group_member.qq) == str(
                 config.ADMIN_QQ)
             robot_name = group.get_member(str(config.QQ)).get_name()
             if msg.strip().startswith(f"@{robot_name}"):
@@ -259,6 +259,18 @@ class MiraiQQClient(QQClientFlask):
                            is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
                            )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
+            self.add_msg(msg)
+        elif message_type == "NudgeEvent":
+            group_qq = str(data["subject"]["id"])
+            group = self.get_group(group_qq)
+            from_member_qq = str(data.get("fromId"))
+            from_member = group.get_member(from_member_qq)
+            target_member_qq = str(data.get("target"))
+            target_member = group.get_member(target_member_qq)
+            msg = GroupNudgeMsg(action=data.get("action"),
+                                group=group,
+                                from_member=from_member, target_member=target_member)
+            msg.reply = lambda _msg, at=False: self.reply_group_msg(_msg, msg, at)
             self.add_msg(msg)
         return {}
 

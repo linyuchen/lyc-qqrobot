@@ -1,6 +1,8 @@
 # coding=UTF8
 from dataclasses import dataclass
 
+from qqsdk.entity.avatar import Avatar
+
 
 @dataclass
 class Friend(object):
@@ -23,6 +25,7 @@ class Friend(object):
     group_id: int = 0  # 所在分组id
     group_name: str = ""  # 所在分组名
     gender: int = 0  # 性别
+    __avatar: Avatar = None
 
     def get_name(self):
         """
@@ -30,3 +33,9 @@ class Friend(object):
         """
 
         return self.mark_name or self.nick
+
+    @property
+    def avatar(self):
+        if not self.__avatar:
+            self.__avatar = Avatar(self.qq)
+        return self.__avatar

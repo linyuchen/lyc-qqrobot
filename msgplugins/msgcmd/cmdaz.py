@@ -40,7 +40,8 @@ class CMD(object):
         解析命令
         成功返回True，反之False
         """
-
+        if not self.cmd_name:
+            return True
         self.input_text = input_text
         input_text = input_text.strip()
 
@@ -121,7 +122,7 @@ def on_command(cmd_name,
                param_len=0,
                alias: tuple[str, ...] = (),
                ignores: tuple[str] = (),
-               bind_msg_type: tuple[Type[GroupMsg | FriendMsg], ...] = (GroupMsg, FriendMsg),
+               bind_msg_type: tuple[Type[GroupMsg | FriendMsg | BaseMsg], ...] = (GroupMsg, FriendMsg),
                desc: str = "",
                at_sep: str = "",
                auto_destroy: bool = True,

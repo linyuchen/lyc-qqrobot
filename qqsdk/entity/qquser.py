@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import List
 
+
 from qqsdk.entity.friend import Friend
 from qqsdk.entity.group import Group
 

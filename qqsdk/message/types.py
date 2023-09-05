@@ -18,3 +18,4 @@ class MessageTypes(StrEnum):
     GROUP_REQUEST_JOIN = "GroupRequestJoin"
     GROUP_NEW_MEMBER = "GroupNewMember"
     GROUP_JOINED = "GroupJoined"  # 我加入群成功
+    GROUP_NUDGE = "GroupNudge"  # 群戳一戳
