@@ -26,6 +26,21 @@ Python3.11
 
 `pip install -r requirements.txt`
 
+### 初始化
+
+初始化表情包库
+
+```bash
+meme download
+```
+
+初始化插件库
+
+```bash
+cd msgplugins/superplugin
+python manage.py migarte
+```
+
 # mirai配置
 
 ## 安装`mirai`
