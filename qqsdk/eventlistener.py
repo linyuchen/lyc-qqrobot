@@ -7,7 +7,7 @@ from queue import Queue
 from typing import List
 
 from common.logger import logger
-from qqsdk.message import GeneralMsg, GroupMsg
+from qqsdk.message import GeneralMsg, GroupMsg, GroupNudgeMsg
 from qqsdk.message.msghandler import MsgHandler
 
 Thread = threading.Thread
@@ -51,7 +51,7 @@ class EventListener(Thread):
             if not handler.check_enabled():
                 # logger.debug(f"消息处理器未启用 {handler.name}")
                 continue
-            if isinstance(msg, GroupMsg):
+            if hasattr(msg, "group"):
                 if not handler.check_enabled(msg.group.qq):
                     # logger.debug(f"消息处理器未在群{msg.group.name}启用 {handler.name}")
                     continue
