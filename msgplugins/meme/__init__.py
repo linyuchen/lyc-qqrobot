@@ -13,7 +13,7 @@ from qqsdk.message import GroupNudgeMsg, MessageSegment
 
 def create_meme_func(key: str, texts: list[str] = None,
                      args: dict[str, any] | Callable[[None], dict] = None,
-                     images_len=1):
+                     images_len=1, images_reversed=False):
     if not texts:
         texts = []
     if not args:
@@ -22,10 +22,11 @@ def create_meme_func(key: str, texts: list[str] = None,
         args = args()
 
     def meme(msg: GroupNudgeMsg) -> Path:
+        new_texts = texts[:]
         for index, text in enumerate(texts):
             new_text = text.replace("{from_name}", msg.from_member.get_name())
             new_text = new_text.replace("{target_name}", msg.target_member.get_name())
-            texts[index] = new_text
+            new_texts[index] = new_text
 
         _meme = get_meme(key)
         loop = asyncio.new_event_loop()
@@ -35,7 +36,9 @@ def create_meme_func(key: str, texts: list[str] = None,
                 images = [msg.target_member.avatar.path]
             case 2:
                 images = [msg.target_member.avatar.path, msg.from_member.avatar.path]
-        result = loop.run_until_complete(_meme(images=images, texts=texts, args=args))
+                if images_reversed:
+                    images = images[::-1]
+        result = loop.run_until_complete(_meme(images=images, texts=new_texts, args=args))
         content = result.getvalue()
         ext = filetype.guess_extension(content)
         file_path = tempfile.mktemp(suffix=f".{ext}")
@@ -147,7 +150,7 @@ nudge_memes = (
     create_meme_func("raise_sign", images_len=0, texts=["{target_name}带带我"]),
     create_meme_func("read_book", images_len=1),
     create_meme_func("repeat", images_len=2, texts=["来点涩图"]),
-    create_meme_func("rip", images_len=2),
+    create_meme_func("rip", images_len=2, images_reversed=True),
     create_meme_func("rip_angrily", images_len=1),
     create_meme_func("rise_dead", images_len=1),
     create_meme_func("roll", images_len=1),
@@ -192,6 +195,10 @@ nudge_memes = (
     create_meme_func("worship", images_len=1),
 )
 
+test_nudge_memes = (
+    create_meme_func("rip", images_len=2, images_reversed=True),
+)
+
 
 @on_command("",
             bind_msg_type=(GroupNudgeMsg,),
@@ -200,6 +207,7 @@ nudge_memes = (
             cmd_group_name="戳一戳表情")
 def meme_touch(msg: GroupNudgeMsg, args: list[str]):
     meme = random.choice(nudge_memes)
+    # meme = random.choice(test_nudge_memes)
     # paths = []
     # for meme in nudge_memes:
     #     file_path = meme(msg)
