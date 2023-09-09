@@ -108,7 +108,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             prompt = "8k "
         else:
             prompt = " ".join(msg_param)
-        if msg.msg.startswith("niji"):
+        if msg.msg.strip().startswith("niji"):
             prompt += " --niji 5"
             if "--style" not in prompt:
                 prompt += " --style original"
