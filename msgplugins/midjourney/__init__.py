@@ -39,7 +39,8 @@ def get_user_id(msg: GroupMsg | FriendMsg):
     return user_id
 
 
-@on_command("画图", alias=("mj", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"), param_len=1,
+@on_command("画图", alias=("mj", "niji", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"),
+            param_len=-1,
             desc="@机器人后发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
@@ -106,7 +107,13 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         if not msg_param and img_post_urls:
             prompt = "8k "
         else:
-            prompt = msg_param[0]
+            prompt = " ".join(msg_param)
+        if msg.msg.startswith("niji"):
+            prompt += " --niji 5"
+            if "--style" not in prompt:
+                prompt += " --style original"
+        if not prompt:
+            return msg.reply("请输入提示词或者附上图片")
         mj_client.draw(prompt, callback, img_post_urls)
 
     threading.Thread(target=reply_thread, daemon=True).start()

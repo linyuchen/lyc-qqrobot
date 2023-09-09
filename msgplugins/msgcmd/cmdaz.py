@@ -38,7 +38,8 @@ class CMD(object):
     def az(self, input_text):
         """
         解析命令
-        成功返回True，反之False
+        成功返回参数列表
+        失败返回False
         """
         if not self.cmd_name:
             return True
@@ -164,7 +165,7 @@ def on_command(cmd_name,
                       alias=list(alias),
                       ignores=list(ignores),
                       )
-            if cmd.az(msg.msg.strip()):
+            if not (cmd.az(msg.msg.strip()) is False):
                 if permission:
                     if not check_permission(msg, permission):
                         return msg.reply(f"您没有权限使用 {cmd_name} 命令")

@@ -8,7 +8,7 @@ from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .tusi import TusiMultipleCountPool
 
-tusi = TusiMultipleCountPool()
+# tusi = TusiMultipleCountPool()
 
 
 @on_command("画图",
