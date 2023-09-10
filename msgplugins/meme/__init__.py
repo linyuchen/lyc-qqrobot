@@ -202,6 +202,7 @@ test_nudge_memes = (
 
 @on_command("",
             bind_msg_type=(GroupNudgeMsg,),
+            desc="手机双击群员头像随机发送表情包",
             auto_destroy=False,
             is_async=True,
             cmd_group_name="戳一戳表情")
