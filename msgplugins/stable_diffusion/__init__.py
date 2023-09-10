@@ -14,7 +14,7 @@ def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
     try:
         img_paths = sd.txt2img(args[0], width=768, height=768)
     except Exception as e:
-        return
+        return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧, {e}")
     for img_path in img_paths[:]:
         if nsfw_detect(img_path):
             img_path.unlink()
@@ -30,7 +30,11 @@ def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
 
 
 def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
-    base64_data = raw_b64_img(sd.img2img(url, args[0]))
+    try:
+        base64_data = raw_b64_img(sd.img2img(url, args[0]))
+    except Exception as e:
+        return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧, {e}")
+
     msg.reply(MessageSegment.image_b64(base64_data))
 
 
@@ -50,5 +54,3 @@ def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
         threading.Thread(target=img2img, args=(msg, args, url[0]), daemon=True).start()
     else:
         threading.Thread(target=txt2img, args=(msg, args), daemon=True).start()
-
-
