@@ -20,7 +20,7 @@ class RunStatePlugin(MsgHandler):
     命令：运行时间
     """
     name = "运行状态"
-    desc = "发送 运行状态 查看机器人状态"
+    desc = "运行状态"
     bind_msg_types = (FriendMsg, GroupMsg)
 
     def __init__(self, **kwargs):

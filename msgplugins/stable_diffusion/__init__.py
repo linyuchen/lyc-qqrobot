@@ -39,7 +39,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 
 @on_command("sd",
-            desc="sd: sd画图，支持图生图，示例：sd 猫耳女孩",
+            desc="sd画图，支持图生图，示例：sd 猫耳女孩",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")

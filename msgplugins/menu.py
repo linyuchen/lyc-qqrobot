@@ -34,5 +34,5 @@ class MenuPlugin(MsgHandler):
             if msg.quote_msg and not msg.msg.strip():
                 return
             msg.destroy()
-            res = "命令列表：\n\n" + "\n\n".join(self.collect_cmd(msg))
+            res = "命令列表(@机器人后发送命令即可触发)：\n\n" + "\n\n".join(self.collect_cmd(msg))
             msg.reply(res)

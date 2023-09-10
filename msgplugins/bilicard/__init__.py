@@ -8,7 +8,6 @@ from . import bilicard
 
 class BiliCardPlugin(MsgHandler):
     name = "B站"
-    desc = "发送 B站视频链接 自动解析视频信息并进行AI总结"
     bind_msg_types = (GroupMsg, FriendMsg)
     is_async = True
     cached = {}

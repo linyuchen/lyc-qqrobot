@@ -11,7 +11,7 @@ from qqsdk.message.segment import MessageSegment
 from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
 
 
-@on_command("百科", param_len=1, desc="发送 百科 + 词语 进行百科搜索,如:百科 猫娘")
+@on_command("百科", param_len=1, desc="百科搜索,如:百科 猫娘")
 def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("正在为您搜索百科...")
 
@@ -22,7 +22,7 @@ def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     threading.Thread(target=reply, daemon=True).start()
 
 
-@on_command("萌娘百科", param_len=1, desc="发送 萌娘百科 + 词语 进行萌娘百科搜索,如:萌娘百科 猫娘")
+@on_command("萌娘百科", param_len=1, desc="萌娘百科搜索,如:萌娘百科 猫娘")
 def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("正在为您搜索萌娘百科...")
 
@@ -48,11 +48,11 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
 
 class ChatGPT(MsgHandler):
     name = "ChatGPT"
-    desc = "发送 #+消息 或者 @机器人+消息 进行AI对话\n\n" \
-           "@机器人发送 网址(如:http://qq.com) 进行AI总结网页\n\n" \
-           "发送 设置人格 + 空格 + 人格提示语 进行AI人格设置\n" \
-           "发送 清除人格 进行AI人格清除\n" \
-           "发送 查看人格 进行AI人格查看\n"
+    desc = "#+消息 或者 @机器人+消息 进行AI对话\n\n" \
+           "@机器人发送 http开头的网址进行AI总结网页\n\n" \
+           "设置人格，如：设置人格 你现在是一只狗娘\n" \
+           "清除人格\n" \
+           "查看人格\n"
     is_async = True
     priority = -1
     bind_msg_types = (GroupMsg, FriendMsg)

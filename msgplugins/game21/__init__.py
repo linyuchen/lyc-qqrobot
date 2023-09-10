@@ -9,7 +9,6 @@ Game21 = game21point.Game
 
 
 class Game(GroupPointAction, Game21):
-    desc = "发送 21点 + 数字 开始21点游戏，数字为下注金额\n发送 21点换牌 可换牌"
 
     def __init__(self):
         GroupPointAction.__init__(self)
@@ -23,7 +22,7 @@ class Game21Plugin(MsgHandler):
     群游戏：21点
     """
     name = "21点"
-    desc = "发送 21点 + 数字 开始21点游戏，数字为下注金额, 不填数字默认下注100"
+    desc = "21点游戏，示例：21点 100\n"
     bind_msg_types = (GroupMsg, )
 
     def __init__(self, **kwargs):

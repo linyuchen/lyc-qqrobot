@@ -20,7 +20,7 @@ class Game24(MsgHandler):
     群游戏：21点
     """
     name = "24点"
-    desc = "发送 24点 开始24点游戏"
+    desc = "24点"
     bind_msg_types = (GroupMsg, )
     
     def __init__(self, **kwargs):

@@ -4,15 +4,15 @@ from .genshinvoice_top import tts, speakers
 
 
 @on_command("tts列表", param_len=0,
-            desc="发送 tts列表 查看可用的人物列表",
+            desc="tts列表",
             cmd_group_name="tts")
 def tts_list(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("语音可用的人物列表:\n" + ", ".join(speakers))
 
 
 @on_command("tts", param_len=-1,
-            desc="发送 tts + 文字 进行语音转换,如:tts 你好\n"
-                 "发送 tts + 人物 + 文字 进行文字转语音,如:tts 可莉 你好",
+            desc="文字转语音,如:tts 你好，"
+                 "或:tts 可莉 你好",
             cmd_group_name="tts")
 def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
     if len(params) == 0:
