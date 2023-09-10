@@ -7,7 +7,7 @@ model_path = cur_path / "nsfw_mobilenet2.224x224.h5"
 
 if not model_path.exists():
     raise Exception(f"nsfw检测模型{model_path}不存在，请下载模型放至{cur_path}, "
-                    f"下载地址：https://s3.amazonaws.com/ir_public/ai/nsfw_models/nsfw.299x299.h5")
+                    f"下载地址：https://s3.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5")
 
 model = predict.load_model(model_path)
 
