@@ -13,7 +13,7 @@ from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
 
 @on_command("百科", param_len=1, desc="发送 百科 + 词语 进行百科搜索,如:百科 猫娘")
 def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
-    msg.reply("正在为您搜索维基百科...")
+    msg.reply("正在为您搜索百科...")
 
     def reply():
         res = summary_web(f"https://zh.wikipedia.org/wiki/{params[0]}")
