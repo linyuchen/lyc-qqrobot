@@ -28,8 +28,9 @@ def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
         text = params[0]
         speaker = "可莉"
 
-    if len(text) > 200:
-        msg.reply("文字长度超过40字")
+    max_len = 200
+    if len(text) > max_len:
+        msg.reply(f"文字长度超过{max_len}字")
         return
     try:
         data = tts(text, speaker)
