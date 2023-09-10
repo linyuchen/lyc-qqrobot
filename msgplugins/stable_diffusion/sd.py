@@ -76,6 +76,7 @@ class SDDraw(AIDrawBase):
                                       negative_prompt=self.negative_prompt,
                                       width=size[0],
                                       height=size[1],
+                                      denoising_strength=0.5
                                       )
         image = resp.images[0]
         return image
