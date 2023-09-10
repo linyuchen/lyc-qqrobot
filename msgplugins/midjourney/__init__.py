@@ -41,7 +41,7 @@ def get_user_id(msg: GroupMsg | FriendMsg):
 
 @on_command("画图", alias=("mj", "niji", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"),
             param_len=-1,
-            desc="@机器人后发送 画图+空格+描述 进行AI画图,如 画图 一只猫在天上飞",
+            desc="@机器人后发送 画图+空格+描述 进行AI画图, 支持图生图, 如 画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     if isinstance(msg, GroupMsg):
