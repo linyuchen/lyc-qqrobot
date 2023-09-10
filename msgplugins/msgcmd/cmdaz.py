@@ -61,8 +61,11 @@ class CMD(object):
 
         # 切割参数
         params_str = input_text[len(cmd_name):]
-        if self.param_sep and self.param_length != 0:  # 检查是参数是否是对应的分隔符开头
-            if not params_str.startswith(self.param_sep):
+        # 检查是参数是否是对应的分隔符开头
+        if self.param_sep and self.param_length != 0:
+            if not params_str and self.param_length == -1:
+                pass
+            elif not params_str.startswith(self.param_sep):
                 return False
         params_str = params_str.strip()
         self.input_param_text = params_str
