@@ -22,7 +22,7 @@ class Game21Plugin(MsgHandler):
     群游戏：21点
     """
     name = "21点"
-    desc = "21点游戏，示例：21点 100\n"
+    desc = "21点游戏，示例：21点 100"
     bind_msg_types = (GroupMsg, )
 
     def __init__(self, **kwargs):
