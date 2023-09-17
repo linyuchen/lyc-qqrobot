@@ -39,7 +39,7 @@ def get_user_id(msg: GroupMsg | FriendMsg):
     return user_id
 
 
-@on_command("画图", alias=("mj", "niji", "画画", "绘图", "画一", "画个", "给我画", "帮我画", "画张"),
+@on_command("画图", alias=("mj", "niji", "画画", "绘图", "画一", "画个", "画张", "画只", "画头", "给我画", "帮我画"),
             param_len=-1,
             desc="AI画图, 支持图生图, 示例：画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
