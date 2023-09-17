@@ -69,8 +69,9 @@ class SDDraw(AIDrawBase):
         fp = io.BytesIO(data)
         image = Image.open(fp)
         size = image.size
-        if size[0] > 768 or size[1] > 768:
-            size = (768, int(size[1] / size[0] * 768))
+        # if size[0] > 768 or size[1] > 768:
+        max_size = 768
+        size = (max_size, int(size[1] / size[0] * max_size))
         resp = self.webui_api.img2img([image],
                                       prompt=self.base_prompt + prompt,
                                       negative_prompt=self.negative_prompt,
