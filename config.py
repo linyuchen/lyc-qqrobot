@@ -55,3 +55,12 @@ def __getattr__(name):
 def __setattr__(name, value):
     config_data[name] = value
     save_config()
+
+
+def get_config(key: str, default=None):
+    return config_data.get(key, default)
+
+
+def set_config(key: str, value):
+    __setattr__(key, value)
+

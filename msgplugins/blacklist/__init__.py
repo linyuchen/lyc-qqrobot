@@ -1,50 +1,45 @@
-import json
-from pathlib import Path
-
 import config
-from qqsdk.message import MsgHandler, GroupMsg
-from msgplugins.msgcmd.cmdaz import CMD
+from config import get_config, set_config
+from qqsdk.message import GeneralMsg, GroupMsg, FriendMsg
+from msgplugins.msgcmd import on_command, CMDPermissions
+
+CONFIG_KEY = "blacklist"
+
+black_list = get_config(CONFIG_KEY, [])
 
 
-class BlackListPlugin(MsgHandler):
-    name = "黑名单"
-    bind_msg_types = (GroupMsg, )
-    config_path = Path(__file__).parent / "config.json"
-    config = []
+@on_command("", priority=100, cmd_group_name="黑名单", auto_destroy=False)
+def check_ignore_cmd(msg: GeneralMsg, params: list[str]):
+    if isinstance(msg, GroupMsg):
+        qq = msg.group.qq
+    else:
+        qq = msg.qq
+    if qq in black_list:
+        return msg.destroy()
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.read()
 
-    def save(self):
-        with open(self.config_path, "w") as f:
-            f.write(json.dumps(self.config, indent=4, ensure_ascii=False))
+@on_command("加入黑名单", cmd_group_name="黑名单",
+            param_len=1,
+            desc="加入黑名单 QQ号",
+            permission=CMDPermissions.SUPER_ADMIN)
+def ignore_user(msg: GeneralMsg, params: list[str]):
+    qq = params[0]
+    if qq == str(config.ADMIN_QQ):
+        return msg.reply("不能屏蔽超级管理员")
 
-    def read(self):
-        if self.config_path.exists():
-            with open(self.config_path, "r") as f:
-                self.config = json.loads(f.read())
+    if qq not in black_list:
+        black_list.append(qq)
+        set_config(CONFIG_KEY, black_list)
+    msg.reply(f"用户{qq}已加入黑名单")
 
-    def handle(self, msg: GroupMsg):
-        qq = msg.group_member.qq
-        if qq in self.config:
-            msg.destroy()
-            return
-        if qq != str(config.ADMIN_QQ):
-            return
-        c = CMD("ignore", int_param_index=[0], param_len=1)
-        no_c = CMD("noignore", int_param_index=[0], param_len=1)
-        if c.az(msg.msg):
-            black_qq = c.get_param_list()[0]
-            if black_qq == config.ADMIN_QQ:
-                return msg.reply("不能屏蔽超级管理员")
-            self.config.append(black_qq)
-            self.save()
-            msg.reply(f"用户{c.get_param_list()[0]}已屏蔽")
-            msg.destroy()
-        elif no_c.az(msg.msg):
-            black_qq = no_c.get_param_list()[0]
-            self.config.remove(black_qq)
-            self.save()
-            msg.reply(f"用户{no_c.get_param_list()[0]}已取消屏蔽")
-            msg.destroy()
+
+@on_command("取消黑名单", cmd_group_name="黑名单",
+            param_len=1,
+            desc="取消黑名单 QQ号",
+            permission=CMDPermissions.SUPER_ADMIN)
+def unignore_user(msg: GeneralMsg, params: list[str]):
+    qq = params[0]
+    if qq in black_list:
+        black_list.remove(qq)
+        set_config(CONFIG_KEY, black_list)
+    msg.reply(f"用户{qq}已移除黑名单")

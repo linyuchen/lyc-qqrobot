@@ -8,28 +8,19 @@ from common.logger import logger
 from .friendmsg import FriendMsg
 from .groupmsg import GroupMsg
 
+import config
+
+
+CONFIG_KEY = "plugin_config"
+
 GeneralMsg = Type[GroupMsg | FriendMsg]
 
-config_path = Path(__file__).parent / "cmd_config.json"
-
-
-def read_config():
-    if not config_path.exists():
-        return {}
-    try:
-        data = json.load(config_path.open("r", encoding="utf8"))
-    except Exception as e:
-        logger.error(f"读取命令开关配置失败：{e}")
-        return {}
-    return data
-
-
-config_data = read_config()  # {"name": {"enabled": True, "exclude_groups": []}
+config_data = config.get_config(CONFIG_KEY, {})  # {"name": {"enabled": True, "exclude_groups": []}
 
 
 def save_config():
     try:
-        json.dump(config_data, config_path.open("w", encoding="utf8"), ensure_ascii=False)
+        config.set_config(CONFIG_KEY, config_data)
     except Exception as e:
         logger.error(f"保存命令开关配置失败：{e}")
 

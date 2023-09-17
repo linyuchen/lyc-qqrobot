@@ -172,7 +172,7 @@ def on_command(cmd_name,
                 if permission:
                     if not check_permission(msg, permission):
                         return msg.reply(f"您没有权限使用 {cmd_name} 命令")
-                if auto_destroy:
+                if auto_destroy and cmd_name:
                     msg.destroy()
                 if ignore_at_other and isinstance(msg, GroupMsg) and msg.is_at_other:
                     return

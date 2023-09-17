@@ -1,5 +1,6 @@
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.msghandler import set_msg_handler_enabled, MsgHandler
+from config import set_config, get_config
 from .cmdaz import on_command
 from .permission import CMDPermissions
 
@@ -103,3 +104,55 @@ def list_cmd_group(msg: GroupMsg | FriendMsg, params: list[str]):
         reply_text += f"{handler.name} {enabled_text}\n"
     msg.reply(reply_text)
 
+
+ignore_cmd_config_key = "ignore_cmd"
+ignore_cmd_config = get_config(ignore_cmd_config_key, {})  # {group_qq: [cmd_name]}
+
+
+@on_command("", cmd_group_name="命令屏蔽管理", priority=100, auto_destroy=False)
+def check_ignore_cmd(msg: GroupMsg, params: list[str]):
+    group_config: list[str] = ignore_cmd_config.get(msg.group.qq, [])
+    for cmd_name in group_config:
+        if msg.msg.strip().startswith(cmd_name):
+            return msg.destroy()
+
+
+@on_command("屏蔽命令",
+            desc="屏蔽命令 命令名，如：屏蔽命令 #，则发送 #xxx 将不会触发命令",
+            param_len=1,
+            cmd_group_name="命令屏蔽管理",
+            permission=CMDPermissions.GROUP_ADMIN)
+def ignore_cmd(msg: GroupMsg, params: list[str]):
+    cmd_name = params[0]
+    if cmd_name == "屏蔽命令":
+        return
+    group_config: list[str] = ignore_cmd_config.setdefault(msg.group.qq, [])
+    if cmd_name not in group_config:
+        group_config.append(cmd_name)
+        set_config("ignore_cmd", ignore_cmd_config)
+    msg.reply(f"已屏蔽命令【{cmd_name}】")
+
+
+@on_command("取消屏蔽命令",
+            desc="取消屏蔽命令 命令名",
+            param_len=1,
+            cmd_group_name="命令屏蔽管理",
+            permission=CMDPermissions.GROUP_ADMIN)
+def unignore_cmd(msg: GroupMsg, params: list[str]):
+    cmd_name = params[0]
+    group_config: list[str] = ignore_cmd_config.get(msg.group.qq, [])
+    if cmd_name in group_config:
+        group_config.remove(cmd_name)
+        set_config(ignore_cmd_config_key, ignore_cmd_config)
+    msg.reply(f"命令【{cmd_name}】已取消屏蔽")
+
+
+@on_command("查看屏蔽命令",
+            cmd_group_name="命令屏蔽管理",
+            permission=CMDPermissions.GROUP_ADMIN)
+def list_ignore_cmd(msg: GroupMsg, params: list[str]):
+    group_config: list[str] = ignore_cmd_config.get(msg.group.qq, [])
+    if not group_config:
+        msg.reply("当前群未屏蔽任何命令")
+        return
+    msg.reply(f"当前屏蔽命令：\n" + "\n".join(group_config))
