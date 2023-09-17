@@ -1,6 +1,7 @@
 import asyncio
 import random
 import tempfile
+import time
 from pathlib import Path
 from typing import Callable
 
@@ -199,6 +200,8 @@ test_nudge_memes = (
     create_meme_func("rip", images_len=2, images_reversed=True),
 )
 
+touch_history = {}  # key: group_qq+'g'+member_qq, value: last_touch_time
+
 
 @on_command("",
             bind_msg_type=(GroupNudgeMsg,),
@@ -214,6 +217,11 @@ def meme_touch(msg: GroupNudgeMsg, args: list[str]):
     #     file_path = meme(msg)
     #     paths.append(file_path)
     # print(paths)
+    member_id = msg.group.qq + "g" + msg.from_member.qq
+    last_time = touch_history.get(member_id, 0)
+    if time.time() - last_time < 30:
+        return
+    touch_history[member_id] = time.time()
     file_path = meme(msg)
     reply_msg = MessageSegment.image_path(file_path)
     msg.reply(reply_msg)
