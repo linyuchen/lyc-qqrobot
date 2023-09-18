@@ -12,7 +12,7 @@ from qqsdk.message import GeneralMsg, MessageSegment
 @on_command("", cmd_group_name="随机加速gif")
 def random_speed_up_gif(msg: GeneralMsg, params: list[str]):
     r_int = random.randint(0, 10)
-    if r_int > 3:
+    if r_int > 1:
         return
     img_urls = msg.msg_chain.get_image_urls()
     if img_urls:
