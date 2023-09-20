@@ -8,8 +8,9 @@ from typing import Callable
 from filetype import filetype
 from meme_generator.cli import get_meme
 
-from msgplugins.msgcmd import on_command
-from qqsdk.message import GroupNudgeMsg, MessageSegment
+from msgplugins.msgcmd import on_command, CMDPermissions
+from qqsdk.message import GroupNudgeMsg, MessageSegment, GroupMsg
+from config import get_config, set_config
 
 
 def create_meme_func(key: str, texts: list[str] = None,
@@ -202,6 +203,9 @@ test_nudge_memes = (
 
 touch_history = {}  # key: group_qq+'g'+member_qq, value: last_touch_time
 
+CONFIG_KEY_MEME_INTERVAL = "meme_interval"
+meme_interval_config: dict = get_config(CONFIG_KEY_MEME_INTERVAL, {})
+
 
 @on_command("",
             bind_msg_type=(GroupNudgeMsg,),
@@ -219,10 +223,25 @@ def meme_touch(msg: GroupNudgeMsg, args: list[str]):
     # print(paths)
     member_id = msg.group.qq + "g" + msg.from_member.qq
     last_time = touch_history.get(member_id, 0)
-    if time.time() - last_time < 30:
+    interval = meme_interval_config.get(msg.group.qq, 30)
+    if time.time() - last_time < interval:
         return
     touch_history[member_id] = time.time()
     file_path = meme(msg)
     reply_msg = MessageSegment.image_path(file_path)
     msg.reply(reply_msg)
     file_path.unlink()
+
+
+@on_command("设置戳一戳表情频率", param_len=1,
+            desc="设置戳一戳表情频率 秒数,如 设置戳一戳表情频率 30",
+            bind_msg_type=(GroupMsg, ),
+            permission=CMDPermissions.GROUP_ADMIN
+            )
+def set_meme_interval(msg: GroupMsg, params: list[str]):
+    interval = params[0]
+    if not interval.isdigit():
+        return msg.reply("请输入正常的频率，频率为秒数")
+    meme_interval_config[msg.group.qq] = int(interval)
+    set_config(CONFIG_KEY_MEME_INTERVAL, meme_interval_config)
+    msg.reply("戳一戳表情频率设置成功")

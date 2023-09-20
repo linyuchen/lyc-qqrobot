@@ -17,7 +17,7 @@ config_data = {
     # QQ = 1577491075,
     "ADMIN_QQ": 379450326,  # 机器人主人的QQ号,
     "LISTEN_PORT": 5000,
-    "SEND2TIM": True,
+    "SEND2TIM": False,
     "SEND2TIM_HTTP_API": "http://localhost:8088/",
     "SD_HTTP_API": "http://192.168.1.4:7860",
     "VITS_GRADIO_SPACE": "zomehwh/vits-uma-genshin-honkai",
