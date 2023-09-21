@@ -27,6 +27,10 @@ def search_baidu(keyword) -> Path:
     e = document.getElementById("content_left")
     e.style.paddingLeft = "10px";
     e.style.paddingRight = "10px";
+    document.getElementById("head").style.display="none";
+    try{
+        document.getElementById("searchTag").style.display="none";
+    }catch{}
     """)
     path = Path(tempfile.mktemp(suffix=".png"))
     e.screenshot(path=path)
