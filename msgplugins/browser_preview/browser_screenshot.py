@@ -3,13 +3,24 @@ from pathlib import Path
 from urllib.parse import quote
 from playwright.sync_api import sync_playwright
 
-p = sync_playwright().start()
-browser = p.chromium.launch()
+p = None
+browser = None
+
+
+def get_browser():
+    global browser
+    if browser:
+        return browser
+    else:
+        global p
+        p = sync_playwright().start()
+        browser = p.chromium.launch()
+        return browser
 
 
 def search_baidu(keyword) -> Path:
     keyword = quote(keyword.encode("utf8"))
-    page = browser.new_page()
+    page = get_browser().new_page()
     page.goto(f"https://www.baidu.com/s?wd={keyword}")
     e = page.locator("css=#content_left")
     e.evaluate("""

@@ -39,6 +39,7 @@ meme download
 初始化插件库
 
 ```bash
+playwright install chromium
 cd msgplugins/superplugin
 python manage.py migarte
 ```

@@ -19,3 +19,4 @@ filetype
 tensorflow>=2.2.0;sys_platform != 'darwin'
 tensorflow_macos>=2.5.0;sys_platform == 'darwin'
 tensorflow-hub
+playwright
