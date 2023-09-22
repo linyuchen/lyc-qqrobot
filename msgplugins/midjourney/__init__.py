@@ -44,9 +44,10 @@ def get_user_id(msg: GroupMsg | FriendMsg):
             desc="AI画图, 支持图生图, 示例：画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
-    if isinstance(msg, GroupMsg):
-        if not msg.is_at_me:
-            return
+    is_single_cmd = msg.msg.strip().lower() == "mj"
+    # if isinstance(msg, GroupMsg):
+    #     if not msg.is_at_me and not is_single_cmd:
+    #         return
 
     def callback(res: TaskCallbackResponse):
         if res.error:
@@ -68,7 +69,6 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
                 msg.reply(reply_msg, at=False)
             res.image_path[0].unlink(missing_ok=True)
 
-    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     # 获取图片
     img_urls = []
     if msg.quote_msg:
@@ -80,6 +80,9 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         img_urls.extend(urls)
     # 批量上传到图床,这里要用异步
     img_post_urls = []
+
+    if not img_urls and not msg_param:
+        return
 
     async def post_img():
         async def task(__url):
@@ -120,6 +123,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         mj_client.draw(prompt, callback, img_post_urls)
 
     threading.Thread(target=reply_thread, daemon=True).start()
+    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
 
 
 @on_command("取图", alias=("U", "u"), param_len=1, int_param_index=[0], sep="", cmd_group_name=CMD_GROUP_NAME)

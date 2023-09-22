@@ -57,11 +57,10 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
             priority=3,
             cmd_group_name="SD画图")
 def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
-    if isinstance(msg, GroupMsg):
-        if not msg.is_at_me:
-            return
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
+    if not url and not args:
+        return
     if url:
         if not args:
             args = ["masterpiece"]
