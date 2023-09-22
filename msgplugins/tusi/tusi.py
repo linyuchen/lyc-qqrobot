@@ -6,12 +6,12 @@ import traceback
 from pathlib import Path
 from typing import Callable
 
-import ifnude
 import requests
 
 from common.taskpool import TaskPool, Task
 from common.utils.translator import is_chinese, trans
 from common.utils.downloader import download2temp
+from common.utils.nsfw_detector import nsfw_detect
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +40,7 @@ class TusiTask(Task):
 
 def download_img(img_url: str) -> Path | None:
     img_path = download2temp(img_url, ".png")
-    # todo: 检查图片是否违规，违规的要打码
-    if ifnude.detect(str(img_path)):
+    if nsfw_detect(img_path):
         return None
     return img_path
 

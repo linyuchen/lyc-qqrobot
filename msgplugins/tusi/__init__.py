@@ -1,14 +1,13 @@
 from functools import reduce
 from pathlib import Path
 
-import ifnude
-
+from common.utils.nsfw_detector import nsfw_detect
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
 from .tusi import TusiMultipleCountPool
 
-# tusi = TusiMultipleCountPool()
+tusi = TusiMultipleCountPool()
 
 
 @on_command("画图",
@@ -21,7 +20,7 @@ def ts_draw(msg: GroupMsg | FriendMsg, args: list[str]):
     # msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     def cb(img_paths: list[Path]):
         for img_path in img_paths[:]:
-            if ifnude.detect(str(img_path)):
+            if nsfw_detect(img_path):
                 img_path.unlink()
                 img_paths.remove(img_path)
         if img_paths:
