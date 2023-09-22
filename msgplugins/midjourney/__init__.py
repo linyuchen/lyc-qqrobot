@@ -39,7 +39,7 @@ def get_user_id(msg: GroupMsg | FriendMsg):
     return user_id
 
 
-@on_command("画图", alias=("mj", "niji", "画画", "绘图", "画一", "画个", "画张", "画只", "画头", "给我画", "帮我画"),
+@on_command("画图", alias=("mj", "MJ", "niji", "NIJI", "画画", "绘图", "画一", "画个", "画张", "画只", "画头", "给我画", "帮我画"),
             param_len=-1,
             desc="AI画图, 支持图生图, 示例：画图 一只猫在天上飞",
             cmd_group_name=CMD_GROUP_NAME)
@@ -112,6 +112,9 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             prompt += " --niji 5"
             if "--style" not in prompt:
                 prompt += " --style original"
+        elif msg.msg.strip().startswith("mj"):
+            if "--style" not in prompt:
+                prompt += " --style raw"
         if not prompt:
             return msg.reply("请输入提示词或者附上图片")
         mj_client.draw(prompt, callback, img_post_urls)
