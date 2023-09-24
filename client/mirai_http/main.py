@@ -9,12 +9,11 @@ from typing import List, Union
 import requests
 from flask import request
 
-from qqsdk.message.groupmsg import GroupSendMsg
 
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg
+from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg, GroupSendMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
