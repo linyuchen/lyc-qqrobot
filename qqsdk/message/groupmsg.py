@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 
 from qqsdk.entity.group import Group, GroupMember
+from qqsdk.message.segment import MessageSegment
 from qqsdk.message.basemsg import BaseMsg
 from qqsdk.message.types import MessageTypes
 
@@ -10,6 +11,7 @@ from qqsdk.message.types import MessageTypes
 class GroupMsg(BaseMsg):
     """
     """
+    msg_id: int = None
     msg_type = MessageTypes.GROUP
     group: Group = None
     group_member: GroupMember = None
@@ -17,6 +19,11 @@ class GroupMsg(BaseMsg):
     is_at_other: bool = False
     is_from_admin: bool = False
     quote_msg: 'GroupMsg' = None
+
+    def recall(self):
+        """
+        撤回消息
+        """
 
 
 @dataclass
@@ -90,7 +97,7 @@ class MeJoinedGroupMsg(GroupMsg):
 
 
 @dataclass
-class InviteMeToGroupMsg(BaseMsg):
+class GroupInviteMsg(BaseMsg):
     """
     """
 
@@ -157,8 +164,14 @@ class DiscussionGroupMsg(BaseMsg):
 
 
 @dataclass
-class SendGroupMsg(BaseMsg):
+class GroupSendMsg(BaseMsg):
     """
     发送给群的消息
     """
+    msg_id: int = None
     group: Group = None
+    msg_type = MessageTypes.GROUP_SEND
+    msg_chain: MessageSegment = None
+
+    def recall(self):
+        pass
