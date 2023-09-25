@@ -1,8 +1,8 @@
 import tempfile
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from urllib.parse import quote
-from contextlib import contextmanager
 
 from PIL import Image
 from playwright.sync_api import sync_playwright, Page
@@ -11,9 +11,11 @@ CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data"
 
 
 @contextmanager
-def new_page(url: str) -> Page:
+def new_page(url: str, proxy: str = "") -> Page:
     with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=False)
+        browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=True, proxy={
+            "server": proxy,
+        } if proxy else None)
         page = browser.new_page()
         try:
             page.goto(url, timeout=30000)
@@ -23,10 +25,6 @@ def new_page(url: str) -> Page:
         yield page
         page.close()
         browser.close()
-
-
-# with new_page("https://www.zhihu.com/signin") as page:
-#     input("登录知乎后按回车")
 
 
 def merge_images(img_paths: list[Path]) -> Path:
@@ -64,8 +62,8 @@ def search_baidu(keyword: str) -> Path:
         return path
 
 
-def github_readme(url: str) -> Path | None:
-    with new_page(url) as page:
+def github_readme(url: str, http_proxy: str = "") -> Path | None:
+    with new_page(url, http_proxy) as page:
         e = page.locator("css=#readme")
         if e.count() == 0:
             return None
@@ -79,17 +77,25 @@ class ZhihuPreviewer:
 
     @staticmethod
     def hidden_elements(page: Page):
+        page.evaluate(
+            """
+            e = document.getElementsByClassName("ContentItem-actions");
+                        for (let i = 0; i < e.length; i++) {
+                            e[i].style.display = "none";
+                            //e[i].remove()
+                        }
+            """
+        )
+
+    @staticmethod
+    def load_all(page: Page):
         # 隐藏赞数栏
         result = page.evaluate("""
             for(let i = 0; i <= document.body.scrollHeight; i+=500){
                 setTimeout(function(){
                     window.scrollTo(0, i);
                     if (i >= (document.body.scrollHeight - 500)){
-                        e = document.getElementsByClassName("ContentItem-actions");
-                        for (let i = 0; i < e.length; i++) {
-                            e[i].style.display = "none";
-                            //e[i].remove()
-                        }
+                        
                         window.scrollTo(0, 0);
                     }
                 }, 200 * (i/500))
@@ -110,9 +116,16 @@ class ZhihuPreviewer:
             question.screenshot(path=question_path)
             time.sleep(1)
 
-            answer = page.locator("css=.QuestionAnswer-content")
+            answer = page.locator("css=.AnswerItem")
             if answer.count() == 0:
                 return None
+            answer = answer.first
+            answer.evaluate(
+                """
+                e = document.getElementsByClassName("AnswerItem")[0]
+                e.style.paddingLeft = "30px";
+                """
+            )
             answer_path = Path(tempfile.mktemp(suffix=".png"))
             answer.screenshot(path=answer_path)
 
@@ -126,6 +139,7 @@ class ZhihuPreviewer:
     def zhihu_zhuanlan(self, url: str) -> Path | None:
 
         with new_page(url) as page:
+            self.load_all(page)
             self.hidden_elements(page)
             author = page.locator("css=.Post-Header")
             if author.count() == 0:
@@ -153,3 +167,15 @@ class ZhihuPreviewer:
             author_path.unlink()
             content_path.unlink()
             return merged_path
+
+    @staticmethod
+    def login():
+        try:
+            with new_page("https://www.zhihu.com/signin") as page:
+                input("登录知乎后按回车")
+        except Exception as e:
+            error = e
+
+
+if __name__ == '__main__':
+    ZhihuPreviewer().login()
