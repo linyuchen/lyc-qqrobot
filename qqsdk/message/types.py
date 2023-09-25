@@ -13,6 +13,7 @@ class MessageTypes(StrEnum):
     ADD_ME_FRIEND_RESULT = "AddMeFriendResult"
 
     GROUP = "GroupMsg"
+    GROUP_SEND = "GroupSend"
     GROUP_ADMIN_CHANGE = "GroupAdminChange"
     GROUP_MEMBER_CARD_CHANGE = "GroupMemberCardChange"
     GROUP_REQUEST_JOIN = "GroupRequestJoin"

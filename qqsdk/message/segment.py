@@ -12,6 +12,7 @@ class MessageSegment:
     """
 
     def __init__(self, msg_type: Optional[str] = None, content: Optional[str] = None):
+        self.msg_id = None
         self.msg_type = msg_type
         self.content = content
         self.quote_msg = None  # FriendMsg or GroupMsg

@@ -9,10 +9,11 @@ from typing import List, Union
 import requests
 from flask import request
 
+
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
-from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg
+from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg, GroupSendMsg
 from qqsdk.message.segment import MessageSegment
 from qqsdk.qqclient import QQClientFlask
 
@@ -85,6 +86,8 @@ class MiraiQQClient(QQClientFlask):
         message_chain = [{"type": "Plain", "text": content}]
         if isinstance(content, MessageSegment):
             message_chain = content.data
+        else:
+            content = MessageSegment.text(content)
 
         send2tim = config.SEND2TIM
         if list(filter(lambda x: x["type"] == "Voice", message_chain)):
@@ -96,7 +99,16 @@ class MiraiQQClient(QQClientFlask):
             res = self.api_post(path,
                                 {"target": int(qq),
                                  "messageChain": message_chain}).json()
+        if is_group:
+            msg_id = res.get("messageId")
+            group_send_msg = GroupSendMsg(msg_id=msg_id, group=self.get_group(qq),
+                                          msg_chain=content)
+            group_send_msg.recall = lambda : self.recall_msg(qq, msg_id)
+            self.msgs.put(group_send_msg)
+        return res
 
+    def recall_msg(self, qq: str, msg_id: int):
+        res = self.api_post("/recall", {"target": int(qq), "messageId": msg_id})
         return res
 
     def get_friends(self) -> List[entity.Friend]:
@@ -145,8 +157,11 @@ class MiraiQQClient(QQClientFlask):
         quote_msg = None
         is_at_me = False
         is_at_other = False
+        msg_id = None
         for c in data:
             match c["type"]:
+                case "source":
+                    msg_id = c.get("id")
                 case "Plain":
                     msg_chain.append(MessageSegment.text(c["text"]))
                 case "At":
@@ -186,8 +201,9 @@ class MiraiQQClient(QQClientFlask):
                     if group_qq:
                         group = self.get_group(str(group_qq))
                         group_member = group.get_member(str(send_qq))
-                        quote_msg = GroupMsg(group=group, group_member=group_member,
+                        quote_msg = GroupMsg(msg_id=c.get("id"), group=group, group_member=group_member,
                                              msg=quote_msg_chain.get_text(), msg_chain=quote_msg_chain)
+                        quote_msg.recall = lambda: self.recall_msg(group_qq, quote_msg.msg_id)
                     else:
                         quote_msg = FriendMsg(friend=self.get_friend(str(send_qq)),
                                               msg=quote_msg_chain.get_text(), msg_chain=quote_msg_chain)
@@ -210,6 +226,7 @@ class MiraiQQClient(QQClientFlask):
         msg_chain.is_at_me = is_at_me
         msg_chain.is_at_other = is_at_other
         msg_chain.quote_msg = quote_msg
+        msg_chain.msg_id = msg_id
         return msg_chain
 
     def get_msg(self):
@@ -248,17 +265,20 @@ class MiraiQQClient(QQClientFlask):
             if msg.strip().startswith(f"@{robot_name}"):
                 msg_chain.is_at_me = True
                 msg = msg.replace(f"@{robot_name}", "", 1)
-            msg = GroupMsg(group=group,
-                           msg=msg,
-                           msg_chain=msg_chain,
-                           quote_msg=quote_msg,
-                           group_member=group_member,
-                           is_at_me=msg_chain.is_at_me,
-                           is_at_other=msg_chain.is_at_other,
-                           is_from_admin=is_from_admin,
-                           is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
-                           )
+            msg = GroupMsg(
+                msg_id=msg_chain.msg_id,
+                group=group,
+                msg=msg,
+                msg_chain=msg_chain,
+                quote_msg=quote_msg,
+                group_member=group_member,
+                is_at_me=msg_chain.is_at_me,
+                is_at_other=msg_chain.is_at_other,
+                is_from_admin=is_from_admin,
+                is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
+            )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
+            msg.recall = lambda: self.recall_msg(group.qq, msg.msg_id)
             self.add_msg(msg)
         elif message_type == "NudgeEvent":
             group_qq = str(data["subject"]["id"])
