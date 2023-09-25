@@ -61,7 +61,7 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
 def github_preview(msg: GeneralMsg, params: list[str]):
     if "//github.com/" in msg.msg:
         # 获取github链接
-        url = re.findall(r"https://github.com/[\w/]+", msg.msg)
+        url = re.findall(r"https://github.com/[\w_/-]+", msg.msg)
         url = url[0] if url else None
         if url:
             msg.destroy()

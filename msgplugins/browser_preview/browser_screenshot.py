@@ -11,7 +11,7 @@ CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data"
 
 
 @contextmanager
-def new_page(url: str, proxy: str = "", headless=True) -> Page:
+def new_page(url: str, proxy: str = "", headless=False) -> Page:
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=headless, proxy={
             "server": proxy,
