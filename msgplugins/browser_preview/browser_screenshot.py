@@ -11,9 +11,9 @@ CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data"
 
 
 @contextmanager
-def new_page(url: str, proxy: str = "") -> Page:
+def new_page(url: str, proxy: str = "", headless=True) -> Page:
     with sync_playwright() as p:
-        browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=True, proxy={
+        browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=headless, proxy={
             "server": proxy,
         } if proxy else None)
         page = browser.new_page()
@@ -171,7 +171,7 @@ class ZhihuPreviewer:
     @staticmethod
     def login():
         try:
-            with new_page("https://www.zhihu.com/signin") as page:
+            with new_page("https://www.zhihu.com/signin", headless=False) as page:
                 input("登录知乎后按回车")
         except Exception as e:
             error = e
