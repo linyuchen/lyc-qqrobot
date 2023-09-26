@@ -67,7 +67,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
             "message_flags": 0,
             "message_id": task.reply_msg.msg_id,
             "application_id": "936929561302675456",
-            "session_id": "34a0d78eb9e624d31ac63cff92c2687a",
+            "session_id": "b74a9d0a15349bbc72fd969edecab7e7",
             "data": {
                 "component_type": 2,
                 "custom_id": f"MJ::JOB::upsample::{task.upscale_index}::{filename}",
