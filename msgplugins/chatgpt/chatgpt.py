@@ -1,17 +1,12 @@
-import json
 import traceback
-from pathlib import Path
 from threading import Lock
 
 import requests
 
 from common.utils.htmlhelper import html2txt
-from config import CHATGPT
+from config import CHATGPT, get_config, set_config
 from .base import ChatGPT
 
-# openai.api_key = "sk-WWTB6z2HAbiSS9slx7jgEZh4eLjF5lIzjVk4kOhh8f6b6fun"
-# openai.api_key = "sk-38hZMJT3EVBBCgZYXSz1Qoz0RIoMTsREHujpaVDJt702VegV"  # neverlike
-# openai.api_base = "https://api.chatanywhere.cn/v1"
 
 thread_lock = Lock()
 
@@ -28,19 +23,17 @@ cat_prompt_text = """遵循以下规则：
 11.你的名字叫喵喵
     """
 
-save_path = Path(__file__).parent / "prompts.json"
 prompt_dict = {}  # context_id: prompt_str
+
+CONFIG_KEY = "chatgpt_prompts"
 
 
 def __read():
-    try:
-        prompt_dict.update(json.load(open(save_path)))
-    except Exception as e:
-        print("read chatgpt prompts failed ", e)
+    prompt_dict.update(get_config(CONFIG_KEY, {}))
 
 
 def __save():
-    json.dump(prompt_dict, open(save_path, "w"))
+    set_config(CONFIG_KEY, prompt_dict)
 
 
 def __get_chatgpt(context_id: str) -> list[ChatGPT]:
