@@ -11,7 +11,7 @@ black_list = get_config(CONFIG_KEY, [])
 @on_command("", priority=100, cmd_group_name="黑名单", auto_destroy=False)
 def check_ignore_cmd(msg: GeneralMsg, params: list[str]):
     if isinstance(msg, GroupMsg):
-        qq = msg.group.qq
+        qq = msg.group_member.qq
     else:
         qq = msg.qq
     if qq in black_list:
