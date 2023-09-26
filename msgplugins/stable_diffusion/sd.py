@@ -63,7 +63,7 @@ class SDDraw(AIDrawBase):
             res_paths.append(Path(image_path))
         return res_paths
 
-    def img2img(self, img_url: str, prompt: str) -> str:
+    def img2img(self, img_url: str, prompt: str, denoising_strength=0.5) -> str:
         prompt = self.trans_prompt(prompt)
         data = requests.get(img_url).content
         fp = io.BytesIO(data)
@@ -77,7 +77,7 @@ class SDDraw(AIDrawBase):
                                       negative_prompt=self.negative_prompt,
                                       width=size[0],
                                       height=size[1],
-                                      denoising_strength=0.5
+                                      denoising_strength=denoising_strength
                                       )
         image = resp.images[0]
         return image

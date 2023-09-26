@@ -1,3 +1,4 @@
+import re
 import threading
 from functools import reduce
 
@@ -16,7 +17,7 @@ sd = SDDraw()
 
 def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
     try:
-        img_paths = sd.txt2img(args[0], width=768, height=768)
+        img_paths = sd.txt2img(" ".join(args), width=768, height=768)
     except ConnectionError as e:
         logger.error(e)
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
@@ -38,8 +39,14 @@ def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
 
 
 def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
+    # 解析重绘幅度参数 -d
+    prompt = " ".join(args)
+    pattern = re.compile(r"-d\s*(0?\.?\d+)")
+    ds = re.findall(pattern, prompt)
+    prompt = re.sub(pattern, "", prompt)
+    ds = 0.5 if not ds else min(float(ds[0]), 1.0)
     try:
-        base64_data = raw_b64_img(sd.img2img(url, args[0]))
+        base64_data = raw_b64_img(sd.img2img(url, prompt, denoising_strength=ds))
     except ConnectionError as e:
         logger.error(e)
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
@@ -52,7 +59,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 @on_command("sd",
             alias=("SD", ),
-            desc="sd画图，支持图生图，示例：sd 猫耳女孩",
+            desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5\n",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")
