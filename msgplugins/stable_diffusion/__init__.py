@@ -1,8 +1,9 @@
 import re
+import tempfile
 import threading
 from functools import reduce
+from pathlib import Path
 
-import requests
 from requests.exceptions import ConnectionError
 
 from common.logger import logger
@@ -46,7 +47,14 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
     prompt = re.sub(pattern, "", prompt)
     ds = 0.5 if not ds else min(float(ds[0]), 1.0)
     try:
-        base64_data = raw_b64_img(sd.img2img(url, prompt, denoising_strength=ds))
+        image = sd.img2img(url, prompt, denoising_strength=ds)
+        img_path = Path(tempfile.mktemp(suffix=".png"))
+        image.save(img_path)
+        if nsfw_detect(img_path):
+            img_path.unlink()
+            return msg.reply("图片违规，已被删除~")
+        img_path.unlink()
+        base64_data = raw_b64_img(image)
     except ConnectionError as e:
         logger.error(e)
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
