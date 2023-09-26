@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from PIL import Image
 
-from msgplugins.browser_preview.browser_screenshot import github_readme, search_baidu, ZhihuPreviewer, moe_wiki
+from msgplugins.browser_preview.browser_screenshot import github_readme, search_baidu, ZhihuPreviewer, moe_wiki, \
+    wx_article
 
 
 class TestBrowserPreview(TestCase):
@@ -27,3 +28,7 @@ class TestBrowserPreview(TestCase):
     def test_moe_wiki(self):
         keyword = "时光代理人"
         Image.open(moe_wiki(keyword)).show()
+
+    def test_wx_article(self):
+        url = "https://mp.weixin.qq.com/s/Y0NkjKNWdtURYOfKBMGxAw"
+        Image.open(wx_article(url)).show()

@@ -11,7 +11,7 @@ CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data"
 
 
 @contextmanager
-def new_page(url: str, proxy: str = "", headless=False) -> Page:
+def new_page(url: str, proxy: str = "", headless=True) -> Page:
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=headless, proxy={
             "server": proxy,
@@ -37,11 +37,11 @@ def load_all(page: Page):
 
                     window.scrollTo(0, 0);
                 }
-            }, 100 * (i/500))
+            }, 200 * (i/500))
         }
         result = document.body.scrollHeight / 500
     """)
-    time.sleep(result * 0.1)
+    time.sleep(result * 0.2)
 
 
 def merge_images(img_paths: list[Path]) -> Path:
@@ -105,7 +105,7 @@ class ZhihuPreviewer:
         )
 
     def zhihu_question(self, url: str) -> Path | None:
-        with new_page(url) as page:
+        with new_page(url, headless=False) as page:
             self.hidden_elements(page)
             question = page.locator("css=.QuestionHeader .QuestionHeader-main")
             if question.count() == 0:
@@ -138,7 +138,7 @@ class ZhihuPreviewer:
 
     def zhihu_zhuanlan(self, url: str) -> Path | None:
 
-        with new_page(url) as page:
+        with new_page(url, headless=False) as page:
             load_all(page)
             self.hidden_elements(page)
             author = page.locator("css=.Post-Header")
@@ -187,6 +187,25 @@ def moe_wiki(keyword: str) -> Path | None:
         content = page.locator("css=#mw-content-text")
         if content.count() == 0:
             return
+        path = Path(tempfile.mktemp(suffix=".png"))
+        content.screenshot(path=path)
+        page.close()
+        return path
+
+
+def wx_article(url: str) -> Path | None:
+    with new_page(url) as page:
+        content = page.locator("css=#img-content")
+        if content.count() == 0:
+            return
+        load_all(page)
+        content.evaluate(
+            """
+            e = document.getElementById("img-content")
+            e.style.paddingLeft = "20px";
+            e.style.paddingRight = "20px";
+            """
+        )
         path = Path(tempfile.mktemp(suffix=".png"))
         content.screenshot(path=path)
         page.close()

@@ -3,9 +3,10 @@ import re
 import config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, MessageSegment
-from .browser_screenshot import search_baidu, ZhihuPreviewer, github_readme
+from .browser_screenshot import search_baidu, ZhihuPreviewer, github_readme, wx_article
 
 zhihu_previewer = ZhihuPreviewer()
+
 
 @on_command("百度",
             param_len=1,
@@ -43,7 +44,6 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
             if img_path:
                 msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
                 img_path.unlink()
-                return
 
     elif "//zhuanlan.zhihu.com/p/" in msg.msg:
         zhuanlan_url = re.findall(r"https://zhuanlan.zhihu.com/p/\d+", msg.msg)
@@ -54,14 +54,13 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
             if img_path:
                 msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(zhuanlan_url), at=False)
                 img_path.unlink()
-                return
 
 
 @on_command("", cmd_group_name="github预览")
 def github_preview(msg: GeneralMsg, params: list[str]):
     if "//github.com/" in msg.msg:
         # 获取github链接
-        url = re.findall(r"https://github.com/[\w_/-]+", msg.msg)
+        url = re.findall(r"https://github.com/[a-zA-Z0-9_/-]+", msg.msg)
         url = url[0] if url else None
         if url:
             msg.destroy()
@@ -69,7 +68,6 @@ def github_preview(msg: GeneralMsg, params: list[str]):
             if img_path:
                 msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
                 img_path.unlink()
-                return
 
 
 @on_command("萌娘百科", param_len=1, desc="萌娘百科搜索,如:萌娘百科 猫娘")
@@ -80,3 +78,16 @@ def moe_wiki(msg: GeneralMsg, params: list[str]):
         msg.reply(MessageSegment.image_path(img_path))
         img_path.unlink()
 
+
+@on_command("", cmd_group_name="微信文章预览")
+def github_preview(msg: GeneralMsg, params: list[str]):
+    if "mp.weixin.qq.com" in msg.msg:
+        # 获取github链接
+        url = re.findall(r"https://mp.weixin.qq.com/s[/a-zA-Z0-9%?&=_-]+", msg.msg)
+        url = url[0] if url else None
+        if url:
+            msg.destroy()
+            img_path = wx_article(url)
+            if img_path:
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
+                img_path.unlink()
