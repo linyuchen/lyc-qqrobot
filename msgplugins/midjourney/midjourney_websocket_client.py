@@ -58,7 +58,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
 
     def __post_upscale(self, task: Task):
         filename = task.reply_msg.attachment_urls[0].split("_")[-1]
-        filename = filename.replace(".png", "")
+        filename = filename.replace(".png", "").split("?")[0]
         payload = {
             "type": 3,
             "nonce": random.randint(1142187534726463488, 1143187534726463488),
