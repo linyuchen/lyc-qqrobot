@@ -41,7 +41,7 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = zhihu_previewer.zhihu_question(url)
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url))
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
                 img_path.unlink()
                 return
 
@@ -52,7 +52,7 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = zhihu_previewer.zhihu_zhuanlan(zhuanlan_url)
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(zhuanlan_url))
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(zhuanlan_url), at=False)
                 img_path.unlink()
                 return
 
@@ -67,6 +67,16 @@ def github_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = github_readme(url, http_proxy=config.get_config("GFW_PROXY"))
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url))
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
                 img_path.unlink()
                 return
+
+
+@on_command("萌娘百科", param_len=1, desc="萌娘百科搜索,如:萌娘百科 猫娘")
+def moe_wiki(msg: GeneralMsg, params: list[str]):
+    msg.reply("正在为您搜索萌娘百科...")
+    img_path = moe_wiki(params[0])
+    if img_path:
+        msg.reply(MessageSegment.image_path(img_path))
+        img_path.unlink()
+

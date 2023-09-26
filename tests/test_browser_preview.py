@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from PIL import Image
 
-from msgplugins.browser_preview.browser_screenshot import github_readme, search_baidu, ZhihuPreviewer
+from msgplugins.browser_preview.browser_screenshot import github_readme, search_baidu, ZhihuPreviewer, moe_wiki
 
 
 class TestBrowserPreview(TestCase):
@@ -23,3 +23,7 @@ class TestBrowserPreview(TestCase):
     def test_zhihu_article(self):
         url = "https://zhuanlan.zhihu.com/p/191600009"
         Image.open(self.zhihu_previewer.zhihu_zhuanlan(url)).show()
+
+    def test_moe_wiki(self):
+        keyword = "时光代理人"
+        Image.open(moe_wiki(keyword)).show()

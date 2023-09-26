@@ -22,15 +22,7 @@ def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     threading.Thread(target=reply, daemon=True).start()
 
 
-@on_command("萌娘百科", param_len=1, desc="萌娘百科搜索,如:萌娘百科 猫娘")
-def moe_wiki(msg: GroupMsg | FriendMsg, params: list[str]):
-    msg.reply("正在为您搜索萌娘百科...")
 
-    def reply():
-        res = summary_web(f"https://zh.moegirl.org.cn/{params[0]}")
-        msg.reply(res)
-
-    threading.Thread(target=reply, daemon=True).start()
 
 
 def send_voice(msg: GroupMsg | FriendMsg, text):

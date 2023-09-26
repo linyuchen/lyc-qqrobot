@@ -27,6 +27,23 @@ def new_page(url: str, proxy: str = "", headless=False) -> Page:
         browser.close()
 
 
+def load_all(page: Page):
+    # 隐藏赞数栏
+    result = page.evaluate("""
+        for(let i = 0; i <= document.body.scrollHeight; i+=500){
+            setTimeout(function(){
+                window.scrollTo(0, i);
+                if (i >= (document.body.scrollHeight - 500)){
+
+                    window.scrollTo(0, 0);
+                }
+            }, 100 * (i/500))
+        }
+        result = document.body.scrollHeight / 500
+    """)
+    time.sleep(result * 0.1)
+
+
 def merge_images(img_paths: list[Path]) -> Path:
     imgs = [Image.open(img_path) for img_path in img_paths]
     width = max([img.size[0] for img in imgs])
@@ -87,23 +104,6 @@ class ZhihuPreviewer:
             """
         )
 
-    @staticmethod
-    def load_all(page: Page):
-        # 隐藏赞数栏
-        result = page.evaluate("""
-            for(let i = 0; i <= document.body.scrollHeight; i+=500){
-                setTimeout(function(){
-                    window.scrollTo(0, i);
-                    if (i >= (document.body.scrollHeight - 500)){
-                        
-                        window.scrollTo(0, 0);
-                    }
-                }, 200 * (i/500))
-            }
-            result = document.body.scrollHeight / 500
-        """)
-        time.sleep(result * 0.2)
-
     def zhihu_question(self, url: str) -> Path | None:
         with new_page(url) as page:
             self.hidden_elements(page)
@@ -139,7 +139,7 @@ class ZhihuPreviewer:
     def zhihu_zhuanlan(self, url: str) -> Path | None:
 
         with new_page(url) as page:
-            self.load_all(page)
+            load_all(page)
             self.hidden_elements(page)
             author = page.locator("css=.Post-Header")
             if author.count() == 0:
@@ -175,6 +175,22 @@ class ZhihuPreviewer:
                 input("登录知乎后按回车")
         except Exception as e:
             error = e
+
+
+def moe_wiki(keyword: str) -> Path | None:
+    with new_page(f"https://zh.moegirl.org.cn/{keyword}") as page:
+        close_btn = page.locator("css=.n-base-close.n-base-close--absolute.n-card-header__close")
+        if close_btn.count() > 0:
+            close_btn.first.click()
+            time.sleep(1)
+        load_all(page)
+        content = page.locator("css=#mw-content-text")
+        if content.count() == 0:
+            return
+        path = Path(tempfile.mktemp(suffix=".png"))
+        content.screenshot(path=path)
+        page.close()
+        return path
 
 
 if __name__ == '__main__':
