@@ -15,6 +15,7 @@ class Game(game21pointbase.Game):
     def __init__(self):
 
         super(Game, self).__init__()
+        self.mutex = threading.Lock()
         self.qq_group_plugin = None
         self.add_handle_func = None
         self.flower_color_list = [u"黑桃", u"红心", u"梅花", u"方块"]
@@ -88,6 +89,8 @@ class Game(game21pointbase.Game):
 
     def update_poker_list(self, group_qq, member_qq, member_name):
 
+        if not self.game_start or self.overing:
+            return u"游戏还没开始呢！"
         sender_info_dic = {"group_qq_number": group_qq, "qq_number": member_qq, "nick": member_name}
         qq_number = sender_info_dic["qq_number"]
         nick = sender_info_dic["nick"]
@@ -243,7 +246,8 @@ class Game(game21pointbase.Game):
         while True:
             self.current_second += 1
             if self.current_second > self.limit_second:
-                self.over_game()
+                with self.mutex:
+                    self.over_game()
                 break
             time.sleep(1)
 
