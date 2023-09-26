@@ -373,8 +373,10 @@ def download_images(img_urls: list[str],
     for img_url in img_urls:
         img_path = tempfile.mktemp(".png")
         if compress_width and compress_height:
+            symbol_q = "?" if "?" not in img_url else ""
+            img_url = img_url + symbol_q + f"&width={compress_width}&height={compress_height}"
             img_url = img_url.replace("cdn.discordapp.com",
-                                      "media.discordapp.net") + f"?width={compress_width}&height={compress_height}"
+                                      "media.discordapp.net")
         try_count = 10
         data = ""
 
