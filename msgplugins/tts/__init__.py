@@ -4,7 +4,7 @@ from .genshinvoice_top import tts, speakers
 
 
 @on_command("tts列表", param_len=0,
-            desc="tts列表",
+            desc="tts列表, 语音角色列表",
             cmd_group_name="tts")
 def tts_list(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("语音可用的人物列表:\n" + ", ".join(speakers))

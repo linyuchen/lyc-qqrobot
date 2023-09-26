@@ -30,19 +30,8 @@ Python3.11
 
 ### 初始化
 
-初始化表情包库
+运行`init.bat`
 
-```bash
-meme download
-```
-
-初始化插件库
-
-```bash
-playwright install chromium
-cd msgplugins/superplugin
-python manage.py migarte
-```
 
 # mirai配置
 
