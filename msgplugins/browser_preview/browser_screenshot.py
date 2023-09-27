@@ -84,6 +84,14 @@ def github_readme(url: str, http_proxy: str = "") -> Path | None:
         e = page.locator("css=#readme")
         if e.count() == 0:
             return None
+        e.evaluate(
+            """
+            e = document.getElementsByClassName("top-0")[0]
+            if (e){
+                e.style.display = "none";
+            }
+            """
+        )
         path = Path(tempfile.mktemp(suffix=".png"))
         e.screenshot(path=path)
         page.close()
