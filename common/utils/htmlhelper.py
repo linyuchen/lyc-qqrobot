@@ -85,11 +85,13 @@ def html2txt(html: str) -> str:
     html = re.sub(" +", " ", html)
     pattern = re.compile("<!--.*?-->", re.S)
     html = re.sub(pattern, "", html)  # remove the comment
-    html = re.sub("<style[^>]*?>.*?</style>", "", html)  # remove the style
+    html = remove_char_entity(html)
+    # while "</style>" in html:
+    html = re.sub("<style.*?>.*?</style>", "", html)  # remove the style
 
     pattern = re.compile("<script[^>]*?>.*?</script>", re.S)
+    # while "</script>" in html:
     html = re.sub(pattern, "", html)  # remove the script
-
     # replace the <br/>
     html = re.sub(u"<br[^>]*?>", "\n", html)
     html = re.sub(u"<p[^>]*?>", "\n", html)
@@ -110,7 +112,6 @@ def html2txt(html: str) -> str:
     #        pattern = re.compile("<.*?/>",re.S)
     #        html = re.sub("<[^>]*?/>","",html)# remove the startend tag
 
-    html = remove_char_entity(html)
 
     return html
 

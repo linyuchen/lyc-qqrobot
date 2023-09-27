@@ -91,7 +91,7 @@ def summary_web(link: str) -> str:
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        # "Accept-Language": "zh-CN,zh;q=0.9",
+        "Accept-Language": "zh-CN,zh;",
         # "Sec-Ch-Ua-Platform": "Windows",
         # 'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
         # "Sec-Fetch-Dest": "document",
@@ -100,10 +100,10 @@ def summary_web(link: str) -> str:
     }
     try:
         html = requests.get(url, headers=headers, timeout=30).text
-    except:
-        return "网页分析失败"
+    except Exception as e:
+        return f"网页分析失败, {e}"
     text = html2txt(html).replace("\n", "")
-    res = chat("", "#总结以下内容并翻译成中文：\n" + text)
+    res = chat("", "#总结以下内容，如果不是中文就翻译成中文：\n" + text)
     return res
 
 
