@@ -58,7 +58,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
 
     def __post_upscale(self, task: Task):
         filename = task.reply_msg.attachment_urls[0].split("_")[-1]
-        filename = filename.replace(".png", "")
+        filename = filename.replace(".png", "").split("?")[0]
         payload = {
             "type": 3,
             "nonce": random.randint(1142187534726463488, 1143187534726463488),
@@ -67,7 +67,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
             "message_flags": 0,
             "message_id": task.reply_msg.msg_id,
             "application_id": "936929561302675456",
-            "session_id": "34a0d78eb9e624d31ac63cff92c2687a",
+            "session_id": "b74a9d0a15349bbc72fd969edecab7e7",
             "data": {
                 "component_type": 2,
                 "custom_id": f"MJ::JOB::upsample::{task.upscale_index}::{filename}",

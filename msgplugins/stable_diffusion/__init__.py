@@ -1,7 +1,9 @@
+import re
+import tempfile
 import threading
 from functools import reduce
+from pathlib import Path
 
-import requests
 from requests.exceptions import ConnectionError
 
 from common.logger import logger
@@ -16,7 +18,7 @@ sd = SDDraw()
 
 def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
     try:
-        img_paths = sd.txt2img(args[0], width=768, height=768)
+        img_paths = sd.txt2img(" ".join(args), width=768, height=768)
     except ConnectionError as e:
         logger.error(e)
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
@@ -38,8 +40,21 @@ def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
 
 
 def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
+    # 解析重绘幅度参数 -d
+    prompt = " ".join(args)
+    pattern = re.compile(r"-d\s*(0?\.?\d+)")
+    ds = re.findall(pattern, prompt)
+    prompt = re.sub(pattern, "", prompt)
+    ds = 0.5 if not ds else min(float(ds[0]), 1.0)
     try:
-        base64_data = raw_b64_img(sd.img2img(url, args[0]))
+        image = sd.img2img(url, prompt, denoising_strength=ds)
+        img_path = Path(tempfile.mktemp(suffix=".png"))
+        image.save(img_path)
+        if nsfw_detect(img_path):
+            img_path.unlink()
+            return msg.reply("图片违规，已被删除~")
+        img_path.unlink()
+        base64_data = raw_b64_img(image)
     except ConnectionError as e:
         logger.error(e)
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
@@ -52,7 +67,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 @on_command("sd",
             alias=("SD", ),
-            desc="sd画图，支持图生图，示例：sd 猫耳女孩",
+            desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5\n",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")
