@@ -80,7 +80,7 @@ def moe_wiki(msg: GeneralMsg, params: list[str]):
 
 
 @on_command("", cmd_group_name="微信文章预览")
-def github_preview(msg: GeneralMsg, params: list[str]):
+def wx_article_preview(msg: GeneralMsg, params: list[str]):
     if "mp.weixin.qq.com" in msg.msg:
         # 获取github链接
         url = re.findall(r"https://mp.weixin.qq.com/s[/a-zA-Z0-9%?&=_-]+", msg.msg)
