@@ -15,6 +15,10 @@ class FriendMsg(BaseMsg):
     msg_type = MessageTypes.FRIEND
     quote_msg: 'FriendMsg' = None  # 引用的消息
 
+    @property
+    def is_from_super_admin(self):
+        return self.friend.is_super_admin
+
 
 @dataclass
 class FriendSignatureChangedMsg(FriendMsg):

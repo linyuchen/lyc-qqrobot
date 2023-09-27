@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List
 
 from qqsdk.entity.avatar import Avatar
+from config import get_config
 
 
 @dataclass
@@ -36,6 +37,10 @@ class GroupMember(object):
         if not self.__avatar:
             self.__avatar = Avatar(self.qq)
         return self.__avatar
+
+    @property
+    def is_super_admin(self):
+        return self.qq in get_config("ADMIN_QQ", [])
 
 
 @dataclass

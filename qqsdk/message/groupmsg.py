@@ -17,13 +17,26 @@ class GroupMsg(BaseMsg):
     group_member: GroupMember = None
     is_at_me: bool = False
     is_at_other: bool = False
-    is_from_admin: bool = False
     quote_msg: 'GroupMsg' = None
 
     def recall(self):
         """
         撤回消息
         """
+
+    @property
+    def is_from_admin(self):
+        """
+        是否是管理员发的消息
+        """
+        return self.group_member.is_admin or self.group_member.is_creator or self.group_member.is_super_admin
+
+    @property
+    def is_from_super_admin(self):
+        """
+        是否是超级管理员发的消息
+        """
+        return self.group_member.is_super_admin
 
 
 @dataclass

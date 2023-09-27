@@ -18,7 +18,6 @@ class BaseMsg:
     is_over: bool = False  # 这条消息声明周期是否结束了，未结束就会传给下一个消息处理器
     is_paused: bool = False
     msg_type: str = ""
-    is_from_super_admin: bool = False
     thread_lock = threading.Lock()
     qq_client: "qqsdk.qqclient.QQClientBase" = None
 

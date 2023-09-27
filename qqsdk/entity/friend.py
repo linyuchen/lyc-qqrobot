@@ -1,6 +1,7 @@
 # coding=UTF8
 from dataclasses import dataclass
 
+from config import get_config
 from qqsdk.entity.avatar import Avatar
 
 
@@ -39,3 +40,8 @@ class Friend(object):
         if not self.__avatar:
             self.__avatar = Avatar(self.qq)
         return self.__avatar
+
+    @property
+    def is_super_admin(self) -> bool:
+        return self.qq in get_config("ADMIN_QQ", [])
+

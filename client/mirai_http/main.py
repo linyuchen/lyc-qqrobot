@@ -243,8 +243,8 @@ class MiraiQQClient(QQClientFlask):
             friend = self.get_friend(str(data["sender"]["id"]))
             msg = FriendMsg(friend=friend, msg=msg,
                             quote_msg=quote_msg,
-                            msg_chain=msg_chain,
-                            is_from_super_admin=str(friend.qq) == str(config.ADMIN_QQ))
+                            msg_chain=msg_chain)
+
             msg.reply = lambda _msg, at=False: self.send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":
@@ -259,8 +259,6 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            is_from_admin = group_member.is_admin or group_member.is_creator or str(group_member.qq) == str(
-                config.ADMIN_QQ)
             robot_name = group.get_member(str(config.QQ)).get_name()
             if msg.strip().startswith(f"@{robot_name}"):
                 msg_chain.is_at_me = True
@@ -274,8 +272,6 @@ class MiraiQQClient(QQClientFlask):
                 group_member=group_member,
                 is_at_me=msg_chain.is_at_me,
                 is_at_other=msg_chain.is_at_other,
-                is_from_admin=is_from_admin,
-                is_from_super_admin=str(group_member.qq) == str(config.ADMIN_QQ)
             )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
             msg.recall = lambda: self.recall_msg(group.qq, msg.msg_id)

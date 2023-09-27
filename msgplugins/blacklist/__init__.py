@@ -24,7 +24,7 @@ def check_ignore_cmd(msg: GeneralMsg, params: list[str]):
             permission=CMDPermissions.SUPER_ADMIN)
 def ignore_user(msg: GeneralMsg, params: list[str]):
     qq = params[0]
-    if qq == str(config.ADMIN_QQ):
+    if qq in config.get_config("ADMIN_QQ", []):
         return msg.reply("不能屏蔽超级管理员")
 
     if qq not in black_list:

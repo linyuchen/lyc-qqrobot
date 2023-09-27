@@ -15,7 +15,7 @@ config_data = {
     "MIRAI_HTTP_API_VERIFY_KEY": "1234567890",
     "QQ": 721011692,
     # QQ = 1577491075,
-    "ADMIN_QQ": 379450326,  # 机器人主人的QQ号,
+    "ADMIN_QQ": [379450326],  # 机器人主人的QQ号,
     "LISTEN_PORT": 5000,
     "SEND2TIM": False,
     "SEND2TIM_HTTP_API": "http://localhost:8088/",
@@ -58,7 +58,11 @@ def __setattr__(name, value):
 
 
 def get_config(key: str, default=None):
-    return config_data.get(key, default)
+    result = config_data.get(key, default)
+    match key:
+        case "ADMIN_QQ":
+            result = list(map(str, result))
+    return result
 
 
 def set_config(key: str, value):
