@@ -22,20 +22,43 @@ def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     threading.Thread(target=reply, daemon=True).start()
 
 
-
-
-
 def send_voice(msg: GroupMsg | FriendMsg, text):
     if not config.TTS_ENABLED:
         return
     from ..tts.genshinvoice_top import tts
     # text = text.replace("喵", "")
-    if len(text) <= 40:
+    if len(text) <= 60:
         try:
             base64_data = tts(text)
             msg.reply(MessageSegment.voice_base64(base64_data))
         except Exception as e:
             logger.error(e)
+
+
+def get_url(text: str) -> str:
+    pattern = re.compile(r"^https?://[A-Za-z0-9$\-_.+!*'(),%;:@&=/?#\[\]]+$")
+    url = re.findall(pattern, text)
+    return url[0] if url else ""
+
+
+def summary_url(url: str) -> str:
+    if url := get_url(url):
+        result = summary_web(url)
+        return result
+
+
+@on_command("总结",
+            alias=("总结一下", "总结网页"),
+            param_len=-1, desc="总结网页,如:总结 https://www.qq.com")
+def summary_web_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
+    text = msg.quote_msg.msg if msg.quote_msg else ""
+    text += "\n" + msg.msg
+    if url := get_url(text):
+        msg.reply("正在为您总结网页...")
+        result = summary_web(url)
+        msg.reply(result + "\n\n" + url)
+        return
+
 
 
 class ChatGPT(MsgHandler):
@@ -50,8 +73,6 @@ class ChatGPT(MsgHandler):
     bind_msg_types = (GroupMsg, FriendMsg)
     records = {}
     ignore_username = ["Q群管家"]
-
-
 
     def handle(self, msg: GroupMsg | FriendMsg):
         if isinstance(msg, GroupMsg) and msg.group_member.get_name() in self.ignore_username:
@@ -75,11 +96,9 @@ class ChatGPT(MsgHandler):
             msg.destroy()
             return
 
-        pattern = re.compile("^https?://[A-Za-z0-9$\-_.+!*'(),%;:@&=/?#\[\]]+$")
-        if re.match(pattern, msg.msg.strip()):
+        if url := get_url(msg.msg):
             if isinstance(msg, GroupMsg) and not msg.is_at_me:
                 return
-            url = msg.msg.strip()
             if res := summary_web(url):
                 msg.reply(res + "\n\n" + url)
                 msg.destroy()
