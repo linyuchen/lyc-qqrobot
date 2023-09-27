@@ -1,12 +1,11 @@
 # 使用Python编写的一套QQ机器人框架
 
-## 目前已经实现的功能
+## 功能
 - [x] 随机加速gif
 - [x] 戳戳群友头像随机发送即时生成的表情包
 - [x] 调用Tim官方客户端发送群消息，避免风控发不出消息
 - [x] 调用Midjourney实现AI绘画
 - [x] 调用StableDiffusion实现AI绘画
-- [x] ~~调用吐司在线画图实现AI绘画，吐司加了验证码，暂时放弃~~
 - [x] 接入chatgpt聊天，可以设置AI人格
 - [x] 发送B站视频链接或者BV、AV号进行分析视频并AI总结视频内容
 - [x] 总结任意网页
@@ -17,7 +16,11 @@
 - [x] 24点算数游戏
 - [x] 活跃度系统，群成员发言一次加一点活跃度，签到、连续签到获得额外奖励，活跃度有排行榜
 - [x] 文字转语音聊天
+- [x] 发送知乎链接自动截图预览，支持知乎专栏、知乎问答
+- [x] 发送github链接自动截图预览readme
+- [x] ~~调用吐司在线画图实现AI绘画，吐司加了验证码，暂时放弃~~
 - [x] ~~原神抽卡模拟，已不再更新~~
+ 
 # 环境
 
 ## Python版本
@@ -30,8 +33,7 @@ Python3.11
 
 ### 初始化
 
-运行`init.bat`
-
+运行`init.bat`，会下载一些必要文件和登录知乎
 
 # mirai配置
 
@@ -77,9 +79,7 @@ webhook:
 
 ## 配置自带的插件参数
 
-运行一次[config.py](config.py)会在同级目录生成一个`config.json`,最终拿到的参数配置就是在`config.json`里面
-
-打开`config.json`修改对应参数
+打开`config.json`修改对应参数, 运行了`init.bat`之后会自动生成`config.json`
 
 [参数文档](doc/config.md)
 
@@ -103,13 +103,12 @@ webhook:
 参考[msgplugins/example.py](msgplugins/example.py)
 
 # TODO
-- [ ] ~~mirai也使用docker~~
-- [ ] ~~mirai和qqrobot使用docker network通信~~
-- [x] 不同环境不同的配置文件
-- [x] docker build脚本，自动识别cpu架构
-- [x] midjourney选图放大功能
-- [x] midjourney生成图功能
 - [ ] 完善本文档
+- [ ] MJ图生图自动识别宽高比例
+- [ ] SD画图识别关键字自动添加lora
+- [ ] 命令菜单使用图片生成并美化
+- [ ] 支持多个机器人账号
+- [ ] 画图引擎切换命令
 
 # 许可证
 
