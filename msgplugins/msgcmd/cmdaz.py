@@ -52,14 +52,21 @@ class CMD(object):
                 return False
         cmd_name = ""
         cmds = list(self.alias) + [self.cmd_name]
-        cmds.sort(key=len, reverse=True)
+
+        def _sort_key(x):
+            if isinstance(x, str):
+                return len(x)
+            else:
+                return 0
+        cmds.sort(key=_sort_key, reverse=True)
         # 检查输入是不是以命令开头
         for i in cmds:
-            if input_text.startswith(i):
-                cmd_name = i
-                break
-            else:
-                r = re.findall(rf"({i})", input_text)
+            if isinstance(i, str):
+                if input_text.startswith(i):
+                    cmd_name = i
+                    break
+            elif isinstance(i, re.Pattern):
+                r = re.findall(i, input_text)
                 if r:
                     cmd_name = r[0]
                     break
@@ -131,7 +138,7 @@ def on_command(cmd_name,
                sep=" ",
                int_param_index: list[int] = (),
                param_len=0,
-               alias: tuple[str, ...] = (),
+               alias: tuple[str | re.Pattern, ...] = (),
                ignores: tuple[str] = (),
                bind_msg_type: tuple[Type[GroupMsg | FriendMsg | BaseMsg], ...] = (GroupMsg, FriendMsg),
                desc: str = "",
