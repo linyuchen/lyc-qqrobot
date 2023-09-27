@@ -1,8 +1,12 @@
 import asyncio
+import io
 import re
 import threading
 import time
 from collections import OrderedDict
+
+import requests
+from PIL import Image
 
 import config
 from common.logger import logger
@@ -84,6 +88,18 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
     if msg_chain:
         urls = msg_chain.get_image_urls()
         img_urls.extend(urls)
+
+    # 获取图片宽高比例
+    img_ratio = ""
+    if img_urls:
+        try:
+            img_data = requests.get(img_urls[0]).content
+        except Exception as e:
+            logger.error(f"获取图片宽高比例失败:{e}")
+        else:
+            img = Image.open(io.BytesIO(img_data))
+            img_ratio = f"-s {img.width}:{img.height}"
+
     # 批量上传到图床,这里要用异步
     img_post_urls = []
 
@@ -126,6 +142,8 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
                 prompt += " --style raw"
         if not prompt:
             return msg.reply("请输入提示词或者附上图片")
+        if img_ratio:
+            prompt += f" {img_ratio}"
         mj_client.draw(prompt, callback, img_post_urls)
 
     threading.Thread(target=reply_thread, daemon=True).start()
