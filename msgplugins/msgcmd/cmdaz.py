@@ -3,6 +3,7 @@
 """
 命令解析模块
 """
+import re
 import threading
 from typing import Callable, Type
 
@@ -51,11 +52,17 @@ class CMD(object):
                 return False
         cmd_name = ""
         cmds = list(self.alias) + [self.cmd_name]
-        cmds.sort(key=len)
+        cmds.sort(key=len, reverse=True)
         # 检查输入是不是以命令开头
         for i in cmds:
             if input_text.startswith(i):
                 cmd_name = i
+                break
+            else:
+                r = re.findall(rf"({i})", input_text)
+                if r:
+                    cmd_name = r[0]
+                    break
         if not cmd_name:
             return False
 
