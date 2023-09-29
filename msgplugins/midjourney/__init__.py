@@ -97,7 +97,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             logger.error(f"获取图片宽高比例失败:{e}")
         else:
             img = Image.open(io.BytesIO(img_data))
-            img_ratio = f"-s {img.width}:{img.height}"
+            img_ratio = f" --ar {img.width}:{img.height} "
 
     # 批量上传到图床,这里要用异步
     img_post_urls = []
@@ -135,10 +135,10 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
         if msg.msg.strip().startswith("niji"):
             prompt += " --niji 5"
             if "--style" not in prompt:
-                prompt += " --style original"
+                prompt += " --style original "
         elif msg.msg.strip().startswith("mj"):
             if "--style" not in prompt:
-                prompt += " --style raw"
+                prompt += " --style raw "
         if not prompt:
             return msg.reply("请输入提示词或者附上图片")
         if img_ratio:
