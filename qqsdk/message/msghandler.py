@@ -42,8 +42,12 @@ class MsgHandler:
     global_enabled = True
 
     def __init__(self, **kwargs):
-        self.instances.append(self)
-        data = get_config(kwargs.get("name", self.name))
+        class_name = self.__class__.__name__
+        # 如果已经存在同名的插件，就不再添加到instances中
+        if not list(filter(lambda i: i.__class__.__name__ == class_name, self.instances)):
+            self.instances.append(self)
+        name = kwargs.get("name", self.name)
+        data = get_config(name)
         self.global_enabled = data["enabled"]
         self.__exclude_groups = data["exclude_groups"]
 
