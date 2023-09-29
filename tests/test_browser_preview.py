@@ -26,7 +26,7 @@ class TestBrowserPreview(TestCase):
         Image.open(self.zhihu_previewer.zhihu_zhuanlan(url)).show()
 
     def test_moe_wiki(self):
-        keyword = "时光代理人"
+        keyword = "39music"
         Image.open(moe_wiki(keyword)).show()
 
     def test_wx_article(self):
