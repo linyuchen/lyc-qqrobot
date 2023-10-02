@@ -10,7 +10,9 @@ class MenuPlugin(MsgHandler):
         friend_cmds: list[str] = []
         group_cmds: list[str] = []
         last_name = ""
-        for handler in msg.qq_client.msg_handlers:
+        handlers = msg.qq_client.msg_handlers[:]
+        handlers.sort(key=lambda x: x.name)
+        for handler in handlers:
             if not handler.desc:
                 continue
             handler: MsgHandler

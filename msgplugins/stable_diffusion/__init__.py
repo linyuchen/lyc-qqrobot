@@ -67,7 +67,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 @on_command("sd",
             alias=("SD", ),
-            desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5\n",
+            desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")
@@ -82,3 +82,10 @@ def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
         threading.Thread(target=img2img, args=(msg, args, url[0]), daemon=True).start()
     else:
         threading.Thread(target=txt2img, args=(msg, args), daemon=True).start()
+
+
+@on_command("lora列表",
+            desc="lora列表: 获取lora关键字",
+            param_len=0, cmd_group_name="SD画图")
+def lora_list(msg: GroupMsg | FriendMsg, args: list[str]):
+    msg.reply(sd.get_loras())

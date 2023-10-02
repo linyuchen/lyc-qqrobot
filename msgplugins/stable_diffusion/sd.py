@@ -11,6 +11,7 @@ import config
 from common.sdwebuiapi import WebUIApi, raw_b64_img
 from common.utils.translator import trans, is_chinese
 from .base import AIDrawBase
+from .lora import trans_lora, get_lora
 
 base_url = config.SD_HTTP_API + "/sdapi/v1/"
 
@@ -30,16 +31,17 @@ class SDDraw(AIDrawBase):
             txt = trans(txt)
         return txt
 
-    def txt2img(self, txt: str, width: int = 1024, height: int = 1024) -> list[Path]:
+    def txt2img(self, prompt: str, width: int = 1024, height: int = 1024) -> list[Path]:
         """
         文字转图片
-        :param txt: 文字
+        :param prompt: 文字
         :param width: 图片宽度
         :param height: 图片高度
         :return: 图片路径列表
         """
 
-        txt = self.trans_prompt(txt)
+        prompt = trans_lora(prompt)
+        prompt = self.trans_prompt(prompt)
         # if "I'm sorry" in txt:
         #     txt = ""
         # 添加lora
@@ -47,7 +49,7 @@ class SDDraw(AIDrawBase):
         # for lora in res_loras:
         #     txt += f",<lora:{lora['name']}:1>,"
         data = {
-            "prompt": self.base_prompt + txt,
+            "prompt": self.base_prompt + prompt,
             "negative_prompt": self.negative_prompt,
             "steps": 20,
             "width": width,
@@ -64,6 +66,7 @@ class SDDraw(AIDrawBase):
         return res_paths
 
     def img2img(self, img_url: str, prompt: str, denoising_strength=0.5) -> Image:
+        prompt = trans_lora(prompt)
         prompt = self.trans_prompt(prompt)
         data = requests.get(img_url).content
         fp = io.BytesIO(data)
@@ -117,7 +120,8 @@ class SDDraw(AIDrawBase):
         return res
 
     def get_loras(self):
-        res = f"lora列表：\n{self.__get_loras()}"
+        # res = f"lora列表：\n{self.__get_loras()}"
+        res = f"sd lora关键字(提示词加上关键字即可触发)：\n{get_lora()}"
         return res
 
     def set_model(self, model_name: str):
@@ -132,3 +136,4 @@ class SDDraw(AIDrawBase):
         }
         self._api_post("options", data)
         return f"模型已切换为：{model_name}"
+

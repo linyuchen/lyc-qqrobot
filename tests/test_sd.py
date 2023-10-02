@@ -11,6 +11,9 @@ class TestSD(TestCase):
         res = self.sd.txt2img("1girl, sky, sunshine, flowers,鸟在天上飞")
         print(res)
 
+    def test_lora(self):
+        print(self.sd.get_loras())
+
 
 class TestTusi(TestCase):
     def test_draw(self):
