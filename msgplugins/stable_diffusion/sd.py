@@ -40,16 +40,11 @@ class SDDraw(AIDrawBase):
         :return: 图片路径列表
         """
 
-        prompt = trans_lora(prompt)
+        lora_prompt, prompt = trans_lora(prompt)
         prompt = self.trans_prompt(prompt)
-        # if "I'm sorry" in txt:
-        #     txt = ""
-        # 添加lora
-        # res_loras = self._api_get("loras")
-        # for lora in res_loras:
-        #     txt += f",<lora:{lora['name']}:1>,"
+
         data = {
-            "prompt": self.base_prompt + prompt,
+            "prompt": self.base_prompt + prompt + lora_prompt,
             "negative_prompt": self.negative_prompt,
             "steps": 20,
             "width": width,
@@ -66,8 +61,8 @@ class SDDraw(AIDrawBase):
         return res_paths
 
     def img2img(self, img_url: str, prompt: str, denoising_strength=0.5) -> Image:
-        prompt = trans_lora(prompt)
-        prompt = self.trans_prompt(prompt)
+        lora_prompt, prompt = trans_lora(prompt)
+        prompt = self.trans_prompt(prompt) + lora_prompt
         data = requests.get(img_url).content
         fp = io.BytesIO(data)
         image = Image.open(fp)

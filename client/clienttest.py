@@ -21,7 +21,7 @@ class ClientTest(QQClientBase):
     def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         print(content)
 
-    def get_msg(self):
+    def get_msg(self, data):
         group_msg = GroupMsg(group=self.TEST_GROUP, group_member=self.TEST_GROUP_MEMBER,
                              msg=str(input("请输入消息:")))
         group_msg.reply = print
@@ -30,7 +30,7 @@ class ClientTest(QQClientBase):
     def start(self) -> None:
         super().start()
         while True:
-            self.get_msg()
+            self.get_msg(data={})
 
 
 if __name__ == "__main__":

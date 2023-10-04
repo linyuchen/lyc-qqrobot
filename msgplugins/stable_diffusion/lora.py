@@ -1,7 +1,7 @@
 # lora的翻译和绑定
 
 lora = {
-    "op": {
+    "原神": {
         "多莉": "dorirdef",
         "多莉2": "dorirnd",
         "瑶瑶": "yaoyaordef",
@@ -95,8 +95,14 @@ lora = {
         "辛焱": "xinyandef",
         "辛焱2": "xinyanrnd",
     },
-    "laughing_finger": {
+    "笑指": {
         "笑指": "laughing_finger",
+    },
+    "克拉拉": {
+        "克拉拉": "clara, honkai_star_rail",
+    },
+    "符玄": {
+        "符玄": "fuxuan"
     }
 }
 
@@ -109,24 +115,29 @@ def get_lora() -> str:
     return result
 
 
-
-def trans_lora(prompt: str) -> str:
-    lora_prompt = []
-    new_prompt = []
+def trans_lora(prompt: str) -> tuple[str, str]:
+    lora_prompts = []
+    new_prompts = []
+    old_prompts = []
     for prompt in prompt.split(","):
+        new_prompt = ""
         for key in lora:
             lora_keys = list(lora[key].keys())
             lora_keys.sort(key=len, reverse=True)
             for lora_key in lora_keys:
                 lora_word = lora[key][lora_key]
                 if lora_key in prompt:
-                    if lora_word not in lora_prompt:
-                        lora_prompt.append(f"<lora:{key}>")
-                    prompt = prompt.replace(lora_key, lora_word + ",")
+                    if lora_word not in lora_prompts:
+                        lora_prompts.append(f"<lora:{key}>")
+                    new_prompt = prompt.replace(lora_key, lora_word + ",")
+                    prompt = prompt.replace(lora_key, "")
 
-        new_prompt.append(prompt)
+        if new_prompt:
+            new_prompts.append(new_prompt)
 
-    return ",".join(lora_prompt) + "," + ",".join(new_prompt)
+        old_prompts.append(prompt)
+
+    return ",".join(lora_prompts) + "," + ",".join(new_prompts), ",".join(old_prompts)
 
 
 if __name__ == '__main__':
