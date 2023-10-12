@@ -152,7 +152,7 @@ class TusiDraw(TaskPool[TusiTask]):
         if is_chinese(txt):
             txt = trans(txt)
         task = TusiTask(prompt=txt, callback=callback)
-        self._join_task(task)
+        self.join_task(task)
 
     def get_models(self) -> str:
         return "模型列表：\n" + "\n".join([f"{'当前' if m == self.model else ''}模型名：{m.name}" for m in self.models])
@@ -164,7 +164,7 @@ class TusiDraw(TaskPool[TusiTask]):
         self.model = model[0]
         return f"模型已切换为{self.model.name}"
 
-    def _on_handling_putted(self, task: TusiTask):
+    def _on_task_handling(self, task: TusiTask):
         res = self._api_post("/works/v1/works/task", {
             "params": {
                 "baseModel": {
