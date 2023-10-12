@@ -15,7 +15,7 @@ def new_page(url: str, proxy: str = "", headless=True) -> Page:
     with sync_playwright() as p:
         browser = p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=headless, proxy={
             "server": proxy,
-        } if proxy else None)
+        } if proxy else None, viewport={"width": 1920, "height": 1080})
         page = browser.new_page()
         try:
             page.goto(url, timeout=30000)
@@ -104,11 +104,16 @@ class ZhihuPreviewer:
     def hidden_elements(page: Page):
         page.evaluate(
             """
-            e = document.getElementsByClassName("ContentItem-actions");
-                        for (let i = 0; i < e.length; i++) {
-                            e[i].style.display = "none";
-                            //e[i].remove()
-                        }
+            let closeLoginBtn = document.getElementsByClassName("Modal-closeButton")[0]
+            if (closeLoginBtn){
+                closeLoginBtn.click()
+            }
+            let e = document.getElementsByClassName("ContentItem-actions");
+            for (let i = 0; i < e.length; i++) {
+                e[i].style.display = "none";
+                //e[i].remove()
+            }
+
             """
         )
 
@@ -147,8 +152,8 @@ class ZhihuPreviewer:
     def zhihu_zhuanlan(self, url: str) -> Path | None:
 
         with new_page(url, headless=False) as page:
-            load_all(page)
             self.hidden_elements(page)
+            load_all(page)
             author = page.locator("css=.Post-Header")
             if author.count() == 0:
                 return None
