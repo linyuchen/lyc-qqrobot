@@ -4,11 +4,8 @@ import os
 import pathlib
 import sys
 import traceback
-from abc import ABCMeta, abstractmethod, ABC
+from abc import ABCMeta, abstractmethod
 
-from flask import Flask
-
-import config
 from common.logger import logger
 from qqsdk import entity
 from qqsdk.eventlistener import EventListener
@@ -76,7 +73,7 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         """
 
     @abstractmethod
-    def get_msg(self):
+    def get_msg(self, data: dict):
         raise NotImplementedError
 
     def get_group(self, group_qq: str) -> entity.Group:
@@ -93,15 +90,3 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
             self.get_friends()
             friend = self.__get_friend(qq)
         return friend
-
-
-class QQClientFlask(QQClientBase, ABC):
-    _flask_app = Flask(__name__)
-
-    def __init__(self):
-        super().__init__()
-        self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])
-
-    def start(self) -> None:
-        super().start()
-        self._flask_app.run(host="0.0.0.0", port=config.LISTEN_PORT)

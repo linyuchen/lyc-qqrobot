@@ -7,25 +7,24 @@ from pathlib import PurePath
 from typing import List, Union
 
 import requests
-from flask import request
-
+from flask import Flask, request
 
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
 from qqsdk.message import GroupMsg, FriendMsg, GroupNudgeMsg, GroupSendMsg
 from qqsdk.message.segment import MessageSegment
-from qqsdk.qqclient import QQClientFlask
+from qqsdk.qqclient import QQClientBase
 
 
-class MiraiQQClient(QQClientFlask):
+class MiraiQQClient(QQClientBase):
     __api_url = config.MIRAI_HTTP_API
     __api_verify_key = config.MIRAI_HTTP_API_VERIFY_KEY
     __api_session_key = ""
 
-    def __init__(self):
+    def __init__(self, qq: str):
         super().__init__()
-        self.qq_user.qq = config.QQ
+        self.qq_user.qq = qq
         self.__verify()
         self.get_friends()
 
@@ -103,7 +102,7 @@ class MiraiQQClient(QQClientFlask):
             msg_id = res.get("messageId")
             group_send_msg = GroupSendMsg(msg_id=msg_id, group=self.get_group(qq),
                                           msg_chain=content)
-            group_send_msg.recall = lambda : self.recall_msg(qq, msg_id)
+            group_send_msg.recall = lambda: self.recall_msg(qq, msg_id)
             self.msgs.put(group_send_msg)
         return res
 
@@ -229,8 +228,8 @@ class MiraiQQClient(QQClientFlask):
         msg_chain.msg_id = msg_id
         return msg_chain
 
-    def get_msg(self):
-        data = request.json
+    def get_msg(self, data: dict):
+        # data = request.json
         # logger.debug(f"收到mirai消息：{data}")
         message_type = data.get("type")
         is_at_me = False
@@ -259,7 +258,7 @@ class MiraiQQClient(QQClientFlask):
                 if not group_member:
                     group_member = entity.GroupMember(qq=group_member_qq, nick=group_member_qq, card="")
                     group.members.append(group_member)
-            robot_name = group.get_member(str(config.QQ)).get_name()
+            robot_name = group.get_member(self.qq_user.qq).get_name()
             if msg.strip().startswith(f"@{robot_name}"):
                 msg_chain.is_at_me = True
                 msg = msg.replace(f"@{robot_name}", "", 1)
@@ -291,4 +290,28 @@ class MiraiQQClient(QQClientFlask):
         return {}
 
 
-MiraiQQClient().start()
+class QQClientFlask:
+    _flask_app = Flask(__name__)
+
+    def __init__(self):
+        self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])
+        self.qq_clients: [str, MiraiQQClient] = {}
+
+    def get_msg(self):
+        # 可以根据 request.environ["HTTP_QQ"] 获取bot的QQ号
+        qq = request.environ.get("HTTP_QQ")
+        data = request.json
+        client = self.qq_clients[qq]
+        client.get_msg(data)
+
+        return {}
+
+    def start(self) -> None:
+        for qq in config.QQ:
+            client = MiraiQQClient(str(qq))
+            self.qq_clients[str(qq)] = client
+            client.start()
+        self._flask_app.run(host="0.0.0.0", port=config.LISTEN_PORT)
+
+
+QQClientFlask().start()

@@ -36,7 +36,7 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
 
 
 def get_url(text: str) -> str:
-    pattern = re.compile(r"^https?://[A-Za-z0-9$\-_.+!*'(),%;:@&=/?#\[\]]+$")
+    pattern = re.compile(r"(https?://[A-Za-z0-9$\-_.+!*'(),%;:@&=/?#\[\]]+)")
     url = re.findall(pattern, text)
     return url[0] if url else ""
 
@@ -58,7 +58,6 @@ def summary_web_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
         result = summary_web(url)
         msg.reply(result + "\n\n" + url)
         return
-
 
 
 class ChatGPT(MsgHandler):

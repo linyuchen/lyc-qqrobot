@@ -86,9 +86,9 @@ def github_readme(url: str, http_proxy: str = "") -> Path | None:
             return None
         e.evaluate(
             """
-            e = document.getElementsByClassName("top-0")[0]
+            e = document.getElementsByClassName("top-0 d-flex")[0]
             if (e){
-                e.style.display = "none";
+                e.remove()
             }
             """
         )
