@@ -42,7 +42,7 @@ class Task:
 class TaskCallbackResponse:
     task: Task
     error: str = ""
-    reply_msg: Message = None
+    reply_msg: Message | None = None
     image_path: list[Path] | None = None
     image_urls: list[str] = None
 
@@ -106,19 +106,24 @@ class MidjourneyClientBase(metaclass=ABCMeta):
         if is_chinese(prompt):
             prompt = trans(prompt).lower()
 
+        # 特殊符号转成空格
+        prompt = re.sub(r'[^a-zA-Z0-9\s]+', ' ', prompt)
+
+        # 违禁词过滤
+        prompt_list = []
         have_banned_words: list[str] = []
-        for banned_word in BANNED_WORDS:
-            if banned_word in prompt:
-                have_banned_words.append(banned_word)
-                prompt = prompt.replace(banned_word, "")
+        for prompt_word in prompt.split():
+            if prompt_word in BANNED_WORDS:
+                have_banned_words.append(prompt_word)
+                continue
+            prompt_list.append(prompt_word)
+        prompt = " ".join(prompt_list)
         task = Task(prompt=prompt, callback=callback, datetime=datetime.now())
         if not prompt:
             error = "提示词不能为空"
             if have_banned_words:
                 error = " 有违禁词" + " ".join(have_banned_words)
             return callback(TaskCallbackResponse(error=error, image_path=None, task=task, reply_msg=None))
-        # 特殊符号转成空格
-        prompt = re.sub(r'[^a-zA-Z0-9\s]+', ' ', prompt)
         prompt = prompt + params
         if urls:
             prompt = " ".join(urls) + " " + prompt

@@ -103,6 +103,9 @@ lora = {
     },
     "符玄": {
         "符玄": "fuxuan"
+    },
+    "星穹铁道_银狼": {
+        "银狼": "silver wolf \(honkai: star rail\)"
     }
 }
 
