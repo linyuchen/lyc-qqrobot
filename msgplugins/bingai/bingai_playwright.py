@@ -5,7 +5,7 @@ import time
 from dataclasses import dataclass
 from typing import Callable
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, Page
 
 CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data_bingai"
 
@@ -21,14 +21,27 @@ class BingAIPlayWright:
             proxy={
                 "server": proxy,
             } if proxy else None)
-        self.page = self.browser.new_page()
-        url = "https://www.bing.com/chat?cc=us"
-        try:
-            self.page.goto(url, timeout=30000)
-        except Exception as e:
-            error_msg = f"{e}"
         # self.page.pause()
-        self.question_num = 0
+        self.pages: dict[str, Page] = {}
+        self.page: Page | None = None
+
+    def change_page(self, user_id: str):
+        self.page = self.__get_page(user_id)
+
+    def __get_page(self, user_id: str):
+        if user_id in self.pages:
+            return self.pages[user_id]
+        else:
+            page = self.browser.new_page()
+            self.pages[user_id] = page
+            page.goto("https://www.bing.com/chat?cc=us", timeout=30000)
+            using_time = 0
+            while not page.query_selector("textarea"):
+                time.sleep(0.1)
+                using_time += 0.1
+                if using_time > 30:
+                    raise Exception("网络超时")
+            return page
 
     def send_msg(self, msg: str):
         if not self.page.query_selector("textarea").is_enabled():
@@ -36,7 +49,6 @@ class BingAIPlayWright:
             time.sleep(1)
         self.page.fill("textarea", msg)
         self.page.click("div[class='control submit']")
-        self.question_num += 1
 
     @property
     def is_responding(self) -> bool:
@@ -60,6 +72,7 @@ class BingAIPlayWright:
 
 @dataclass
 class BinAITask:
+    user_id: str
     question: str
     reply_callback: Callable[[str], None]
 
@@ -78,6 +91,7 @@ class BinAITaskPool(threading.Thread):
         bing = BingAIPlayWright(proxy=self.proxy, headless=self.headless)
         while True:
             task = self.task_queue.get()
+            bing.change_page(task.user_id)
             try:
                 bing.send_msg(task.question)
             except Exception as e:
@@ -94,6 +108,7 @@ if __name__ == '__main__':
     test = BinAITaskPool(proxy="http://localhost:7890", headless=False)
     test.start()
     while True:
+        uid = input("user_id:")
         question = input("请输入问题：")
         print("思考中...")
-        test.put_question(BinAITask(question, print))
+        test.put_question(BinAITask(uid, question, print))

@@ -1,6 +1,6 @@
 from config import get_config
 from msgplugins.msgcmd import on_command
-from qqsdk.message import GeneralMsg
+from qqsdk.message import GeneralMsg, FriendMsg
 
 from .bingai_playwright import BinAITaskPool, BinAITask
 
@@ -9,10 +9,17 @@ bingai_task_pool.start()
 
 
 @on_command("bing",
+            alias=("#", ),
             desc="bing 问题，获取bing ai的回复,如: bing 上海的天气",
             param_len=1,
             cmd_group_name="bingai"
             )
 def bing(msg: GeneralMsg, params: list[str]):
     msg.reply("正在思考中……")
-    bingai_task_pool.put_question(BinAITask(params[0], msg.reply))
+    if isinstance(msg, FriendMsg):
+        user_id = msg.friend.qq + "f"
+    else:
+        user_id = msg.group.qq + "g"
+
+    task = BinAITask(user_id, params[0], msg.reply)
+    bingai_task_pool.put_question(task)
