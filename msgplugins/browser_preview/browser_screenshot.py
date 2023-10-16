@@ -28,7 +28,6 @@ def new_page(url: str, proxy: str = "", headless=True) -> Page:
 
 
 def load_all(page: Page):
-    # 隐藏赞数栏
     result = page.evaluate("""
         for(let i = 0; i <= document.body.scrollHeight; i+=500){
             setTimeout(function(){
@@ -197,9 +196,16 @@ def moe_wiki(keyword: str) -> Path | None:
             close_btn.first.click()
             time.sleep(1)
         load_all(page)
-        content = page.locator("css=#mw-content-text")
-        if content.count() == 0:
+        content = page.query_selector("#mw-content-text")
+        if not content:
             return
+        content.evaluate(
+            """
+            e = document.getElementById("mw-content-text")
+            e.style.paddingLeft = "40px";
+            e.style.paddingRight = "40px";
+            """
+        )
         path = Path(tempfile.mktemp(suffix=".png"))
         content.screenshot(path=path)
         page.close()
@@ -215,8 +221,8 @@ def wx_article(url: str) -> Path | None:
         content.evaluate(
             """
             e = document.getElementById("img-content")
-            e.style.paddingLeft = "20px";
-            e.style.paddingRight = "20px";
+            e.style.paddingLeft = "40px";
+            e.style.paddingRight = "40px";
             """
         )
         path = Path(tempfile.mktemp(suffix=".png"))

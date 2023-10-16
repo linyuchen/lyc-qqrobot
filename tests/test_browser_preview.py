@@ -30,5 +30,5 @@ class TestBrowserPreview(TestCase):
         Image.open(moe_wiki(keyword)).show()
 
     def test_wx_article(self):
-        url = "https://mp.weixin.qq.com/s/Y0NkjKNWdtURYOfKBMGxAw"
+        url = "https://mp.weixin.qq.com/s/2j1VZDFsgxiuLVjNq09SXw"
         Image.open(wx_article(url)).show()
