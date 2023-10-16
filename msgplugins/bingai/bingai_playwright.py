@@ -91,8 +91,8 @@ class BinAITaskPool(threading.Thread):
         bing = BingAIPlayWright(proxy=self.proxy, headless=self.headless)
         while True:
             task = self.task_queue.get()
-            bing.change_page(task.user_id)
             try:
+                bing.change_page(task.user_id)
                 bing.send_msg(task.question)
             except Exception as e:
                 reply_text = f"发生了错误：{e}"
