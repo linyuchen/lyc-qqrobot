@@ -3,11 +3,18 @@ import tempfile
 import threading
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 
 from playwright.sync_api import sync_playwright, Page
 
 CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data_bingai"
+
+
+@dataclass
+class BingAIImageResponse:
+    preview: Path
+    img_urls: list[str]
 
 
 class BingAIPlayWright:
@@ -35,12 +42,13 @@ class BingAIPlayWright:
             page = self.browser.new_page()
             self.pages[user_id] = page
             page.goto("https://www.bing.com/chat?cc=us", timeout=30000)
-            using_time = 0
-            while not page.query_selector("textarea"):
-                time.sleep(0.1)
-                using_time += 0.1
-                if using_time > 30:
-                    raise Exception("网络超时")
+            for i in range(30):
+                time.sleep(1)
+                if page.query_selector("textarea"):
+                    break
+            else:
+                raise Exception("网络超时")
+
             return page
 
     def send_msg(self, msg: str):
@@ -56,18 +64,44 @@ class BingAIPlayWright:
         return responding
 
     def get_msg(self):
-        used_time = 0
-        while self.is_responding:
-            time.sleep(0.5)
-            used_time += 0.5
-            if used_time > self.timeout:
-                return "网络超时了~"
+        for i in range(self.timeout):
+            time.sleep(1)
+            if not self.is_responding:
+                break
+        else:
+            return "网络超时了~"
+
         # css选择器 选择ai的文本回复 "cib-message[source='bot'][type='text'] .ac-textBlock"
         replies = self.page.query_selector_all("cib-message[source='bot'][type='text'] .ac-textBlock")
         last_reply = replies[-1]
         # 移除里面的sup标签
         last_reply.evaluate("el => el.querySelectorAll('sup').forEach(e => e.remove())")
         return last_reply.inner_text()
+
+    def draw(self, prompt: str):
+        page = self.browser.new_page()
+        page.goto("https://www.bing.com/images/create/")
+        page.fill("#sb_form_q", prompt)
+        page.click("#create_btn_c")
+        time.sleep(5)
+        for i in range(60 * 5):
+            time.sleep(1)
+            create_btn = page.query_selector("#create_btn_c")
+            if create_btn.inner_text() == "Create":
+                break
+        else:
+            raise Exception("网络超时")
+
+        gir = page.query_selector("#gir_async")
+        path = tempfile.mktemp(suffix=".png")
+        path = Path(path)
+        gir.screenshot(path=path)
+        img_list = gir.query_selector_all("img")
+        img_urls = []
+        for img in img_list:
+            img_url = img.get_attribute("src").split("?")[0]
+            img_urls.append(img_url)
+        return BingAIImageResponse(path, img_urls)
 
 
 @dataclass
