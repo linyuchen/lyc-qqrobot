@@ -2,9 +2,8 @@ from config import get_config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
 
-from .bingai_playwright import BinAITaskPool, BinAITask, BingAIPlayWright
+from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright
 
-bingai_playwright = BingAIPlayWright(proxy=get_config("GFW_PROXY"), headless=False)
 bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False)
 bingai_task_pool.start()
 
@@ -22,8 +21,8 @@ def bing(msg: GeneralMsg, params: list[str]):
     else:
         user_id = msg.group.qq + "g"
 
-    task = BinAITask(user_id, params[0], msg.reply)
-    bingai_task_pool.put_question(task)
+    task = BingAIChatTask(user_id, params[0], msg.reply)
+    bingai_task_pool.put_task(task)
 
 
 @on_command(
