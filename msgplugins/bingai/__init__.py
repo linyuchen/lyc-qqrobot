@@ -2,14 +2,14 @@ from config import get_config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
 
-from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright
+from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright, BingAIDrawTask, BingAIImageResponse
 
 bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False)
 bingai_task_pool.start()
 
 
 @on_command("bing",
-            alias=("#", ),
+            alias=("#",),
             desc="bing 问题，获取bing ai的回复,如: bing 上海的天气",
             param_len=1,
             cmd_group_name="bingai"
@@ -28,13 +28,18 @@ def bing(msg: GeneralMsg, params: list[str]):
 @on_command(
     "DE3",
     alias=("bing画图", "de3", "微软画图"),
+    param_len=1,
     desc="DALL·E 3画图,如: DE3 一只会飞的猫猫",
+    cmd_group_name="bingai",
 )
 def bingai_draw(msg: GeneralMsg, params: list[str]):
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     prompt = params[0]
-    res = bingai_playwright.draw(prompt)
-    msg.reply(
-        MessageSegment.image_path(res.image_path) +
-        MessageSegment.text(f"提示词:{prompt}\n\n原图："+'\n'.join(res.image_urls))
-    )
+
+    def reply(resp: BingAIImageResponse):
+        msg.reply(
+            MessageSegment.image_path(resp.preview) +
+            MessageSegment.text(f"提示词:{prompt}\n\n原图：" + '\n'.join(resp.img_urls))
+        )
+
+    bingai_task_pool.put_task(BingAIDrawTask(prompt, reply))

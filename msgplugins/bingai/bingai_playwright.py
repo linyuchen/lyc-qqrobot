@@ -19,38 +19,59 @@ class BingAIImageResponse:
     img_urls: list[str]
 
 
+@dataclass
+class TaskPage:
+    page: Page
+    last_time: float
+
+
 class BingAIPlayWright:
+    browser: BrowserContext = None
+    browser_context_manager = None
 
     def __init__(self, proxy: str = "", headless=False):
         self.proxy = proxy
         self.headless = headless
         self.timeout = 90
+        self.page_lifecycle_time = 5 * 60
         # self.page.pause()
-        self.pages: dict[str, Page] = {}
-        self.page: Page | None = None
+        self.pages: dict[str, TaskPage] = {}
 
-    async def new_page(self):
-        p = await async_playwright().start()
-        browser = await p.chromium.launch_persistent_context(
+    async def init(self):
+        if self.browser:
+            return
+        self.browser_context_manager = await async_playwright().start()
+        self.browser = await self.browser_context_manager.chromium.launch_persistent_context(
             CHROME_DATA_DIR,
             headless=self.headless,
             base_url="https://www.bing.com",
             proxy={
                 "server": self.proxy,
             } if self.proxy else None)
-        return await browser.new_page()
+
+    async def new_page(self):
+        return await self.browser.new_page()
         # p = await self.browser.new_page()
         # await p.goto("https://www.bing.com/chat?cc=us")
 
-    async def change_page(self, user_id: str):
-        self.page = await self.__get_page(user_id)
+    async def check_page_lifecycle(self):
+        closed_user_ids = []
+        for user_id, page in self.pages.items():
+            if time.time() - page.last_time > self.page_lifecycle_time:
+                await page.page.close()
+                closed_user_ids.append(user_id)
+
+        for user_id in closed_user_ids:
+            del self.pages[user_id]
 
     async def __get_page(self, user_id: str):
         if user_id in self.pages:
-            return self.pages[user_id]
+            task_page = self.pages[user_id]
+            task_page.last_time = time.time()
+            page = task_page.page
         else:
             page = await self.new_page()
-            self.pages[user_id] = page
+            self.pages[user_id] = TaskPage(page, time.time())
             await page.goto("https://www.bing.com/chat?cc=us", timeout=30000)
             for i in range(30):
                 time.sleep(1)
@@ -59,30 +80,31 @@ class BingAIPlayWright:
             else:
                 raise Exception("网络超时")
 
-            return page
+        return page
 
-    async def send_msg(self, msg: str):
-        if not await (await self.page.query_selector("textarea")).is_enabled():
-            await self.page.click("button[aria-label='新主题']")
+    async def send_msg(self, msg: str, uid: str):
+        page = await self.__get_page(uid)
+        if not await (await page.query_selector("textarea")).is_enabled():
+            await page.click("button[aria-label='新主题']")
             await asyncio.sleep(1)
-        await self.page.fill("textarea", msg)
-        await self.page.click("div[class='control submit']")
+        await page.fill("textarea", msg)
+        await page.click("div[class='control submit']")
 
-    @property
-    async def is_responding(self) -> bool:
-        responding = await (await self.page.query_selector("#stop-responding-button")).is_enabled()
+    async def get_is_responding(self, uid: str) -> bool:
+        page = await self.__get_page(uid)
+        responding = await (await page.query_selector("#stop-responding-button")).is_enabled()
         return responding
 
-    async def get_msg(self):
+    async def get_msg(self, uid: str):
         for i in range(self.timeout):
             await asyncio.sleep(1)
-            if not (await self.is_responding):
+            if not (await self.get_is_responding(uid)):
                 break
         else:
             return "网络超时了~"
-
+        page = await self.__get_page(uid)
         # css选择器 选择ai的文本回复 "cib-message[source='bot'][type='text'] .ac-textBlock"
-        replies = await self.page.query_selector_all("cib-message[source='bot'][type='text'] .ac-textBlock")
+        replies = await page.query_selector_all("cib-message[source='bot'][type='text'] .ac-textBlock")
         last_reply = replies[-1]
         # 移除里面的sup标签
         await last_reply.evaluate("el => el.querySelectorAll('sup').forEach(e => e.remove())")
@@ -131,6 +153,7 @@ class BinAITaskPool(threading.Thread):
     def __init__(self, proxy: str = "", headless=True):
         self.proxy = proxy
         self.headless = headless
+        self.concurrency = 2
         super().__init__(daemon=True)
         self.chat_task_queue: queue.Queue[BingAIChatTask] = queue.Queue()
         self.draw_task_queue: queue.Queue[BingAIDrawTask] = queue.Queue()
@@ -146,14 +169,13 @@ class BinAITaskPool(threading.Thread):
 
         async def handle_chat_task(chat_task: BingAIChatTask):
             try:
-                await bing.change_page(chat_task.user_id)
-                await bing.send_msg(chat_task.question)
+                await bing.send_msg(chat_task.question, chat_task.user_id)
             except Exception as e:
                 traceback.print_exc()
                 reply_text = f"发生了错误：{e}"
             else:
                 try:
-                    reply_text = await bing.get_msg()
+                    reply_text = await bing.get_msg(chat_task.user_id)
                 except Exception as e:
                     reply_text = f"网络错误：{e}"
             threading.Thread(target=chat_task.reply_callback, args=(reply_text,), daemon=True).start()
@@ -163,35 +185,38 @@ class BinAITaskPool(threading.Thread):
             threading.Thread(target=draw_task.reply_callback, args=(draw_resp,), daemon=True).start()
 
         async def handle_task():
-            async_tasks = []
-            for i in range(2):
-                if not self.chat_task_queue.empty():
-                    t = self.chat_task_queue.get()
-                    async_tasks.append(handle_chat_task(t))
-            for i in range(2):
-                if not self.draw_task_queue.empty():
-                    t = self.draw_task_queue.get()
-                    async_tasks.append(handle_draw_task(t))
-            if async_tasks:
-                await asyncio.gather(*async_tasks)
+            await bing.init()
+            while True:
+                async_tasks = []
+                for i in range(self.concurrency):
+                    if not self.chat_task_queue.empty():
+                        t = self.chat_task_queue.get()
+                        async_tasks.append(handle_chat_task(t))
+                for i in range(self.concurrency):
+                    if not self.draw_task_queue.empty():
+                        t = self.draw_task_queue.get()
+                        async_tasks.append(handle_draw_task(t))
+                if async_tasks:
+                    await asyncio.gather(*async_tasks)
+                await bing.check_page_lifecycle()
+                await asyncio.sleep(1)
 
-        while True:
-            try:
-                asyncio.run(handle_task())
-            except Exception as e:
-                traceback.print_exc()
-                print(e)
-                time.sleep(1)
+        try:
+            asyncio.run(handle_task())
+        except Exception as e:
+            traceback.print_exc()
+            print(e)
 
 
 if __name__ == '__main__':
     test = BinAITaskPool(proxy="http://localhost:7890", headless=False)
     test.start()
-    while True:
-        uid = input("user_id:")
-        question = input("请输入问题：")
-        print("思考中...")
-        if question.startswith("画"):
-            test.put_task(BingAIDrawTask(question[1:], print))
-        else:
-            test.put_task(BingAIChatTask(uid, question, print))
+    time.sleep(2)
+    test.put_task(BingAIChatTask("3", "hello", print))
+    time.sleep(2)
+    test.put_task(BingAIChatTask("1", "你好", print))
+    time.sleep(2)
+    test.put_task(BingAIChatTask("2", "你是谁", print))
+    # test.put_task(BingAIDrawTask("一只猫", print))
+    # test.put_task(BingAIDrawTask("两只猫", print))
+    test.join()
