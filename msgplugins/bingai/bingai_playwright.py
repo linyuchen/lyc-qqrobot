@@ -20,7 +20,7 @@ class BingAIImageResponse:
 
 
 @dataclass
-class TaskPage:
+class PageLifeCycle:
     page: Page
     last_time: float
 
@@ -35,7 +35,7 @@ class BingAIPlayWright:
         self.timeout = 90
         self.page_lifecycle_time = 5 * 60
         # self.page.pause()
-        self.pages: dict[str, TaskPage] = {}
+        self.pages: dict[str, PageLifeCycle] = {}
 
     async def init(self):
         if self.browser:
@@ -71,7 +71,7 @@ class BingAIPlayWright:
             page = task_page.page
         else:
             page = await self.new_page()
-            self.pages[user_id] = TaskPage(page, time.time())
+            self.pages[user_id] = PageLifeCycle(page, time.time())
             await page.goto("https://www.bing.com/chat?cc=us", timeout=30000)
             for i in range(30):
                 time.sleep(1)
@@ -133,6 +133,7 @@ class BingAIPlayWright:
         for img in img_list:
             img_url = (await img.get_attribute("src")).split("?")[0]
             img_urls.append(img_url)
+        await page.close()
         return BingAIImageResponse(path, img_urls)
 
 
@@ -184,25 +185,40 @@ class BinAITaskPool(threading.Thread):
             draw_resp = await bing.draw(draw_task.prompt)
             threading.Thread(target=draw_task.reply_callback, args=(draw_resp,), daemon=True).start()
 
-        async def handle_task():
-            await bing.init()
+        async def listen_draw_task():
+            while True:
+                async_tasks = []
+                for i in range(self.concurrency):
+                    if not self.draw_task_queue.empty():
+                        t = self.draw_task_queue.get()
+                        async_tasks.append(handle_draw_task(t))
+
+                if async_tasks:
+                    await asyncio.gather(*async_tasks)
+                await asyncio.sleep(1)
+
+        async def listen_chat_task():
             while True:
                 async_tasks = []
                 for i in range(self.concurrency):
                     if not self.chat_task_queue.empty():
                         t = self.chat_task_queue.get()
                         async_tasks.append(handle_chat_task(t))
-                for i in range(self.concurrency):
-                    if not self.draw_task_queue.empty():
-                        t = self.draw_task_queue.get()
-                        async_tasks.append(handle_draw_task(t))
+
                 if async_tasks:
                     await asyncio.gather(*async_tasks)
                 await bing.check_page_lifecycle()
                 await asyncio.sleep(1)
 
+        async def run():
+            await bing.init()
+            await asyncio.gather(
+                listen_draw_task(),
+                listen_chat_task()
+            )
+
         try:
-            asyncio.run(handle_task())
+            asyncio.run(run())
         except Exception as e:
             traceback.print_exc()
             print(e)
@@ -217,6 +233,6 @@ if __name__ == '__main__':
     test.put_task(BingAIChatTask("1", "你好", print))
     time.sleep(2)
     test.put_task(BingAIChatTask("2", "你是谁", print))
-    # test.put_task(BingAIDrawTask("一只猫", print))
-    # test.put_task(BingAIDrawTask("两只猫", print))
+    test.put_task(BingAIDrawTask("一只猫", print))
+    test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
