@@ -148,6 +148,7 @@ class BingAIChatTask:
 class BingAIDrawTask:
     prompt: str
     reply_callback: Callable[[BingAIImageResponse], None]
+    error_callback: Callable[[str], None] = None
 
 
 class BinAITaskPool(threading.Thread):
@@ -182,8 +183,15 @@ class BinAITaskPool(threading.Thread):
             threading.Thread(target=chat_task.reply_callback, args=(reply_text,), daemon=True).start()
 
         async def handle_draw_task(draw_task: BingAIDrawTask):
-            draw_resp = await bing.draw(draw_task.prompt)
-            threading.Thread(target=draw_task.reply_callback, args=(draw_resp,), daemon=True).start()
+            try:
+                draw_resp = await bing.draw(draw_task.prompt)
+            except Exception as draw_error:
+                if draw_task.error_callback:
+                    threading.Thread(target=draw_task.error_callback, args=(f"画图发生了错误：{draw_error}",),
+                                     daemon=True).start()
+                return
+            else:
+                threading.Thread(target=draw_task.reply_callback, args=(draw_resp,), daemon=True).start()
 
         async def listen_draw_task():
             while True:
@@ -194,7 +202,10 @@ class BinAITaskPool(threading.Thread):
                         async_tasks.append(handle_draw_task(t))
 
                 if async_tasks:
-                    await asyncio.gather(*async_tasks)
+                    try:
+                        await asyncio.gather(*async_tasks)
+                    except Exception as e:
+                        traceback.print_exc()
                 await asyncio.sleep(1)
 
         async def listen_chat_task():
@@ -206,7 +217,10 @@ class BinAITaskPool(threading.Thread):
                         async_tasks.append(handle_chat_task(t))
 
                 if async_tasks:
-                    await asyncio.gather(*async_tasks)
+                    try:
+                        await asyncio.gather(*async_tasks)
+                    except Exception as e:
+                        traceback.print_exc()
                 await bing.check_page_lifecycle()
                 await asyncio.sleep(1)
 
