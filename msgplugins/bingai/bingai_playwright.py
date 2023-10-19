@@ -155,7 +155,8 @@ class BinAITaskPool(threading.Thread):
     def __init__(self, proxy: str = "", headless=True):
         self.proxy = proxy
         self.headless = headless
-        self.concurrency = 2
+        self.chat_concurrency = 1
+        self.draw_concurrency = 5
         super().__init__(daemon=True)
         self.chat_task_queue: queue.Queue[BingAIChatTask] = queue.Queue()
         self.draw_task_queue: queue.Queue[BingAIDrawTask] = queue.Queue()
@@ -196,7 +197,7 @@ class BinAITaskPool(threading.Thread):
         async def listen_draw_task():
             while True:
                 async_tasks = []
-                for i in range(self.concurrency):
+                for i in range(self.draw_concurrency):
                     if not self.draw_task_queue.empty():
                         t = self.draw_task_queue.get()
                         async_tasks.append(handle_draw_task(t))
@@ -211,7 +212,7 @@ class BinAITaskPool(threading.Thread):
         async def listen_chat_task():
             while True:
                 async_tasks = []
-                for i in range(self.concurrency):
+                for i in range(self.chat_concurrency):
                     if not self.chat_task_queue.empty():
                         t = self.chat_task_queue.get()
                         async_tasks.append(handle_chat_task(t))
@@ -247,6 +248,6 @@ if __name__ == '__main__':
     test.put_task(BingAIChatTask("1", "你好", print))
     time.sleep(2)
     test.put_task(BingAIChatTask("2", "你是谁", print))
-    test.put_task(BingAIDrawTask("一只猫", print))
-    test.put_task(BingAIDrawTask("两只猫", print))
+    # test.put_task(BingAIDrawTask("一只猫", print))
+    # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
