@@ -119,7 +119,7 @@ class BingAIPlayWright:
         for i in range(60 * 5):
             await asyncio.sleep(1)
             create_btn = await page.query_selector("#create_btn_c")
-            if await create_btn.inner_text() == "Create":
+            if await create_btn.inner_text() in ["Create", "创建"]:
                 break
         else:
             raise Exception("网络超时")
