@@ -54,7 +54,7 @@ def close_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启全局插件",
-            desc="开启全局插件 插件名，如：开启全局插件 斗牛",
+            desc="开启全局插件 插件名，让插件在所有群都开启，如：开启全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -63,7 +63,7 @@ def open_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭全局插件",
-            desc="关闭全局插件 插件名，如：关闭全局插件 斗牛",
+            desc="关闭全局插件 插件名，让插件在所有群都关闭，如：关闭全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -90,7 +90,7 @@ def close_group_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("插件列表",
-            desc="插件列表",
+            desc="插件列表, 获取所有插件名",
             cmd_group_name=CMD_GROUP,
             )
 def list_cmd_group(msg: GroupMsg | FriendMsg, params: list[str]):
