@@ -32,6 +32,7 @@ def manage_global_cmd(enabled: bool, msg: GroupMsg | FriendMsg, params: list[str
 
 
 @on_command("开启插件",
+            desc="开启插件 插件名，如：开启插件 斗牛",
             alias=("插件开启", "打开插件", "插件打开"),
             param_len=1,
             bind_msg_type=(GroupMsg,),
@@ -42,6 +43,7 @@ def open_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭插件",
+            desc="关闭插件 插件名，如：关闭插件 斗牛",
             alias=("插件关闭", "关闭插件", "插件关闭"),
             param_len=1,
             bind_msg_type=(GroupMsg,),
@@ -52,6 +54,7 @@ def close_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启全局插件",
+            desc="开启全局插件 插件名，如：开启全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -60,6 +63,7 @@ def open_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭全局插件",
+            desc="关闭全局插件 插件名，如：关闭全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -68,6 +72,7 @@ def close_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启他群插件",
+            desc="开启他群插件 插件名 群号，如：开启他群插件 斗牛 123456",
             param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -76,6 +81,7 @@ def open_group_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭他群插件",
+            desc="关闭他群插件 插件名 群号，如：关闭他群插件 斗牛 123456",
             param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -84,6 +90,7 @@ def close_group_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("插件列表",
+            desc="插件列表",
             cmd_group_name=CMD_GROUP,
             )
 def list_cmd_group(msg: GroupMsg | FriendMsg, params: list[str]):
