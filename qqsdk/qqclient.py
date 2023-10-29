@@ -78,9 +78,16 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
     def get_msg(self, data: dict):
         raise NotImplementedError
 
-    def get_group(self, group_qq: str) -> entity.Group:
+    def __get_group(self, group_qq: str) -> entity.Group:
         result = list(filter(lambda g: g.qq == group_qq, self.qq_user.groups))
         return result and result[0] or None
+
+    def get_group(self, group_qq: str) -> entity.Group:
+        group = self.__get_group(group_qq)
+        if not group:
+            self.get_groups()
+            group = self.__get_group(group_qq)
+        return group
 
     def __get_friend(self, qq: str) -> entity.Friend | None:
         result = list(filter(lambda f: f.qq == qq, self.qq_user.friends))
