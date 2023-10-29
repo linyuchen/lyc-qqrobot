@@ -62,11 +62,13 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         for group in self.qq_user.groups:
             self.send_msg(group.qq, content, is_group=True)
 
+    @abstractmethod
     def get_friends(self) -> list[entity.Friend]:
         """
         获取好友，结果将放在self.qq_user.friends里面
         """
 
+    @abstractmethod
     def get_groups(self) -> list[entity.Group]:
         """
         结果保存在 self.qq_user.groups
