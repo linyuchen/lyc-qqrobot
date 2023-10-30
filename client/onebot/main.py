@@ -1,8 +1,12 @@
+import sys
+from pathlib import PurePath
 from abc import ABC
 from functools import reduce
 
 import requests
 from flask import request, Flask
+
+sys.path.append(str(PurePath(__file__).parent.parent.parent))
 
 from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup
 from config import get_config
