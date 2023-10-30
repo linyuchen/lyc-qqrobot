@@ -11,6 +11,7 @@ def save_config():
 
 config_data = {
     "GFW_PROXY": "http://192.168.1.4:7890",
+    "ONEBOT_HTTP_API": "http://localhost:3000",
     "MIRAI_HTTP_API": "http://localhost:8080",
     "MIRAI_HTTP_API_VERIFY_KEY": "1234567890",
     "QQ": [721011692],

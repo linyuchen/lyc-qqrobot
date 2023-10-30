@@ -1,63 +1,99 @@
 from abc import ABC
+from functools import reduce
 
 import requests
 from flask import request, Flask
 
-from client.onebot.msgtype import OnebotNewMessage
+from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup
 from config import get_config
-from qqsdk.message import MessageSegment
+from qqsdk.entity import GroupMember, Friend, Group
+from qqsdk.message import MessageSegment, GroupMsg
 from qqsdk.qqclient import QQClientBase
 
+# MessageSegment.to_data = MessageSegment.to_onebot_data
 
-class OnebotQQClient(QQClientBase, ABC):
+
+class OnebotQQClient(ABC, QQClientBase):
     def __init__(self, qq: str):
-        self.qq_user.qq = qq
         super().__init__()
-        self.host = get_config("SATORI_HOST")
+        self.qq_user.qq = qq
+        self.host = get_config("ONEBOT_HTTP_API")
 
     def __post(self, url, data: dict = None) -> dict | list[dict]:
         resp = requests.post(self.host + url, json=data).json()
         return resp
 
-    # def get_friends(self) -> list[entity.Friend]:
-    #     resp: list[dict] = self.__post("/friend.list")
-    #     users = [SatoriUser(**i) for i in resp]
-    #     friends = [entity.Friend(qq=i.id, nick=i.name, mark_name=i.name) for i in users]
-    #     return friends
+    def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
+        """
+        # qq: 好友或陌生人或QQ群号
+        # content: 要发送的内容，unicode编码
+        """
+        if isinstance(content, str):
+            content = MessageSegment.text(content)
+        message = content.onebot_data
+        post_data = {
+            "action": "send_group_msg" if is_group else "send_private_msg",
+            "params": {
+                "group_id": qq if is_group else None,
+                "user_id": qq,
+                "message": message
+            }
+        }
+        resp = self.__post("/", post_data)
 
-    # def get_groups(self) -> list[entity.Group]:
-    #     resp: list[dict] = self.__post("/guild.list")
-    #     guilds = [SatoriGuild(**i) for i in resp]
-    #     groups = []
-    #     for guild in guilds:
-    #         resp = self.__post("/guild.member.list", {"guild_id": guild.id})
-    #         satori_members = [SatoriGuildMember(**i) for i in resp]
-    #         members = []
-    #         for satori_member in satori_members:
-    #             member = entity.GroupMember(qq=satori_member.user.id, nick=satori_member.name)
-    #             members.append(member)
-    #
-    #         group = entity.Group(qq=guild.id, name=guild.name, members=members)
-    #         groups.append(group)
-    #
-    #     return groups
+    def get_friends(self) -> list[Friend]:
+        resp = self.__post("/", {
+            "action": "get_friend_list",
+        })
+        friends: list[OnebotRespFriend] = resp["data"]
+        self.qq_user.friends = [Friend(qq=i["user_id"], nick=i["user_name"]) for i in friends]
+        return self.qq_user.friends
+
+    def get_groups(self) -> list[Group]:
+        resp = self.__post("/", {
+            "action": "get_group_list",
+        })
+        groups: list[OnebotRespGroup] = resp["data"]
+        self.qq_user.groups = [Group(qq=i["group_id"], name=i["group_name"], members=[]) for i in groups]
+        return self.qq_user.groups
+
     def get_group_members(self, group_qq: str):
         resp = self.__post("/", {
             "action": "get_group_member_list",
             "params": {"group_id": group_qq}
         })
+        members: list[OnebotRespGroupMember] = resp["data"]
+        group = self.get_group(group_qq)
+        group.members = [GroupMember(qq=i["user_id"], nick=i["user_name"]) for i in members]
 
-
-    def get_msg(self, data: OnebotNewMessage):
+    def get_msg(self, data: OnebotRespNewMessage):
         if data["detail_type"] == "group":
             group = self.get_group(data["group_id"])
             group_member = group.get_member(data["user_id"])
             if not group_member:
-                group.get_members()
+                self.get_group_members(data["group_id"])
                 group_member = group.get_member(data["user_id"])
+                if not group_member:
+                    return
+            msg_text = ""
+            message_segments = []
+            for resp_message in data["message"]:
+                match resp_message["type"]:
+                    case "text":
+                        msg_text += resp_message["data"]["text"]
+                        message_segments.append(MessageSegment.text(resp_message["data"]["text"]))
+                    case "at":
+                        at_qq = resp_message["data"]["mention"]
+                        is_at_me = at_qq == self.qq_user.qq
+                        is_at_other = not is_at_me
+                        message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
+                    case "image":
+                        message_segments.append(MessageSegment.image(resp_message["data"]["path"]))
 
-    def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
-        pass
+            msg_chain = reduce(lambda a, b: a + b, message_segments)
+            group_msg = GroupMsg(group=group, group_member=group_member, msg=msg_text, msg_chain=msg_chain)
+            group_msg.reply = lambda content, is_reply=False: self.send_msg(group.qq, content, is_group=True)
+            self.add_msg(group_msg)
 
 
 class QQClientFlask:
@@ -68,8 +104,8 @@ class QQClientFlask:
         self.qq_clients: [str, OnebotQQClient] = {}
 
     def get_msg(self):
-        json_data: OnebotNewMessage = request.json
-        qq = json_data["self"]["self_id"]
+        json_data: OnebotRespNewMessage = request.json
+        qq = json_data["self"]["user_id"]
         client: OnebotQQClient = self.qq_clients[qq]
         client.get_msg(json_data)
 

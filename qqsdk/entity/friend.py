@@ -21,7 +21,7 @@ class Friend(object):
     """
     qq: str
     nick: str
-    mark_name: str
+    mark_name: str = ""
     status: any = None  # 登录状态，类型未知
     group_id: int = 0  # 所在分组id
     group_name: str = ""  # 所在分组名
