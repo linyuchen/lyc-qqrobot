@@ -96,7 +96,7 @@ class OnebotQQClient(ABC, QQClientBase):
 
             msg_chain = reduce(lambda a, b: a + b, message_segments)
             group_msg = GroupMsg(group=group, group_member=group_member, msg=msg_text, msg_chain=msg_chain)
-            group_msg.reply = lambda content, is_reply=False: self.send_msg(group.qq, content, is_group=True)
+            group_msg.reply = lambda content, at=False: self.send_msg(group.qq, content, is_group=True)
             self.add_msg(group_msg)
 
 
