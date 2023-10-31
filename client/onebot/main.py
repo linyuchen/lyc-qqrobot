@@ -81,6 +81,8 @@ class OnebotQQClient(ABC, QQClientBase):
                     return
             msg_text = ""
             message_segments = []
+            is_at_me = False
+            is_at_other = False
             for resp_message in data["message"]:
                 match resp_message["type"]:
                     case "text":
@@ -95,7 +97,12 @@ class OnebotQQClient(ABC, QQClientBase):
                         message_segments.append(MessageSegment.image(resp_message["data"]["path"]))
 
             msg_chain = reduce(lambda a, b: a + b, message_segments)
-            group_msg = GroupMsg(group=group, group_member=group_member, msg=msg_text, msg_chain=msg_chain)
+            group_msg = GroupMsg(group=group,
+                                 group_member=group_member,
+                                 msg=msg_text,
+                                 msg_chain=msg_chain,
+                                 is_at_me=is_at_me,
+                                 is_at_other=is_at_other)
             group_msg.reply = lambda content, at=False: self.send_msg(group.qq, content, is_group=True)
             self.add_msg(group_msg)
 
