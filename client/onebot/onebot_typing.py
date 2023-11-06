@@ -9,6 +9,7 @@ class _OnebotSelf(TypedDict):
 
 class _OnebotMessageItemDataAt(TypedDict):
     mention: str  # at的qq号
+    qq: str  # at的qq号
 
 
 class _OnebotMessageItemDataText(TypedDict):
@@ -17,6 +18,7 @@ class _OnebotMessageItemDataText(TypedDict):
 
 class _OnebotMessageItemDataImage(TypedDict):
     path: str
+    file: str
 
 
 class _OnebotMessageItemDataReply(TypedDict):
@@ -47,6 +49,7 @@ class OnebotRespNewMessage(TypedDict):
     self: _OnebotSelf
     type: Literal["message"]
     detail_type: Literal["group", "private"]
+    message_type: Literal["group", "private"]
     message: list[_OnebotMessageItemAt | _OnebotMessageItemText | _OnebotMessageItemImage | _OnebotMessageItemReply]
     group_id: str
     user_id: str

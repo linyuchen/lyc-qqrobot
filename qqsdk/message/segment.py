@@ -44,7 +44,6 @@ class MessageSegment:
             _msg += MessageSegment("ImagePath", str(path))
         return _msg
 
-
     @staticmethod
     def image_b64(data: str):
         return MessageSegment("ImageBase64", data)
@@ -68,26 +67,27 @@ class MessageSegment:
         return ms
 
     @staticmethod
-    def to_onebot_data(msg_type: str, content: str):
+    def to_onebot11_data(msg_type: str, content: str):
         data = {"type": msg_type}
         if msg_type == "Plain":
-            data.update({"content": content, "type": "text"})
-        elif msg_type == "ImageUrl":
-            data.update({"type": "Image", "url": content})
+            data.update({"data": {"text": content}, "type": "text"})
         elif msg_type == "ImagePath":
             content = Path(content)
             # 复制一份到临时目录
             temp_path = Path(tempfile.mktemp(content.suffix))
             temp_path.write_bytes(content.read_bytes())
-            data.update({"type": "image", "file": str(temp_path)})
-        elif msg_type == "ImageBase64":
-            data.update({"type": "Image", "base64": content})
-        elif msg_type == "VoicePath":
-            data.update({"type": "Voice", "path": content})
-        elif msg_type == "VoiceBase64":
-            data.update({"type": "Voice", "base64": content})
+            data.update({"type": "image", "data": {"file": str(temp_path)}})
         elif msg_type == "At":
-            data.update({"type": "At", "mention": content})
+            data.update({"type": "at", "data": {"qq": content}})
+        # elif msg_type == "ImageUrl":
+        #     data.update({"type": "Image", "data": {"url": content}})
+        # elif msg_type == "ImageBase64":
+        #     data.update({"type": "Image", "data": {"base64": content}})
+        # elif msg_type == "VoicePath":
+        #     data.update({"type": "Voice", "data": {"file": content}})
+        # elif msg_type == "VoiceBase64":
+        #     data.update({"type": "Voice", "base64": content})
+
         return data
 
     @staticmethod
@@ -120,10 +120,10 @@ class MessageSegment:
         return result
 
     @property
-    def onebot_data(self) -> List:
+    def onebot11_data(self) -> List:
         result = []
         for msg_data in self.origin_data:
-            result.append(self.to_onebot_data(msg_data[0], msg_data[1]))
+            result.append(self.to_onebot11_data(msg_data[0], msg_data[1]))
         return result
 
     def __add__(self, other: Self) -> Self:

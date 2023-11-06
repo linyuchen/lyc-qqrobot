@@ -17,7 +17,7 @@ from qqsdk.qqclient import QQClientBase
 # MessageSegment.to_data = MessageSegment.to_onebot_data
 
 
-class OnebotQQClient(ABC, QQClientBase):
+class Onebot11QQClient(ABC, QQClientBase):
     def __init__(self, qq: str):
         super().__init__()
         self.qq_user.qq = qq
@@ -34,16 +34,17 @@ class OnebotQQClient(ABC, QQClientBase):
         """
         if isinstance(content, str):
             content = MessageSegment.text(content)
-        message = content.onebot_data
+        message = content.onebot11_data
         post_data = {
-            "action": "send_group_msg" if is_group else "send_private_msg",
-            "params": {
-                "group_id": qq if is_group else None,
-                "user_id": qq,
-                "message": message
-            }
+            "group_id": qq if is_group else None,
+            "user_id": qq,
+            "message": message
         }
-        resp = self.__post("/", post_data)
+        if is_group:
+            path = "/send_group_msg"
+        else:
+            path = "/send_private_msg"
+        resp = self.__post(path, post_data)
 
     def get_friends(self) -> list[Friend]:
         resp = self.__post("/", {
@@ -68,7 +69,11 @@ class OnebotQQClient(ABC, QQClientBase):
         })
         members: list[OnebotRespGroupMember] = resp["data"]
         group = self.get_group(group_qq)
-        group.members = [GroupMember(qq=i["user_id"], nick=i["user_name"]) for i in members]
+        group.members = [GroupMember(
+            qq=i["user_id"],
+            nick=i["user_name"],
+            card=i["user_display_name"]
+        ) for i in members]
 
     def get_msg(self, data: OnebotRespNewMessage):
         if data["detail_type"] == "group":
@@ -89,12 +94,12 @@ class OnebotQQClient(ABC, QQClientBase):
                         msg_text += resp_message["data"]["text"]
                         message_segments.append(MessageSegment.text(resp_message["data"]["text"]))
                     case "at":
-                        at_qq = resp_message["data"]["mention"]
+                        at_qq = resp_message["data"]["qq"]
                         is_at_me = at_qq == self.qq_user.qq
                         is_at_other = not is_at_me
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
                     case "image":
-                        message_segments.append(MessageSegment.image(resp_message["data"]["path"]))
+                        message_segments.append(MessageSegment.image(resp_message["data"]["file"]))
 
             msg_chain = reduce(lambda a, b: a + b, message_segments)
             group_msg = GroupMsg(group=group,
@@ -103,7 +108,15 @@ class OnebotQQClient(ABC, QQClientBase):
                                  msg_chain=msg_chain,
                                  is_at_me=is_at_me,
                                  is_at_other=is_at_other)
-            group_msg.reply = lambda content, at=False: self.send_msg(group.qq, content, is_group=True)
+
+            def reply(content, at=True):
+                if isinstance(content, str):
+                    content = MessageSegment.text(content)
+                if at:
+                    content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
+                self.send_msg(group.qq, content, is_group=True)
+
+            group_msg.reply = reply
             self.add_msg(group_msg)
 
 
@@ -112,19 +125,19 @@ class QQClientFlask:
 
     def __init__(self):
         self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])
-        self.qq_clients: [str, OnebotQQClient] = {}
+        self.qq_clients: [str, Onebot11QQClient] = {}
 
     def get_msg(self):
         json_data: OnebotRespNewMessage = request.json
         qq = json_data["self"]["user_id"]
-        client: OnebotQQClient = self.qq_clients[qq]
+        client: Onebot11QQClient = self.qq_clients[qq]
         client.get_msg(json_data)
 
         return {}
 
     def start(self) -> None:
         for qq in get_config("QQ"):
-            client = OnebotQQClient(str(qq))
+            client = Onebot11QQClient(str(qq))
             self.qq_clients[str(qq)] = client
             client.start()
         self._flask_app.run(host="0.0.0.0", port=get_config("LISTEN_PORT"))
