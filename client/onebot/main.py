@@ -101,7 +101,7 @@ class Onebot11QQClient(ABC, QQClientBase):
                     case "image":
                         message_segments.append(MessageSegment.image(resp_message["data"]["file"]))
 
-            msg_chain = reduce(lambda a, b: a + b, message_segments)
+            msg_chain = reduce(lambda a, b: a + b, message_segments) if message_segments else None
             group_msg = GroupMsg(group=group,
                                  group_member=group_member,
                                  msg=msg_text,

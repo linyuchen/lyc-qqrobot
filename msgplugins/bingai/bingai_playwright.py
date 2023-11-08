@@ -126,7 +126,40 @@ class BingAIPlayWright:
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
-        await gir.wait_for_selector("img")
+        # await gir.wait_for_selector("img")
+        await gir.evaluate("""
+            () => {
+        var images = document.querySelectorAll('#gir_async img');
+
+        function preLoad() {
+
+            var promises = [];
+
+            function loadImage(img) {
+                return new Promise(function(resolve,reject) {
+                    if (img.complete) {
+                        resolve(img)
+                    }
+                    img.onload = function() {
+                        resolve(img);
+                    };
+                    img.onerror = function(e) {
+                        resolve(img);
+                    };
+                })
+            }
+
+            for (var i = 0; i < images.length; i++)
+            {
+                promises.push(loadImage(images[i]));
+            }
+
+            return Promise.all(promises);
+        }
+
+        return preLoad();
+    }
+        """)
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
         await gir.screenshot(path=path)
