@@ -48,6 +48,7 @@ class BingAIPlayWright:
             proxy={
                 "server": self.proxy,
             } if self.proxy else None)
+        return self
 
     async def new_page(self):
         return await self.browser.new_page()
@@ -125,6 +126,7 @@ class BingAIPlayWright:
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
+        await gir.wait_for_selector("img")
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
         await gir.screenshot(path=path)
