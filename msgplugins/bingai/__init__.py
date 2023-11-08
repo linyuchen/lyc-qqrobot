@@ -1,3 +1,4 @@
+from common.cmd_alias import CMD_ALIAS_DRAW
 from config import get_config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
@@ -27,7 +28,8 @@ def bing(msg: GeneralMsg, params: list[str]):
 
 @on_command(
     "DE3",
-    alias=("bing画图", "de3", "微软画图"),
+    alias=("bing画图", "de3", "微软画图") + CMD_ALIAS_DRAW,
+    priority=5,
     param_len=1,
     desc="DALL·E 3画图,如: DE3 一只会飞的猫猫",
     cmd_group_name="bingai",

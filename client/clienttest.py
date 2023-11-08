@@ -1,3 +1,4 @@
+from qqsdk import entity
 from qqsdk.entity import Group, GroupMember
 from qqsdk.message import GroupMsg
 from qqsdk.message.segment import MessageSegment
@@ -10,6 +11,12 @@ TEST_GROUP_MEMBER_NAME = "test"
 
 
 class ClientTest(QQClientBase):
+    def get_friends(self) -> list[entity.Friend]:
+        pass
+
+    def get_groups(self) -> list[entity.Group]:
+        pass
+
     TEST_GROUP_MEMBER = GroupMember(qq=TEST_GROUP_MEMBER_QQ, nick=TEST_GROUP_MEMBER_NAME)
     TEST_GROUP = Group(qq=TEST_GROUP_QQ, name=TEST_GROUP_NAME,
                        members=[TEST_GROUP_MEMBER])

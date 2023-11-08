@@ -6,6 +6,7 @@ from pathlib import Path
 
 from requests.exceptions import ConnectionError
 
+from common.cmd_alias import CMD_ALIAS_DRAW
 from common.logger import logger
 from common.utils.nsfw_detector import nsfw_detect
 from msgplugins.msgcmd.cmdaz import on_command
@@ -66,7 +67,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 
 @on_command("sd",
-            alias=("SD", ),
+            alias=("SD", ) + CMD_ALIAS_DRAW,
             desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5",
             param_len=-1,
             priority=3,

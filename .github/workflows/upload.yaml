@@ -6,17 +6,17 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
+#    steps:
 
-    - name: Copy code to server
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.HOST }}
-        port: ${{ secrets.PORT }}
-        username: ${{ secrets.USERNAME }}
+#    - name: Copy code to server
+#      uses: appleboy/ssh-action@v0.1.10
+#      with:
+#        host: ${{ secrets.HOST }}
+#        port: ${{ secrets.PORT }}
+#        username: ${{ secrets.USERNAME }}
 #        password: ${{ secrets.PASSWORD }}
-        key: ${{ secrets.SSH_KEY }}
-        script_stop: true
+#        key: ${{ secrets.SSH_KEY }}
+#        script_stop: true
 #        script: |
 #          cd /home/linyuchen/qqrobot-plugin
 #          git checkout master
