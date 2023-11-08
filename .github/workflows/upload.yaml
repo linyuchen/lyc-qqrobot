@@ -1,11 +1,11 @@
-name: Deploy to Server
-on:
-  push:
-    branches:
-      - master
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+#name: Deploy to Server
+#on:
+#  push:
+#    branches:
+#      - master
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
 #    steps:
 
 #    - name: Copy code to server
