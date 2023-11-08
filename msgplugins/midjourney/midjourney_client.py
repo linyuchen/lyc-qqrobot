@@ -15,9 +15,8 @@ import pytz
 from common.discord_client import DiscordSeleniumClient, Message, download_images
 from common.logger import logger
 from common.utils.translator import is_chinese, trans
+from common.utils.nsfw_detector import BANNED_WORDS
 
-BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
-BANNED_WORDS = [word["words"].strip().lower() for word in BANNED_WORDS]
 
 TaskCallback = NewType("TackCallback", Callable[['TaskCallbackParam'], None])
 

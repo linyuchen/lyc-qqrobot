@@ -1,4 +1,7 @@
+import json
+import re
 from pathlib import Path
+
 from .predict import classify
 
 cur_path = Path(__file__).parent
@@ -18,6 +21,24 @@ def nsfw_detect(img_path: Path) -> bool:
     return data["hentai"] > 0.5
 
 
+BANNED_WORDS = json.load(open(Path(__file__).parent / "banned_words.json"))
+BANNED_WORDS = [word["words"].strip().lower() for word in BANNED_WORDS]
+
+
+def nsfw_words_filter(text: str) -> str:
+    # 特殊符号转成空格
+    text = re.sub(r'[^a-zA-Z0-9\s]+', ' ', text)
+    result = []
+    for prompt_word in text.split():
+        if prompt_word in BANNED_WORDS:
+            # have_banned_words.append(prompt_word)
+            continue
+        result.append(prompt_word)
+    return " ".join(result)
+
+
 __all__ = [
-    "nsfw_detect"
+    "nsfw_detect",
+    "nsfw_words_filter",
+    "BANNED_WORDS"
 ]

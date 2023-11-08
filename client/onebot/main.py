@@ -94,7 +94,7 @@ class Onebot11QQClient(ABC, QQClientBase):
                         msg_text += resp_message["data"]["text"]
                         message_segments.append(MessageSegment.text(resp_message["data"]["text"]))
                     case "at":
-                        at_qq = resp_message["data"]["qq"]
+                        at_qq = resp_message["data"].get("qq") or resp_message["data"].get("mention")
                         is_at_me = at_qq == self.qq_user.qq
                         is_at_other = not is_at_me
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
