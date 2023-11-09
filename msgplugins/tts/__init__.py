@@ -33,8 +33,8 @@ def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
         msg.reply(f"文字长度超过{max_len}字")
         return
     try:
-        data = tts(text, speaker)
+        voice_path = tts(text, speaker)
     except Exception as e:
         msg.reply(f"语音转换失败: {e}")
         return
-    msg.reply(MessageSegment.voice_base64(data))
+    msg.reply(MessageSegment.voice_path(voice_path))

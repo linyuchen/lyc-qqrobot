@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 import requests
 
-from .utils import wav2silk_base64
+from .utils import wav2silk_base64, wav2amr
 
 speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿', '晴霓', '杰帕德', '素裳', '绿芙蓉', '罗刹', '艾丝妲',
             '黑塔', '丹枢', '希露瓦', '白露', '费斯曼', '停云', '可可利亚', '景元', '螺丝咕姆', '青镞', '公输师傅',
@@ -31,12 +31,12 @@ speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿',
             '阿巴图伊', '陆景和', '莫弈', '夏彦', '左然']
 
 
-def tts(text: str, speaker: str = "可莉") -> str:
-    url = f"https://genshinvoice.top/api?speaker={quote(speaker)}&text={quote(text)}=wav&length=1&noise=0.5&noisew=0.9&sdp_ratio=0.2"
+def tts(text: str, speaker: str = "可莉") -> Path:
+    url = f"https://genshinvoice.top/api?speaker={quote(speaker)}_ZH&text={quote(text)}=wav&length=1&noise=0.5&noisew=0.9&sdp_ratio=0.2&language=ZH"
     data = requests.get(url).content
     wav_path = Path(tempfile.mktemp(suffix=".wav"))
     with open(wav_path, "wb") as f:
         f.write(data)
 
-    data = wav2silk_base64(wav_path)
-    return data
+    return wav2amr(wav_path)
+    # return data

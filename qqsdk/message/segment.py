@@ -83,8 +83,8 @@ class MessageSegment:
         #     data.update({"type": "Image", "data": {"url": content}})
         # elif msg_type == "ImageBase64":
         #     data.update({"type": "Image", "data": {"base64": content}})
-        # elif msg_type == "VoicePath":
-        #     data.update({"type": "Voice", "data": {"file": content}})
+        elif msg_type == "VoicePath":
+            data.update({"type": "voice", "data": {"file": content}})
         # elif msg_type == "VoiceBase64":
         #     data.update({"type": "Voice", "base64": content})
 
