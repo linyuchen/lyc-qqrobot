@@ -27,7 +27,7 @@ BANNED_WORDS = [word["words"].strip().lower() for word in BANNED_WORDS]
 
 def nsfw_words_filter(text: str) -> str:
     # 特殊符号转成空格
-    text = re.sub(r'[^a-zA-Z0-9\s]+', ' ', text)
+    text = re.sub(r'[,，。.(){}:]+', ' ', text)
     result = []
     for prompt_word in text.split():
         if prompt_word in BANNED_WORDS:
