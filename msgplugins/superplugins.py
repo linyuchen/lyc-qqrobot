@@ -46,15 +46,17 @@ class GroupMsgEvent(MsgHandler):
             CMD("金币兑换活跃度", handle_func=group_action.private_point2group_point, param_len=1,
                 int_param_index=[0]),
         ]
-
+        trigger_cmd_name = ""
         result = ""
         for cmd in cmds:
             result = cmd.handle(msg.msg)
             if result:
+                trigger_cmd_name = cmd.cmd_name
                 break
 
         if result:
-            msg.reply(result)
+            at = not (trigger_cmd_name in ["签到", "我的活跃度"])
+            msg.reply(result, at)
             msg.destroy()
 
 
