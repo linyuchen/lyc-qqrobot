@@ -23,6 +23,7 @@ class _OnebotMessageItemDataImage(TypedDict):
 
 class _OnebotMessageItemDataReply(TypedDict):
     reply: str  # 回复的消息id
+    id: str
 
 
 class _OnebotMessageItemAt(TypedDict):
@@ -51,6 +52,7 @@ class OnebotRespNewMessage(TypedDict):
     detail_type: Literal["group", "private"]
     message_type: Literal["group", "private"]
     message: list[_OnebotMessageItemAt | _OnebotMessageItemText | _OnebotMessageItemImage | _OnebotMessageItemReply]
+    message_id: str
     group_id: str
     user_id: str
 

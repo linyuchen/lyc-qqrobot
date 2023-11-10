@@ -27,6 +27,11 @@ class Onebot11QQClient(ABC, QQClientBase):
         resp = requests.post(self.host + url, json=data).json()
         return resp
 
+    def recall_msg(self, msg_id: str):
+        resp = self.__post("/delete_msg", {
+            "message_id": msg_id
+        })
+
     def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
@@ -107,16 +112,19 @@ class Onebot11QQClient(ABC, QQClientBase):
                                  msg=msg_text,
                                  msg_chain=msg_chain,
                                  is_at_me=is_at_me,
-                                 is_at_other=is_at_other)
+                                 is_at_other=is_at_other,
+                                 msg_id=data["message_id"])
 
             def reply(content, at=True):
                 if isinstance(content, str):
                     content = MessageSegment.text(content)
-                if at:
-                    content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
+                content = MessageSegment.reply(group_msg.msg_id) + content
+                # if at:
+                #     content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
                 self.send_msg(group.qq, content, is_group=True)
 
             group_msg.reply = reply
+            group_msg.recall = lambda: self.recall_msg(group_msg.msg_id)
             self.add_msg(group_msg)
 
 

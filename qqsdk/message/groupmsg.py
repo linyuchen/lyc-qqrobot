@@ -11,7 +11,7 @@ from qqsdk.message.types import MessageTypes
 class GroupMsg(BaseMsg):
     """
     """
-    msg_id: int = None
+    msg_id: int | str = None
     msg_type = MessageTypes.GROUP
     group: Group = None
     group_member: GroupMember = None

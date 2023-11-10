@@ -67,6 +67,11 @@ class MessageSegment:
         return ms
 
     @staticmethod
+    def reply(msg_id: str):
+        ms = MessageSegment("reply", msg_id)
+        return ms
+
+    @staticmethod
     def to_onebot11_data(msg_type: str, content: str):
         data = {"type": msg_type}
         if msg_type == "Plain":
@@ -87,7 +92,8 @@ class MessageSegment:
             data.update({"type": "voice", "data": {"file": content}})
         # elif msg_type == "VoiceBase64":
         #     data.update({"type": "Voice", "base64": content})
-
+        elif msg_type == "reply":
+            data.update({"type": "reply", "data": {"id": content}})
         return data
 
     @staticmethod
