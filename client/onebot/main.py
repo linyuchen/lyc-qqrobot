@@ -118,7 +118,8 @@ class Onebot11QQClient(ABC, QQClientBase):
             def reply(content, at=True):
                 if isinstance(content, str):
                     content = MessageSegment.text(content)
-                content = MessageSegment.reply(group_msg.msg_id) + content
+                if not list(filter(lambda ms: ms["type"] == "voice", content.onebot11_data)):
+                    content = MessageSegment.reply(group_msg.msg_id) + content
                 # if at:
                 #     content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
                 self.send_msg(group.qq, content, is_group=True)

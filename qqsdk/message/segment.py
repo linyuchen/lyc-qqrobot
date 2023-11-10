@@ -126,7 +126,7 @@ class MessageSegment:
         return result
 
     @property
-    def onebot11_data(self) -> List:
+    def onebot11_data(self) -> List[dict]:
         result = []
         for msg_data in self.origin_data:
             result.append(self.to_onebot11_data(msg_data[0], msg_data[1]))
