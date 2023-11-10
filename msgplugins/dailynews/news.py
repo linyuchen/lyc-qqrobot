@@ -15,6 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 # base_path = PurePath(__file__).parent
 base_path = Path(tempfile.mkdtemp())
+base_path.mkdir(exist_ok=True)
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
