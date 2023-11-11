@@ -1,3 +1,4 @@
+import base64
 import tempfile
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
@@ -86,8 +87,12 @@ class MessageSegment:
             data.update({"type": "at", "data": {"qq": content}})
         # elif msg_type == "ImageUrl":
         #     data.update({"type": "Image", "data": {"url": content}})
-        # elif msg_type == "ImageBase64":
-        #     data.update({"type": "Image", "data": {"base64": content}})
+        elif msg_type == "ImageBase64":
+            # base64转成路径
+            content = base64.b64decode(content)
+            temp_path = Path(tempfile.mktemp(".png"))
+            temp_path.write_bytes(content)
+            data.update({"type": "image", "data": {"file": str(temp_path)}})
         elif msg_type == "VoicePath":
             data.update({"type": "voice", "data": {"file": content}})
         # elif msg_type == "VoiceBase64":

@@ -110,7 +110,7 @@ class Onebot11QQClient(ABC, QQClientBase):
                         at_member = group.get_member(at_qq)
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
                     case MessageItemType.image:
-                        message_segments.append(MessageSegment.image(resp_message["data"]["file"]))
+                        message_segments.append(MessageSegment.image_path(resp_message["data"]["file"]))
                     case MessageItemType.reply:
                         reply_msg_id = resp_message["data"].get("id")
                         quote_msg = self.get_history_msg(reply_msg_id)
