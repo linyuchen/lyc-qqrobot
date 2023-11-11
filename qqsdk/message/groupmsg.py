@@ -177,14 +177,8 @@ class DiscussionGroupMsg(BaseMsg):
 
 
 @dataclass
-class GroupSendMsg(BaseMsg):
+class GroupSendMsg(GroupMsg):
     """
     发送给群的消息
     """
-    msg_id: int | str = None
-    group: Group = None
     msg_type = MessageTypes.GROUP_SEND
-    msg_chain: MessageSegment = None
-
-    def recall(self):
-        pass

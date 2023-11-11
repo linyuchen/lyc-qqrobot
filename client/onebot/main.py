@@ -8,10 +8,11 @@ from flask import request, Flask
 
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 
-from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup
+from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup, \
+    MessageItemType
 from config import get_config
 from qqsdk.entity import GroupMember, Friend, Group
-from qqsdk.message import MessageSegment, GroupMsg, GroupSendMsg
+from qqsdk.message import MessageSegment, GroupMsg, GroupSendMsg, GeneralMsg
 from qqsdk.qqclient import QQClientBase
 
 # MessageSegment.to_data = MessageSegment.to_onebot_data
@@ -89,26 +90,33 @@ class Onebot11QQClient(ABC, QQClientBase):
                 group_member = group.get_member(data["user_id"])
                 if not group_member:
                     return
-            msg_text = ""
-            message_segments = []
+
             is_at_me = False
             is_at_other = False
+            message_segments = []
+            msg_text = ""
+            quote_msg: GeneralMsg | None = None
             for resp_message in data["message"]:
                 match resp_message["type"]:
-                    case "text":
+                    case MessageItemType.text:
                         msg_text += resp_message["data"]["text"]
                         message_segments.append(MessageSegment.text(resp_message["data"]["text"]))
-                    case "at":
+                    case MessageItemType.at:
                         at_qq = resp_message["data"].get("qq") or resp_message["data"].get("mention")
                         is_at_me = at_qq == self.qq_user.qq
                         is_at_other = not is_at_me
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
-                    case "image":
+                    case MessageItemType.image:
                         message_segments.append(MessageSegment.image(resp_message["data"]["file"]))
-
+                    case MessageItemType.reply:
+                        reply_msg_id = resp_message["data"].get("id")
+                        quote_msg = self.get_history_msg(reply_msg_id)
+                        message_segments.append(MessageSegment.reply(reply_msg_id))
             msg_chain = reduce(lambda a, b: a + b, message_segments) if message_segments else None
             if group_member.qq == self.qq_user.qq:
                 group_msg = GroupSendMsg(group=group,
+                                         group_member=group_member,
+                                         quote_msg=quote_msg,
                                          msg=msg_text,
                                          msg_chain=msg_chain,
                                          msg_id=data["message_id"])
@@ -116,6 +124,7 @@ class Onebot11QQClient(ABC, QQClientBase):
                 group_msg = GroupMsg(group=group,
                                      group_member=group_member,
                                      msg=msg_text,
+                                     quote_msg=quote_msg,
                                      msg_chain=msg_chain,
                                      is_at_me=is_at_me,
                                      is_at_other=is_at_other,

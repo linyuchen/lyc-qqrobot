@@ -1,5 +1,12 @@
-
+from enum import StrEnum
 from typing import Literal, TypedDict
+
+
+class MessageItemType(StrEnum):
+    text = "text"
+    image = "image"
+    at = "at"
+    reply = "reply"
 
 
 class _OnebotSelf(TypedDict):
@@ -27,22 +34,22 @@ class _OnebotMessageItemDataReply(TypedDict):
 
 
 class _OnebotMessageItemAt(TypedDict):
-    type: Literal["at"]
+    type: Literal[MessageItemType.at]
     data: _OnebotMessageItemDataAt
 
 
 class _OnebotMessageItemText(TypedDict):
-    type: Literal["text"]
+    type: Literal[MessageItemType.text]
     data: _OnebotMessageItemDataText
 
 
 class _OnebotMessageItemImage(TypedDict):
-    type: Literal["image"]
+    type: Literal[MessageItemType.image]
     data: _OnebotMessageItemDataImage
 
 
 class _OnebotMessageItemReply(TypedDict):
-    type: Literal["reply"]
+    type: Literal[MessageItemType.reply]
     data: _OnebotMessageItemDataReply
 
 

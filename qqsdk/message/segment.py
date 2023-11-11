@@ -17,10 +17,10 @@ class MessageSegment:
         self.msg_type = msg_type
         self.content = content
         self.quote_msg = None  # FriendMsg or GroupMsg
-        self.origin_data: List[Tuple[str, str]] = []
         self.is_at_me = False
         self.is_at_other = False
         self.is_at_all = False
+        self.origin_data: List[Tuple[str, str]] = []
         if msg_type and content:
             self.origin_data.append((msg_type, content))
 
