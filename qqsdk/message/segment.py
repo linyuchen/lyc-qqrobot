@@ -140,11 +140,32 @@ class MessageSegment:
 
     def get_text(self):
         """获取纯文本"""
-        return "".join([msg_data["text"] for msg_data in self.data if msg_data["type"] == "Plain"])
+        return "".join([msg_data.get("text") or msg_data.get("data", {}).get("text") for msg_data in self.data if msg_data["type"] == "Plain"])
 
     def get_image_urls(self) -> list[str]:
         """获取图片链接"""
-        return [msg_data["url"] for msg_data in self.data if msg_data["type"] == "Image"]
+        result = []
+        for msg_data in self.data:
+            if msg_data["type"] == "Image":
+                if "url" in msg_data:
+                    result.append(msg_data["url"])
+            elif msg_data["type"] == "image":
+                # onebot 11
+                pass
+                # result.append(msg_data["data"]["file"])
+        return result
+
+    def get_image_paths(self) -> list[Path]:
+        """获取图片路径"""
+        result = []
+        for msg_data in self.data:
+            if msg_data["type"] == "Image":
+                if "path" in msg_data:
+                    result.append(Path(msg_data["path"]))
+            elif msg_data["type"] == "image":
+                # onebot 11
+                result.append(Path(msg_data["data"]["file"]))
+        return result
 
 
 if __name__ == '__main__':

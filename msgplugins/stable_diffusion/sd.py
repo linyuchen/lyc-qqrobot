@@ -60,12 +60,15 @@ class SDDraw(AIDrawBase):
             res_paths.append(Path(image_path))
         return res_paths
 
-    def img2img(self, img_url: str, prompt: str, denoising_strength=0.5) -> Image:
+    def img2img(self, img_url: str | Path, prompt: str, denoising_strength=0.5) -> Image:
         lora_prompt, prompt = trans_lora(prompt)
         prompt = self.trans_prompt(prompt) + lora_prompt
-        data = requests.get(img_url).content
-        fp = io.BytesIO(data)
-        image = Image.open(fp)
+        if isinstance(img_url, Path):
+            image = Image.open(img_url)
+        else:
+            data = requests.get(img_url).content
+            fp = io.BytesIO(data)
+            image = Image.open(fp)
         size = image.size
         # if size[0] > 768 or size[1] > 768:
         max_size = 768

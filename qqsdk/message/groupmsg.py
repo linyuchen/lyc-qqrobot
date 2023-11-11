@@ -17,6 +17,7 @@ class GroupMsg(BaseMsg):
     group_member: GroupMember = None
     is_at_me: bool = False
     is_at_other: bool = False
+    at_member: GroupMember = None
     quote_msg: 'GroupMsg' = None
 
     def recall(self):
