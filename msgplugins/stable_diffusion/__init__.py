@@ -1,6 +1,7 @@
 import re
 import tempfile
 import threading
+import traceback
 from functools import reduce
 from pathlib import Path
 
@@ -61,6 +62,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
     except Exception as e:
         logger.error(e)
+        traceback.print_exc()
         return msg.reply(f"画图失败，请检查图片或者提示词")
 
     msg.reply(MessageSegment.image_b64(base64_data))
