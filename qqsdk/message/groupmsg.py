@@ -181,7 +181,7 @@ class GroupSendMsg(BaseMsg):
     """
     发送给群的消息
     """
-    msg_id: int = None
+    msg_id: int | str = None
     group: Group = None
     msg_type = MessageTypes.GROUP_SEND
     msg_chain: MessageSegment = None

@@ -11,7 +11,7 @@ sys.path.append(str(PurePath(__file__).parent.parent.parent))
 from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup
 from config import get_config
 from qqsdk.entity import GroupMember, Friend, Group
-from qqsdk.message import MessageSegment, GroupMsg
+from qqsdk.message import MessageSegment, GroupMsg, GroupSendMsg
 from qqsdk.qqclient import QQClientBase
 
 # MessageSegment.to_data = MessageSegment.to_onebot_data
@@ -107,13 +107,19 @@ class Onebot11QQClient(ABC, QQClientBase):
                         message_segments.append(MessageSegment.image(resp_message["data"]["file"]))
 
             msg_chain = reduce(lambda a, b: a + b, message_segments) if message_segments else None
-            group_msg = GroupMsg(group=group,
-                                 group_member=group_member,
-                                 msg=msg_text,
-                                 msg_chain=msg_chain,
-                                 is_at_me=is_at_me,
-                                 is_at_other=is_at_other,
-                                 msg_id=data["message_id"])
+            if group_member.qq == self.qq_user.qq:
+                group_msg = GroupSendMsg(group=group,
+                                         msg=msg_text,
+                                         msg_chain=msg_chain,
+                                         msg_id=data["message_id"])
+            else:
+                group_msg = GroupMsg(group=group,
+                                     group_member=group_member,
+                                     msg=msg_text,
+                                     msg_chain=msg_chain,
+                                     is_at_me=is_at_me,
+                                     is_at_other=is_at_other,
+                                     msg_id=data["message_id"])
 
             def reply(content, at=True):
                 if isinstance(content, str):
