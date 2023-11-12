@@ -2,6 +2,7 @@ import sys
 from abc import ABC
 from functools import reduce
 from pathlib import PurePath
+from typing import Type, Union
 
 import requests
 from flask import request, Flask
@@ -116,7 +117,10 @@ class Onebot11QQClient(ABC, QQClientBase):
                         quote_msg = self.get_history_msg(reply_msg_id)
                         message_segments.append(MessageSegment.reply(reply_msg_id))
             msg_chain = reduce(lambda a, b: a + b, message_segments) if message_segments else None
-            group_msg_class = GroupSendMsg if group_member.qq == self.qq_user.qq else GroupMsg
+            if group_member.qq == self.qq_user.qq:
+                group_msg_class = GroupSendMsg
+            else:
+                group_msg_class = GroupMsg
             group_msg = group_msg_class(
                 group=group,
                 group_member=group_member,
@@ -128,11 +132,12 @@ class Onebot11QQClient(ABC, QQClientBase):
                 at_member=at_member,
                 msg_id=data["message_id"])
 
-            def reply(content, at=True):
+            def reply(content, at=True, quote=True):
                 if isinstance(content, str):
                     content = MessageSegment.text(content)
                 if not list(filter(lambda ms: ms["type"] == "voice", content.onebot11_data)):
-                    content = MessageSegment.reply(group_msg.msg_id) + content
+                    if quote:
+                        content = MessageSegment.reply(group_msg.msg_id) + content
                 # if at:
                 #     content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
                 self.send_msg(group.qq, content, is_group=True)
