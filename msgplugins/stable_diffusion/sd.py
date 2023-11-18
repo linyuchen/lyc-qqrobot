@@ -11,7 +11,7 @@ import config
 from common.sdwebuiapi import WebUIApi, raw_b64_img
 from common.utils.translator import trans, is_chinese
 from .base import AIDrawBase
-from .lora import trans_lora, get_lora
+from .lora import trans_lora, get_lora_format
 
 base_url = config.SD_HTTP_API + "/sdapi/v1/"
 
@@ -119,7 +119,7 @@ class SDDraw(AIDrawBase):
 
     def get_loras(self):
         # res = f"lora列表：\n{self.__get_loras()}"
-        res = f"sd lora关键字(提示词加上关键字即可触发)：\n{get_lora()}"
+        res = f"sd lora关键字(提示词加上关键字即可触发)：\n{get_lora_format()}"
         return res
 
     def set_model(self, model_name: str):

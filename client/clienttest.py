@@ -29,9 +29,10 @@ class ClientTest(QQClientBase):
         print(content)
 
     def get_msg(self, data):
+        msg = str(input("请输入消息:"))
         group_msg = GroupMsg(group=self.TEST_GROUP, group_member=self.TEST_GROUP_MEMBER,
-                             msg=str(input("请输入消息:")))
-        group_msg.reply = print
+                             msg=msg, msg_chain=MessageSegment.text(msg))
+        group_msg.reply = lambda content, **kwargs: print(content)
         self.add_msg(group_msg)
 
     def start(self) -> None:

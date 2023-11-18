@@ -172,6 +172,9 @@ class MessageSegment:
                 result.append(Path(msg_data["data"]["file"]))
         return result
 
+    def __str__(self):
+        return str(self.onebot11_data)
+
 
 if __name__ == '__main__':
     msg = MessageSegment.text("123")
