@@ -4,7 +4,7 @@ from msgplugins.msgcmd.cmdaz import CMD
 from .news import get_news2
 
 
-class ExamplePlugin(MsgHandler):
+class DailyNewsPlugin(MsgHandler):
     name = "每日新闻"
     desc = "今日新闻"
     bind_msg_types = (GroupMsg, FriendMsg)
