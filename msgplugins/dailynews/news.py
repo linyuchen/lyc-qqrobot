@@ -63,6 +63,7 @@ def get_news():
 
 
 def get_news2():
+    base_path.mkdir(exist_ok=True)
     today = time.strftime("%Y-%m-%d")
     yesterday = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 60 * 60))
     today_img_path = base_path / (today + ".png")
