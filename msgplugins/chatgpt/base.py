@@ -36,7 +36,8 @@ class ChatGPT:
         messages.insert(0, {'role': 'system', 'content': self.prompt})
         if len(question) > self.question_max:
             question = question[0:(self.question_max // 2)] + question[-(self.question_max // 2):]
-        messages.append({'role': 'user', 'content': question})
+        user_message = {'role': 'user', 'content': question}
+        messages.append(user_message)
 
         response = self.openai_client.chat.completions.create(
             model=self.model,
@@ -50,5 +51,6 @@ class ChatGPT:
             if choice.finish_reason == 'stop':
                 break
             completion['content'] += choice.delta.content
+        self.history.append(user_message)
         self.history.append(completion)
         return completion['content']
