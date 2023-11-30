@@ -37,6 +37,5 @@ def tts(text: str, speaker: str = "可莉") -> Path:
     wav_path = Path(tempfile.mktemp(suffix=".wav"))
     with open(wav_path, "wb") as f:
         f.write(data)
-
     return wav2amr(wav_path)
     # return data

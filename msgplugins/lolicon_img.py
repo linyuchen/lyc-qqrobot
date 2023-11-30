@@ -13,11 +13,11 @@ from qqsdk.message import GeneralMsg, MessageSegment
             param_len=-1, is_async=True, cmd_group_name="来点色图")
 def lolicon_img(msg: GeneralMsg, msg_params: list[str]):
     try:
-        api_url = "https://api.lolicon.app/setu/v2?size=small"
+        api_url = "https://api.lolicon.app/setu/v2?size=medium"
         if msg_params:
             api_url += "&tag=" + "&tag=".join(msg_params)
         data = requests.get(api_url).json()["data"]
-        img_url = data[0]["urls"]["small"]
+        img_url = data[0]["urls"]["medium"]
         img_data = requests.get(img_url).content
         img_path = tempfile.mktemp(".png")
         img_path = Path(img_path)

@@ -79,22 +79,23 @@ class MessageSegment:
             data.update({"data": {"text": content}, "type": "text"})
         elif msg_type == "ImagePath":
             content = Path(content)
+            base64_data = base64.b64encode(content.read_bytes()).decode()
             # 复制一份到临时目录
-            temp_path = Path(tempfile.mktemp(content.suffix))
-            temp_path.write_bytes(content.read_bytes())
-            data.update({"type": "image", "data": {"file": str(temp_path)}})
+            # temp_path = Path(tempfile.mktemp(content.suffix))
+            # temp_path.write_bytes(content.read_bytes())
+            data.update({"type": "image", "data": {"file": "base64://" + base64_data}})
         elif msg_type == "At":
             data.update({"type": "at", "data": {"qq": content}})
         # elif msg_type == "ImageUrl":
         #     data.update({"type": "Image", "data": {"url": content}})
         elif msg_type == "ImageBase64":
-            # base64转成路径
-            content = base64.b64decode(content)
-            temp_path = Path(tempfile.mktemp(".png"))
-            temp_path.write_bytes(content)
-            data.update({"type": "image", "data": {"file": str(temp_path)}})
+            # content = base64.b64decode(content)
+            # temp_path = Path(tempfile.mktemp(".png"))
+            # temp_path.write_bytes(content)
+            data.update({"type": "image", "data": {"file": f"base64://{content}"}})
         elif msg_type == "VoicePath":
-            data.update({"type": "voice", "data": {"file": content}})
+            base64_data = base64.b64encode(Path(content).read_bytes()).decode()
+            data.update({"type": "voice", "data": {"file": f"base64://{base64_data}"}})
         # elif msg_type == "VoiceBase64":
         #     data.update({"type": "Voice", "base64": content})
         elif msg_type == "reply":
