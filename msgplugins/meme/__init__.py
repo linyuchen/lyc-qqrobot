@@ -8,9 +8,9 @@ from typing import Callable
 from filetype import filetype
 from meme_generator.cli import get_meme
 
+from config import get_config, set_config
 from msgplugins.msgcmd import on_command, CMDPermissions
 from qqsdk.message import GroupNudgeMsg, MessageSegment, GroupMsg
-from config import get_config, set_config
 
 
 def create_meme_func(key: str, texts: list[str] = None,
@@ -23,11 +23,17 @@ def create_meme_func(key: str, texts: list[str] = None,
     if callable(args) and not isinstance(args, dict):
         args = args()
 
-    def meme(msg: GroupNudgeMsg) -> Path:
+    def meme(msg: GroupNudgeMsg | GroupMsg) -> Path:
+        if isinstance(msg, GroupNudgeMsg):
+            from_member = msg.from_member
+            target_member = msg.target_member
+        else:
+            from_member = msg.group_member
+            target_member = msg.at_member
         new_texts = texts[:]
         for index, text in enumerate(texts):
-            new_text = text.replace("{from_name}", msg.from_member.get_name())
-            new_text = new_text.replace("{target_name}", msg.target_member.get_name())
+            new_text = text.replace("{from_name}", from_member.get_name())
+            new_text = new_text.replace("{target_name}", target_member.get_name())
             new_texts[index] = new_text
 
         _meme = get_meme(key)
@@ -35,9 +41,9 @@ def create_meme_func(key: str, texts: list[str] = None,
         images = []
         match images_len:
             case 1:
-                images = [msg.target_member.avatar.path]
+                images = [target_member.avatar.path]
             case 2:
-                images = [msg.target_member.avatar.path, msg.from_member.avatar.path]
+                images = [target_member.avatar.path, from_member.avatar.path]
                 if images_reversed:
                     images = images[::-1]
         result = loop.run_until_complete(_meme(images=images, texts=new_texts, args=args))
@@ -207,13 +213,17 @@ CONFIG_KEY_MEME_INTERVAL = "meme_interval"
 meme_interval_config: dict = get_config(CONFIG_KEY_MEME_INTERVAL, {})
 
 
-@on_command("",
-            bind_msg_type=(GroupNudgeMsg,),
-            desc="手机双击群员头像随机发送表情包",
+@on_command("拍一拍",
+            alias=("戳一戳", "摸一摸", "拍拍", "摸摸", "戳戳"),
+            desc="@群员后发送 拍一拍 生成表情包, 如@喵了个咪 拍一拍",
+            # desc="手机双击群员头像随机发送表情包",
+            param_len=0,
+            bind_msg_type=(GroupNudgeMsg, GroupMsg),
             auto_destroy=False,
             is_async=True,
+            ignore_at_other=False,
             cmd_group_name="戳一戳表情")
-def meme_touch(msg: GroupNudgeMsg, args: list[str]):
+def meme_touch(msg: GroupNudgeMsg | GroupMsg, args: list[str]):
     meme = random.choice(nudge_memes)
     # meme = random.choice(test_nudge_memes)
     # paths = []
@@ -221,21 +231,24 @@ def meme_touch(msg: GroupNudgeMsg, args: list[str]):
     #     file_path = meme(msg)
     #     paths.append(file_path)
     # print(paths)
-    member_id = msg.group.qq + "g" + msg.from_member.qq
-    last_time = touch_history.get(member_id, 0)
-    interval = meme_interval_config.get(msg.group.qq, 30)
-    if time.time() - last_time < interval:
-        return
-    touch_history[member_id] = time.time()
+    # member_id = msg.group.qq + "g" + msg.from_member.qq
+    # last_time = touch_history.get(member_id, 0)
+    # interval = meme_interval_config.get(msg.group.qq, 30)
+    # if time.time() - last_time < interval:
+    #     return
+    # touch_history[member_id] = time.time()
+    if isinstance(msg, GroupMsg):
+        if not msg.at_member:
+            return
     file_path = meme(msg)
     reply_msg = MessageSegment.image_path(file_path)
-    msg.reply(reply_msg)
+    msg.reply(reply_msg, quote=False)
     file_path.unlink()
 
 
 @on_command("设置戳一戳表情频率", param_len=1,
             desc="设置戳一戳表情频率 秒数,如 设置戳一戳表情频率 30",
-            bind_msg_type=(GroupMsg, ),
+            bind_msg_type=(GroupMsg,),
             permission=CMDPermissions.GROUP_ADMIN
             )
 def set_meme_interval(msg: GroupMsg, params: list[str]):
