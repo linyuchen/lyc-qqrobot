@@ -117,18 +117,42 @@ class BingAIPlayWright:
         await page.fill("#sb_form_q", prompt)
         await page.click("#create_btn_c")
         await asyncio.sleep(5)
-        for i in range(60 * 5):
-            await asyncio.sleep(1)
+
+        async def check_need_reload():
+            need_reload_ele = await page.query_selector("#giloadhelpc")
+            if need_reload_ele:
+                display = await need_reload_ele.evaluate("el => getComputedStyle(el).display")
+                return display != "none"
+
+        async def check_complete():
             create_btn = await page.query_selector("#create_btn_c")
             if await create_btn.inner_text() in ["Create", "创建"]:
+                return True
+
+        async def check_error() -> str:
+            error_ele = await page.query_selector("#girer")
+            if error_ele:
+                return await error_ele.inner_text()
+            return ""
+
+        for i in range(60 * 5):
+            await asyncio.sleep(1)
+            if error := await check_error():
+                raise Exception(error)
+            if await check_complete():
                 break
+            if await check_need_reload():
+                await page.reload()
+                await asyncio.sleep(3)
+
+
+
         else:
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
 
-        async def wait_for_preview_img():
-            await asyncio.wait_for(gir.evaluate("""
+        await gir.evaluate("""
                 () => {
             var images = document.querySelectorAll('#gir_async img');
 
@@ -160,17 +184,8 @@ class BingAIPlayWright:
 
             return preLoad();
         }
-            """), 30)
+            """)
 
-        for i in range(3):
-            try:
-                await wait_for_preview_img()
-                break
-            except:
-                print("超时，刷新页面")
-                await page.reload()
-                gir = await page.query_selector("#gir_async")
-                pass
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
         await gir.screenshot(path=path)
@@ -233,6 +248,7 @@ class BinAITaskPool(threading.Thread):
             try:
                 draw_resp = await bing.draw(draw_task.prompt)
             except Exception as draw_error:
+                # traceback.print_exc()
                 if draw_task.error_callback:
                     threading.Thread(target=draw_task.error_callback, args=(f"画图发生了错误：{draw_error}",),
                                      daemon=True).start()
@@ -294,6 +310,6 @@ if __name__ == '__main__':
     # test.put_task(BingAIChatTask("1", "你好", print))
     # time.sleep(2)
     # test.put_task(BingAIChatTask("2", "你是谁", print))
-    test.put_task(BingAIDrawTask("一只猫", print))
+    test.put_task(BingAIDrawTask("三只猫", print, print))
     # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
