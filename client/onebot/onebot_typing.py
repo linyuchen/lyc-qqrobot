@@ -1,5 +1,12 @@
-
+from enum import StrEnum
 from typing import Literal, TypedDict
+
+
+class MessageItemType(StrEnum):
+    text = "text"
+    image = "image"
+    at = "at"
+    reply = "reply"
 
 
 class _OnebotSelf(TypedDict):
@@ -9,6 +16,7 @@ class _OnebotSelf(TypedDict):
 
 class _OnebotMessageItemDataAt(TypedDict):
     mention: str  # at的qq号
+    qq: str  # at的qq号
 
 
 class _OnebotMessageItemDataText(TypedDict):
@@ -17,29 +25,31 @@ class _OnebotMessageItemDataText(TypedDict):
 
 class _OnebotMessageItemDataImage(TypedDict):
     path: str
+    file: str
 
 
 class _OnebotMessageItemDataReply(TypedDict):
     reply: str  # 回复的消息id
+    id: str
 
 
 class _OnebotMessageItemAt(TypedDict):
-    type: Literal["at"]
+    type: Literal[MessageItemType.at]
     data: _OnebotMessageItemDataAt
 
 
 class _OnebotMessageItemText(TypedDict):
-    type: Literal["text"]
+    type: Literal[MessageItemType.text]
     data: _OnebotMessageItemDataText
 
 
 class _OnebotMessageItemImage(TypedDict):
-    type: Literal["image"]
+    type: Literal[MessageItemType.image]
     data: _OnebotMessageItemDataImage
 
 
 class _OnebotMessageItemReply(TypedDict):
-    type: Literal["reply"]
+    type: Literal[MessageItemType.reply]
     data: _OnebotMessageItemDataReply
 
 
@@ -47,7 +57,9 @@ class OnebotRespNewMessage(TypedDict):
     self: _OnebotSelf
     type: Literal["message"]
     detail_type: Literal["group", "private"]
+    message_type: Literal["group", "private"]
     message: list[_OnebotMessageItemAt | _OnebotMessageItemText | _OnebotMessageItemImage | _OnebotMessageItemReply]
+    message_id: str
     group_id: str
     user_id: str
 

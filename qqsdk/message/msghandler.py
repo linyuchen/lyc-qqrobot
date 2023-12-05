@@ -80,7 +80,7 @@ class MsgHandler:
                 self.__exclude_groups.append(group_qq)
 
     def check_type(self, msg: GeneralMsg):
-        return isinstance(msg, self.bind_msg_types)
+        return type(msg) in self.bind_msg_types
 
     def handle(self, msg: GeneralMsg):
         pass

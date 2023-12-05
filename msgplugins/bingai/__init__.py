@@ -1,3 +1,5 @@
+from common.cmd_alias import CMD_ALIAS_DRAW
+from common.utils.nsfw_detector import nsfw_words_filter
 from config import get_config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
@@ -27,14 +29,19 @@ def bing(msg: GeneralMsg, params: list[str]):
 
 @on_command(
     "DE3",
-    alias=("bing画图", "de3", "微软画图"),
+    alias=("bing画图", "de3", "微软画图") + CMD_ALIAS_DRAW,
+    priority=5,
     param_len=1,
     desc="DALL·E 3画图,如: DE3 一只会飞的猫猫",
     cmd_group_name="bingai",
 )
 def bingai_draw(msg: GeneralMsg, params: list[str]):
-    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     prompt = params[0]
+    prompt = nsfw_words_filter(prompt)
+    if not prompt:
+        msg.reply("提示词中含有敏感词汇，请重新输入")
+        return
+    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
 
     def reply(resp: BingAIImageResponse):
         msg.reply(

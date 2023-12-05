@@ -29,8 +29,8 @@ def send_voice(msg: GroupMsg | FriendMsg, text):
     # text = text.replace("喵", "")
     if len(text) <= 60:
         try:
-            base64_data = tts(text)
-            msg.reply(MessageSegment.voice_base64(base64_data))
+            voice_path = tts(text)
+            msg.reply(MessageSegment.voice_path(voice_path))
         except Exception as e:
             logger.error(e)
 

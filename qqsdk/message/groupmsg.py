@@ -11,12 +11,13 @@ from qqsdk.message.types import MessageTypes
 class GroupMsg(BaseMsg):
     """
     """
-    msg_id: int = None
+    msg_id: int | str = None
     msg_type = MessageTypes.GROUP
     group: Group = None
     group_member: GroupMember = None
     is_at_me: bool = False
     is_at_other: bool = False
+    at_member: GroupMember = None
     quote_msg: 'GroupMsg' = None
 
     def recall(self):
@@ -177,14 +178,8 @@ class DiscussionGroupMsg(BaseMsg):
 
 
 @dataclass
-class GroupSendMsg(BaseMsg):
+class GroupSendMsg(GroupMsg):
     """
     发送给群的消息
     """
-    msg_id: int = None
-    group: Group = None
     msg_type = MessageTypes.GROUP_SEND
-    msg_chain: MessageSegment = None
-
-    def recall(self):
-        pass

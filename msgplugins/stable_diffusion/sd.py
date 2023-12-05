@@ -11,7 +11,7 @@ import config
 from common.sdwebuiapi import WebUIApi, raw_b64_img
 from common.utils.translator import trans, is_chinese
 from .base import AIDrawBase
-from .lora import trans_lora, get_lora
+from .lora import trans_lora, get_lora_format
 
 base_url = config.SD_HTTP_API + "/sdapi/v1/"
 
@@ -60,12 +60,15 @@ class SDDraw(AIDrawBase):
             res_paths.append(Path(image_path))
         return res_paths
 
-    def img2img(self, img_url: str, prompt: str, denoising_strength=0.5) -> Image:
+    def img2img(self, img_url: str | Path, prompt: str, denoising_strength=0.5) -> Image:
         lora_prompt, prompt = trans_lora(prompt)
         prompt = self.trans_prompt(prompt) + lora_prompt
-        data = requests.get(img_url).content
-        fp = io.BytesIO(data)
-        image = Image.open(fp)
+        if isinstance(img_url, Path):
+            image = Image.open(img_url)
+        else:
+            data = requests.get(img_url).content
+            fp = io.BytesIO(data)
+            image = Image.open(fp)
         size = image.size
         # if size[0] > 768 or size[1] > 768:
         max_size = 768
@@ -116,7 +119,7 @@ class SDDraw(AIDrawBase):
 
     def get_loras(self):
         # res = f"lora列表：\n{self.__get_loras()}"
-        res = f"sd lora关键字(提示词加上关键字即可触发)：\n{get_lora()}"
+        res = f"sd lora关键字(提示词加上关键字即可触发)：\n{get_lora_format()}"
         return res
 
     def set_model(self, model_name: str):

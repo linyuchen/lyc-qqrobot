@@ -1,11 +1,13 @@
 import re
 import tempfile
 import threading
+import traceback
 from functools import reduce
 from pathlib import Path
 
 from requests.exceptions import ConnectionError
 
+from common.cmd_alias import CMD_ALIAS_DRAW
 from common.logger import logger
 from common.utils.nsfw_detector import nsfw_detect
 from msgplugins.msgcmd.cmdaz import on_command
@@ -60,22 +62,25 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
         return msg.reply(f"画图失败，可能主人把SD给关掉了，等主人回来后开启吧")
     except Exception as e:
         logger.error(e)
+        traceback.print_exc()
         return msg.reply(f"画图失败，请检查图片或者提示词")
 
     msg.reply(MessageSegment.image_b64(base64_data))
 
 
 @on_command("sd",
-            alias=("SD", ),
+            alias=("SD", ) + CMD_ALIAS_DRAW,
             desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")
 def sd_draw(msg: GroupMsg | FriendMsg, args: list[str]):
-    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     url = msg.msg_chain.get_image_urls() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_urls()
+    if not url:
+        url = msg.msg_chain.get_image_paths() or msg.quote_msg and msg.quote_msg.msg_chain.get_image_paths()
     if not url and not args:
         return
+    msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     if url:
         if not args:
             args = ["masterpiece"]

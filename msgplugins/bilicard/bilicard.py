@@ -41,7 +41,7 @@ def b32_to_bv(b23tv: str):
     b23.tv链接转BV链接
     """
     url = f"https://b23.tv/{b23tv}"
-    url = request.urlopen(url).geturl()
+    url = session.get(url).url
     return url
 
 
@@ -246,9 +246,10 @@ if __name__ == "__main__":
 
     # 被翻译成英文了
     # _text = 'https://bilibili.com/video/BV1Ds4y1e7ZB'
-    bvid = get_bv_id(_text)
+    # bvid = get_bv_id(_text)
     # print(gen_text(bvid))
-    _video_info = get_video_info(bvid)
-    gen_image(_video_info)
+    # _video_info = get_video_info(bvid)
+    # gen_image(_video_info)
     # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
     # print(_r)
+    print(b32_to_bv("LPrGvRX"))

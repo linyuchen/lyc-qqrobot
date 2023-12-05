@@ -32,17 +32,17 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
         https://www.zhihu.com/question/27830729
         """
         # 匹配知乎问题链接
-        question_url = re.findall(r"https://www.zhihu.com/question/\d+", msg.msg)
+        question_url = re.findall(r"https?://www.zhihu.com/question/\d+", msg.msg)
         question_url = question_url[0] if question_url else None
         # 匹配知乎回答链接
-        answer_url = re.findall(r"https://www.zhihu.com/question/\d+/answer/\d+", msg.msg)
+        answer_url = re.findall(r"https?://www.zhihu.com/question/\d+/answer/\d+", msg.msg)
         answer_url = answer_url[0] if answer_url else None
         url = answer_url or question_url
         if url:
             msg.destroy()
             img_path = zhihu_previewer.zhihu_question(url)
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False, quote=False)
                 img_path.unlink()
 
     elif "//zhuanlan.zhihu.com/p/" in msg.msg:
@@ -52,7 +52,8 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = zhihu_previewer.zhihu_zhuanlan(zhuanlan_url)
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(zhuanlan_url), at=False)
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(zhuanlan_url),
+                          at=False, quote=False)
                 img_path.unlink()
 
 
@@ -66,7 +67,7 @@ def github_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = github_readme(url, http_proxy=config.get_config("GFW_PROXY"))
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False, quote=False)
                 img_path.unlink()
 
 
@@ -89,5 +90,5 @@ def wx_article_preview(msg: GeneralMsg, params: list[str]):
             msg.destroy()
             img_path = wx_article(url)
             if img_path:
-                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False)
+                msg.reply(MessageSegment.image_path(img_path) + MessageSegment.text(url), at=False, quote=False)
                 img_path.unlink()

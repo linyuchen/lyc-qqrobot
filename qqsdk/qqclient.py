@@ -9,7 +9,7 @@ from abc import ABCMeta, abstractmethod
 from common.logger import logger
 from qqsdk import entity
 from qqsdk.eventlistener import EventListener
-from qqsdk.message import MsgHandler
+from qqsdk.message import MsgHandler, BaseMsg
 from qqsdk.message.segment import MessageSegment
 
 
@@ -20,6 +20,7 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         self.qq_user = entity.QQUser(friends=[], groups=[])
         self.online = True
         self.msg_handlers = self.setup_plugins()
+        self.msg_history: list[BaseMsg] = []
 
     def setup_plugins(self) -> list[MsgHandler]:
         plugins_path = pathlib.PurePath(__file__).parent.parent / "msgplugins"
@@ -99,3 +100,13 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
             self.get_friends()
             friend = self.__get_friend(qq)
         return friend
+
+    def add_msg(self, msg: BaseMsg):
+        self.msg_history.append(msg)
+        super().add_msg(msg)
+
+    def get_history_msg(self, msg_id: str | int):
+        for msg in self.msg_history:
+            if getattr(msg, "msg_id") == msg_id:
+                return msg
+        return None

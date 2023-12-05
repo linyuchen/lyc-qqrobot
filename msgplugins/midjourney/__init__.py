@@ -9,6 +9,7 @@ import requests
 from PIL import Image
 
 import config
+from common.cmd_alias import CMD_ALIAS_DRAW
 from common.logger import logger
 from common.utils.postimg import postimg_cc
 from msgplugins.msgcmd.cmdaz import on_command
@@ -46,11 +47,9 @@ def get_user_id(msg: GroupMsg | FriendMsg):
 @on_command("画图",
             alias=(
                     "mj", "MJ", "niji", "NIJI",
-                    "画画", "绘图", re.compile(r"^画一\w"),
-                    "画个", "画张", "画只", "画头", "画条", "画幅",
-                    "给我画", "帮我画"
-            ),
+            ) + CMD_ALIAS_DRAW,
             param_len=-1,
+            priority=4,
             desc="mj 提示词,画写实风格\nniji 提示词,画动漫风格\n画图支持图生图",
             cmd_group_name=CMD_GROUP_NAME)
 def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):

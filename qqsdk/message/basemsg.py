@@ -21,10 +21,11 @@ class BaseMsg:
     thread_lock = threading.Lock()
     qq_client: "qqsdk.qqclient.QQClientBase" = None
 
-    def reply(self, content: str | MessageSegment, at=True):
+    def reply(self, content: str | MessageSegment, at=True, quote=True):
         """
         :param content:回复内容
         :param at:是否@发送者
+        :param quote:是否引用回复
         :return:
         """
         raise NotImplementedError

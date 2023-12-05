@@ -19,11 +19,11 @@ class TestBingAI(unittest.TestCase):
     def test_draw(self):
         async def t():
             p = await BingAIPlayWright(proxy="http://localhost:7890", headless=False).init()
-            result = await p.draw("一只猫娘")
+            result = await p.draw("青椒炒肉")
             print(result)
         # asyncio.run(t())
         # input("按任意键退出")
-        bingai_pool.put_task(BingAIDrawTask("炒肉丝", print))
+        bingai_pool.put_task(BingAIDrawTask("青椒炒肉", print))
         bingai_pool.join()
 
 

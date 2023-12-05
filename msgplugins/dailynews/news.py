@@ -1,10 +1,11 @@
 import os.path
 import re
+import tempfile
 import textwrap
 import time
 
 import unicodedata
-from pathlib import PurePath
+from pathlib import PurePath, Path
 
 import requests
 
@@ -12,7 +13,9 @@ from common.stringplus import split_lines
 from common.utils import htmlhelper
 from PIL import Image, ImageDraw, ImageFont
 
-base_path = PurePath(__file__).parent
+# base_path = PurePath(__file__).parent
+base_path = Path(tempfile.mkdtemp())
+base_path.mkdir(exist_ok=True)
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -60,10 +63,11 @@ def get_news():
 
 
 def get_news2():
+    base_path.mkdir(exist_ok=True)
     today = time.strftime("%Y-%m-%d")
     yesterday = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 60 * 60))
-    today_img_path = base_path / "data" / (today + ".png")
-    yesterday_img_path = base_path / "data" / (yesterday + ".png")
+    today_img_path = base_path / (today + ".png")
+    yesterday_img_path = base_path / (yesterday + ".png")
 
     if os.path.exists(today_img_path):
         # 对比昨天的图片，如果一样就不更新
@@ -71,7 +75,10 @@ def get_news2():
             os.remove(today_img_path)
         else:
             return str(today_img_path)
-    url = "https://api.03c3.cn/zb/index.php"
+    url = "http://dwz.2xb.cn/zaob"
+    url = requests.get(url).json().get("imageUrl")
+    if not url:
+        return
     with open(today_img_path, "wb") as f:
         try:
             img_data = requests.get(url, headers=headers).content

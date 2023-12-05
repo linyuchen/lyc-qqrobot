@@ -1,3 +1,4 @@
+import base64
 import tempfile
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
@@ -17,10 +18,10 @@ class MessageSegment:
         self.msg_type = msg_type
         self.content = content
         self.quote_msg = None  # FriendMsg or GroupMsg
-        self.origin_data: List[Tuple[str, str]] = []
         self.is_at_me = False
         self.is_at_other = False
         self.is_at_all = False
+        self.origin_data: List[Tuple[str, str]] = []
         if msg_type and content:
             self.origin_data.append((msg_type, content))
 
@@ -43,7 +44,6 @@ class MessageSegment:
         for path in paths[1:]:
             _msg += MessageSegment("ImagePath", str(path))
         return _msg
-
 
     @staticmethod
     def image_b64(data: str):
@@ -68,26 +68,38 @@ class MessageSegment:
         return ms
 
     @staticmethod
-    def to_onebot_data(msg_type: str, content: str):
+    def reply(msg_id: str):
+        ms = MessageSegment("reply", msg_id)
+        return ms
+
+    @staticmethod
+    def to_onebot11_data(msg_type: str, content: str):
         data = {"type": msg_type}
         if msg_type == "Plain":
-            data.update({"content": content, "type": "text"})
-        elif msg_type == "ImageUrl":
-            data.update({"type": "Image", "url": content})
+            data.update({"data": {"text": content}, "type": "text"})
         elif msg_type == "ImagePath":
             content = Path(content)
+            base64_data = base64.b64encode(content.read_bytes()).decode()
             # 复制一份到临时目录
-            temp_path = Path(tempfile.mktemp(content.suffix))
-            temp_path.write_bytes(content.read_bytes())
-            data.update({"type": "image", "file": str(temp_path)})
-        elif msg_type == "ImageBase64":
-            data.update({"type": "Image", "base64": content})
-        elif msg_type == "VoicePath":
-            data.update({"type": "Voice", "path": content})
-        elif msg_type == "VoiceBase64":
-            data.update({"type": "Voice", "base64": content})
+            # temp_path = Path(tempfile.mktemp(content.suffix))
+            # temp_path.write_bytes(content.read_bytes())
+            data.update({"type": "image", "data": {"file": "base64://" + base64_data}})
         elif msg_type == "At":
-            data.update({"type": "At", "mention": content})
+            data.update({"type": "at", "data": {"qq": content}})
+        # elif msg_type == "ImageUrl":
+        #     data.update({"type": "Image", "data": {"url": content}})
+        elif msg_type == "ImageBase64":
+            # content = base64.b64decode(content)
+            # temp_path = Path(tempfile.mktemp(".png"))
+            # temp_path.write_bytes(content)
+            data.update({"type": "image", "data": {"file": f"base64://{content}"}})
+        elif msg_type == "VoicePath":
+            base64_data = base64.b64encode(Path(content).read_bytes()).decode()
+            data.update({"type": "voice", "data": {"file": f"base64://{base64_data}"}})
+        # elif msg_type == "VoiceBase64":
+        #     data.update({"type": "Voice", "base64": content})
+        elif msg_type == "reply":
+            data.update({"type": "reply", "data": {"id": content}})
         return data
 
     @staticmethod
@@ -120,10 +132,10 @@ class MessageSegment:
         return result
 
     @property
-    def onebot_data(self) -> List:
+    def onebot11_data(self) -> List[dict]:
         result = []
         for msg_data in self.origin_data:
-            result.append(self.to_onebot_data(msg_data[0], msg_data[1]))
+            result.append(self.to_onebot11_data(msg_data[0], msg_data[1]))
         return result
 
     def __add__(self, other: Self) -> Self:
@@ -134,11 +146,35 @@ class MessageSegment:
 
     def get_text(self):
         """获取纯文本"""
-        return "".join([msg_data["text"] for msg_data in self.data if msg_data["type"] == "Plain"])
+        return "".join([msg_data.get("text") or msg_data.get("data", {}).get("text") for msg_data in self.data if msg_data["type"] == "Plain"])
 
     def get_image_urls(self) -> list[str]:
         """获取图片链接"""
-        return [msg_data["url"] for msg_data in self.data if msg_data["type"] == "Image"]
+        result = []
+        for msg_data in self.data:
+            if msg_data["type"] == "Image":
+                if "url" in msg_data:
+                    result.append(msg_data["url"])
+            elif msg_data["type"] == "image":
+                # onebot 11
+                pass
+                # result.append(msg_data["data"]["file"])
+        return result
+
+    def get_image_paths(self) -> list[Path]:
+        """获取图片路径"""
+        result = []
+        for msg_data in self.data:
+            if msg_data["type"] == "Image":
+                if "path" in msg_data:
+                    result.append(Path(msg_data["path"]))
+            elif msg_data["type"] == "image":
+                # onebot 11
+                result.append(Path(msg_data["data"]["file"]))
+        return result
+
+    def __str__(self):
+        return str(self.onebot11_data)
 
 
 if __name__ == '__main__':

@@ -15,6 +15,7 @@ class ChatGPT:
         self.history_max = 10
         self.prompt = prompt
         self.history = []  # messages
+        self.openai_client = openai.Client(api_key=self.api_key, base_url=self.api_base)
 
     def get_prompt(self):
         return self.prompt
@@ -35,26 +36,21 @@ class ChatGPT:
         messages.insert(0, {'role': 'system', 'content': self.prompt})
         if len(question) > self.question_max:
             question = question[0:(self.question_max // 2)] + question[-(self.question_max // 2):]
-        messages.append({'role': 'user', 'content': question})
+        user_message = {'role': 'user', 'content': question}
+        messages.append(user_message)
 
-        response = openai.ChatCompletion.create(
+        response = self.openai_client.chat.completions.create(
             model=self.model,
-            api_key=self.api_key,
-            api_base=self.api_base,
             # prompt=prompt,
             messages=messages,
             stream=True,
         )
-        completion = {'role': '', 'content': ''}
-        res = []
+        completion = {'role': 'assistant', 'content': ''}
         for event in response:
-            if event['choices'][0]['finish_reason'] == 'stop':
-                # print(f'收到的完成数据: {completion}')
+            choice = event.choices[0]
+            if choice.finish_reason == 'stop':
                 break
-            for delta_k, delta_v in event['choices'][0]['delta'].items():
-                # print(f'流响应数据: {delta_k} = {delta_v}')
-                completion[delta_k] += delta_v
-        res.append(completion)  # 直接在传入参数 messages 中追加消息
-        res = "\n".join(map(lambda m: m['content'], res))
-        self.history.append({'role': 'assistant', 'content': res})
-        return res
+            completion['content'] += choice.delta.content
+        self.history.append(user_message)
+        self.history.append(completion)
+        return completion['content']
