@@ -138,16 +138,15 @@ class BingAIPlayWright:
         for i in range(60 * 5):
             await asyncio.sleep(1)
             if error := await check_error():
+                await page.close()
                 raise Exception(error)
             if await check_complete():
                 break
             if await check_need_reload():
                 await page.reload()
                 await asyncio.sleep(3)
-
-
-
         else:
+            await page.close()
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
