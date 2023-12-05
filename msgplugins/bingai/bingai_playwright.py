@@ -193,6 +193,8 @@ class BingAIPlayWright:
         img_urls = []
         for img in img_list:
             img_url = (await img.get_attribute("src")).split("?")[0]
+            if img_url.endswith(".svg"):
+                continue
             img_urls.append(img_url)
         await page.close()
         return BingAIImageResponse(path, img_urls)
