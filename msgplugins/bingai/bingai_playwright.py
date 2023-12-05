@@ -126,7 +126,51 @@ class BingAIPlayWright:
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
-        await gir.wait_for_selector("img")
+
+        async def wait_for_preview_img():
+            await asyncio.wait_for(gir.evaluate("""
+                () => {
+            var images = document.querySelectorAll('#gir_async img');
+
+            function preLoad() {
+
+                var promises = [];
+
+                function loadImage(img) {
+                    return new Promise(function(resolve,reject) {
+                        if (img.complete) {
+                            resolve(img)
+                        }
+                        img.onload = function() {
+                            resolve(img);
+                        };
+                        img.onerror = function(e) {
+                            resolve(img);
+                        };
+                    })
+                }
+
+                for (var i = 0; i < images.length; i++)
+                {
+                    promises.push(loadImage(images[i]));
+                }
+
+                return Promise.all(promises);
+            }
+
+            return preLoad();
+        }
+            """), 30)
+
+        for i in range(3):
+            try:
+                await wait_for_preview_img()
+                break
+            except:
+                print("超时，刷新页面")
+                await page.reload()
+                gir = await page.query_selector("#gir_async")
+                pass
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
         await gir.screenshot(path=path)
@@ -245,11 +289,11 @@ if __name__ == '__main__':
     test = BinAITaskPool(proxy="http://localhost:7890", headless=False)
     test.start()
     time.sleep(2)
-    test.put_task(BingAIChatTask("3", "hello", print))
-    time.sleep(2)
-    test.put_task(BingAIChatTask("1", "你好", print))
-    time.sleep(2)
-    test.put_task(BingAIChatTask("2", "你是谁", print))
-    # test.put_task(BingAIDrawTask("一只猫", print))
+    # test.put_task(BingAIChatTask("3", "hello", print))
+    # time.sleep(2)
+    # test.put_task(BingAIChatTask("1", "你好", print))
+    # time.sleep(2)
+    # test.put_task(BingAIChatTask("2", "你是谁", print))
+    test.put_task(BingAIDrawTask("一只猫", print))
     # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
