@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
 
@@ -67,6 +68,29 @@ class MessageSegment:
         return ms
 
     @staticmethod
+    def to_onebot_data(msg_type: str, content: str):
+        data = {"type": msg_type}
+        if msg_type == "Plain":
+            data.update({"content": content, "type": "text"})
+        elif msg_type == "ImageUrl":
+            data.update({"type": "Image", "url": content})
+        elif msg_type == "ImagePath":
+            content = Path(content)
+            # 复制一份到临时目录
+            temp_path = Path(tempfile.mktemp(content.suffix))
+            temp_path.write_bytes(content.read_bytes())
+            data.update({"type": "image", "file": str(temp_path)})
+        elif msg_type == "ImageBase64":
+            data.update({"type": "Image", "base64": content})
+        elif msg_type == "VoicePath":
+            data.update({"type": "Voice", "path": content})
+        elif msg_type == "VoiceBase64":
+            data.update({"type": "Voice", "base64": content})
+        elif msg_type == "At":
+            data.update({"type": "At", "mention": content})
+        return data
+
+    @staticmethod
     def to_data(msg_type: str, content: str):
         """
         可以在外部更改此方法
@@ -93,6 +117,13 @@ class MessageSegment:
         result = []
         for msg_data in self.origin_data:
             result.append(self.to_data(msg_data[0], msg_data[1]))
+        return result
+
+    @property
+    def onebot_data(self) -> List:
+        result = []
+        for msg_data in self.origin_data:
+            result.append(self.to_onebot_data(msg_data[0], msg_data[1]))
         return result
 
     def __add__(self, other: Self) -> Self:
