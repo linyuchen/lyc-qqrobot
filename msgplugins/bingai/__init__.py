@@ -50,4 +50,4 @@ def bingai_draw(msg: GeneralMsg, params: list[str]):
             MessageSegment.text(f"提示词:{prompt}\n\n原图：" + '\n'.join(resp.img_urls))
         )
 
-    bingai_task_pool.put_task(BingAIDrawTask(prompt, reply))
+    bingai_task_pool.put_task(BingAIDrawTask(prompt, reply, msg.reply))

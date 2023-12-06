@@ -32,7 +32,9 @@ def get_config(handler_name: str):
 @dataclass
 class MsgHandler:
     name = ""  # 不是唯一的，同类型的可以一样
+    cmd_name = ""  # 绑定的命令名
     desc = ""  # 描述 一般写'发送 xxx 触发xxx'
+    example = ""  # 例子
     qq_client: "qqsdk.qqclient.QQClientBase" = None
     is_async = False  # 为True时，handle函数会在新线程中执行
     bind_msg_types: Tuple[Type[GeneralMsg]] = ()  # 绑定的消息类型

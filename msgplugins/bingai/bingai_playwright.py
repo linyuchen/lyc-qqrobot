@@ -132,22 +132,22 @@ class BingAIPlayWright:
         async def check_error() -> str:
             error_ele = await page.query_selector("#girer")
             if error_ele:
+                await (await error_ele.query_selector(".gie_btns")).evaluate("el => el.style.display = 'none'")
                 return await error_ele.inner_text()
             return ""
 
         for i in range(60 * 5):
             await asyncio.sleep(1)
             if error := await check_error():
+                await page.close()
                 raise Exception(error)
             if await check_complete():
                 break
             if await check_need_reload():
                 await page.reload()
                 await asyncio.sleep(3)
-
-
-
         else:
+            await page.close()
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
@@ -193,6 +193,8 @@ class BingAIPlayWright:
         img_urls = []
         for img in img_list:
             img_url = (await img.get_attribute("src")).split("?")[0]
+            if img_url.endswith(".svg"):
+                continue
             img_urls.append(img_url)
         await page.close()
         return BingAIImageResponse(path, img_urls)
@@ -307,6 +309,6 @@ if __name__ == '__main__':
     # test.put_task(BingAIChatTask("1", "你好", print))
     # time.sleep(2)
     # test.put_task(BingAIChatTask("2", "你是谁", print))
-    test.put_task(BingAIDrawTask("三只猫", print, print))
+    test.put_task(BingAIDrawTask("没有衣服的阿狸", print, print))
     # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()

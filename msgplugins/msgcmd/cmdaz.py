@@ -142,6 +142,7 @@ def on_command(cmd_name,
                ignores: tuple[str] = (),
                bind_msg_type: tuple[Type[GroupMsg | FriendMsg | BaseMsg], ...] = (GroupMsg, FriendMsg),
                desc: str = "",
+               example: str = "",
                at_sep: str = "",
                auto_destroy: bool = True,
                cmd_group_name: str = "",
@@ -161,6 +162,7 @@ def on_command(cmd_name,
     :param ignores: 忽略的命令
     :param bind_msg_type: 绑定的消息类型
     :param desc: 命令描述
+    :param example: 命令例子
     :param at_sep: at之后的命令分隔符
     :param auto_destroy: 是否自动销毁消息
     :param cmd_group_name: 命令组名
@@ -201,6 +203,7 @@ def on_command(cmd_name,
             'bind_msg_types': bind_msg_type,
             'handle': handle,
             'name': cmd_group_name,
+            'cmd_name': cmd_name,
             'priority': priority,
         })
 

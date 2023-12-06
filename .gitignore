@@ -20,5 +20,6 @@ msgplugins/bilicard/cookie.txt
 msgplugins/blacklist/config.json
 msgplugins/stable_diffusion/*.png
 msgplugins/chatgpt/prompts.json
+msgplugins/vision_menu/menu.png
 config.json
 qqsdk/message/cmd_config.json
