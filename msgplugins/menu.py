@@ -34,7 +34,7 @@ class MenuPlugin(MsgHandler):
         return []
 
     def handle(self, msg: GroupMsg | FriendMsg):
-        if CMD("菜单", alias=["功能", "帮助"]).az(msg.msg) or (not msg.msg.strip() and getattr(msg, "is_at_me", False)):
+        if CMD("menu").az(msg.msg) or (not msg.msg.strip() and getattr(msg, "is_at_me", False)):
             if msg.quote_msg and not msg.msg.strip():
                 return
             if isinstance(msg, GroupMsg) and msg.is_at_other:

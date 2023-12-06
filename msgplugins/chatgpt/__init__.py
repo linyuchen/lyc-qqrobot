@@ -1,17 +1,17 @@
 import re
 import threading
 import time
-from pathlib import Path
 
 import config
 from common.logger import logger
 from msgplugins.msgcmd.cmdaz import CMD, on_command
-from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
+from qqsdk.message import MsgHandler, GroupMsg, FriendMsg, GeneralMsg
 from qqsdk.message.segment import MessageSegment
 from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
 
 
-@on_command("百科", param_len=1, desc="百科搜索,如:百科 猫娘")
+@on_command("百科", param_len=1, desc="百科搜索",
+            example="如:百科 猫娘", is_async=True)
 def wiki(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("正在为您搜索百科...")
 
@@ -47,9 +47,10 @@ def summary_url(url: str) -> str:
         return result
 
 
-@on_command("总结",
-            alias=("总结一下", "总结网页"),
-            param_len=-1, desc="总结网页,如:总结 https://www.qq.com")
+@on_command("总结网页",
+            alias=("总结一下",),
+            param_len=-1,
+            desc="AI总结网页", example="总结网页 https://www.qq.com", is_async=True)
 def summary_web_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
     text = msg.quote_msg.msg if msg.quote_msg else ""
     text += "\n" + msg.msg
@@ -60,75 +61,61 @@ def summary_web_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
         return
 
 
-class ChatGPT(MsgHandler):
-    name = "ChatGPT"
-    desc = "#+消息 或者 @机器人+消息 进行AI对话\n\n" \
-           "@机器人发送 http开头的网址进行AI总结网页\n\n" \
-           "设置人格，如：设置人格 你现在是一只狗娘\n" \
-           "清除人格\n" \
-           "查看人格\n"
-    is_async = True
-    priority = -1
-    bind_msg_types = (GroupMsg, FriendMsg)
-    records = {}
-    ignore_username = ["Q群管家"]
+def get_context_id(msg: GeneralMsg) -> str:
+    context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
+    return context_id
 
-    def handle(self, msg: GroupMsg | FriendMsg):
-        if isinstance(msg, GroupMsg) and msg.group_member.get_name() in self.ignore_username:
-            return
-        context_id = msg.group.qq + "g" if isinstance(msg, GroupMsg) else msg.friend.qq + "f"
-        set_prompt_cmd = CMD("设置人格", param_len=1)
-        clear_prompt_cmd = CMD("清除人格", alias=["恢复人格", "清空人格", "重置人格"])
-        get_prompt_cmd = CMD("查看人格")
-        if set_prompt_cmd.az(msg.msg):
-            set_prompt(context_id, set_prompt_cmd.get_param_list()[0])
-            msg.reply("人格设置成功")
-            msg.destroy()
-            return
-        elif clear_prompt_cmd.az(msg.msg):
-            clear_prompt(context_id)
-            msg.destroy()
-            msg.reply("人格已清除")
-            return
-        elif get_prompt_cmd.az(msg.msg):
-            msg.reply("当前人格:\n\n" + get_prompt(context_id))
-            msg.destroy()
-            return
 
-        if url := get_url(msg.msg):
-            if isinstance(msg, GroupMsg) and not msg.is_at_me:
-                return
-            if res := summary_web(url):
-                msg.reply(res + "\n\n" + url)
-                msg.destroy()
-                return
-        if isinstance(msg, GroupMsg):
-            cmd = CMD("#",
-                      alias=["＃"],
-                      sep="", param_len=1,
-                      ignores=["#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"])
-            if cmd.az(msg.msg) or getattr(msg, "is_at_me", False):
-                if time.time() - self.records.setdefault(msg.group_member.qq, 0) < 5:
-                    return
-                self.records[msg.group_member.qq] = time.time()
+@on_command("设置人格", param_len=1,
+            cmd_group_name="ChatGPT",
+            desc="设置AI人格",
+            example="设置人格 你现在是一只狗娘")
+def set_prompt_cmd(msg: GeneralMsg, params: list[str]):
+    set_prompt(get_context_id(msg), params[0])
+    msg.reply("人格设置成功")
 
-                # use_gpt_4 = msg.group_member.qq == str(config.ADMIN_QQ) and msg.msg.startswith("#")
-                def reply():
-                    _chat_text = cmd.input_text or msg.msg
-                    if msg.quote_msg:
-                        _chat_text = msg.quote_msg.msg + '\n' + _chat_text
-                    _res = chat(context_id, _chat_text)
-                    msg.reply(_res)
-                    send_voice(msg, _res)
 
-                threading.Thread(target=reply, daemon=True).start()
-        elif isinstance(msg, FriendMsg):
-            if time.time() - self.records.setdefault(msg.friend.qq, 0) < 5:
-                return
-            self.records[msg.friend.qq] = time.time()
-            chat_text = msg.msg
-            if msg.quote_msg:
-                chat_text = msg.quote_msg.msg + '\n' + chat_text
-            res = chat(context_id, chat_text)
-            send_voice(msg, res)
-            msg.reply(res)
+@on_command("清除人格", alias=("恢复人格", "清空人格", "重置人格"),
+            cmd_group_name="ChatGPT",
+            desc="清除AI人格")
+def clear_prompt_cmd(msg: GeneralMsg, params: list[str]):
+    clear_prompt(get_context_id(msg))
+    msg.reply("人格清除成功")
+
+
+@on_command("查看人格",
+            cmd_group_name="ChatGPT",
+            desc="查看AI人格")
+def clear_prompt_cmd(msg: GeneralMsg, params: list[str]):
+    clear_prompt(get_context_id(msg))
+    msg.reply("当前人格:\n\n" + get_prompt(get_context_id(msg)))
+
+
+chat_records = {}
+
+
+@on_command("",
+            cmd_group_name="ChatGPT",
+            desc="@机器人进行AI对话",
+            example="@喵了个咪 你好",
+            is_async=True, priority=-1)
+def chat_cmd(msg: GeneralMsg, params: list[str]):
+    if isinstance(msg, GroupMsg):
+        sender_qq = msg.group_member.qq
+        if not msg.is_at_me:
+            return
+        if msg.group_member.nick in ["Q群管家"]:
+            return
+    else:
+        sender_qq = msg.friend.qq
+
+    if time.time() - chat_records.setdefault(sender_qq, 0) < 5:
+        return
+    chat_records[sender_qq] = time.time()
+
+    _chat_text = msg.msg
+    if msg.quote_msg:
+        _chat_text = msg.quote_msg.msg + '\n' + _chat_text
+    _res = chat(get_context_id(msg), _chat_text)
+    msg.reply(_res)
+    send_voice(msg, _res)

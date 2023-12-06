@@ -1,4 +1,5 @@
 import re
+import tempfile
 import time
 import uuid
 from io import BytesIO
@@ -150,7 +151,7 @@ def get_video_summary_by_ai(aid, cid) -> str:
 def gen_image(video_info: dict) -> str:
     base_path = Path(__file__).parent
     # save_path = base_path / f"test.png"
-    save_path = base_path / f"{uuid.uuid4()}.png"
+    save_path = tempfile.mktemp(suffix=".png")
     image = Image.new("RGBA", (560, 470 + 15), (255, 255, 255, 255))
     # image.paste((220, 220, 220), (0, 480, 530, 620))
     cover = Image.open(BytesIO(
@@ -224,7 +225,7 @@ def gen_image(video_info: dict) -> str:
 
 
 def get_font(size=20):
-    font = ImageFont.truetype(str(Path(__file__).parent.parent.parent / "common/仓耳今楷01-9128-W05.otf"), size)
+    font = ImageFont.truetype(str(Path(__file__).parent.parent.parent / "common/fonts/仓耳舒圆体.ttf"), size)
     return font
 
 
@@ -246,10 +247,10 @@ if __name__ == "__main__":
 
     # 被翻译成英文了
     # _text = 'https://bilibili.com/video/BV1Ds4y1e7ZB'
-    # bvid = get_bv_id(_text)
+    bvid = get_bv_id(_text)
     # print(gen_text(bvid))
-    # _video_info = get_video_info(bvid)
-    # gen_image(_video_info)
+    _video_info = get_video_info(bvid)
+    print(gen_image(_video_info))
     # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
     # print(_r)
-    print(b32_to_bv("LPrGvRX"))
+    # print(b32_to_bv("LPrGvRX"))

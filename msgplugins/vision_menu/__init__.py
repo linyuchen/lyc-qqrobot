@@ -4,9 +4,11 @@ from .util import create_menu_image
 
 
 @on_command("菜单",
-            alias=("help",),
-            param_len=0, desc="菜单")
+            alias=("help", "功能", "帮助"),
+            param_len=0, desc="菜单", ignore_at_other=True)
 def help_menu(msg: GeneralMsg, params: list[str]):
+    if msg.quote_msg:
+        return
     menu_list = []
     handlers: list[MsgHandler] = msg.qq_client.msg_handlers[:]
     handlers.sort(key=lambda x: x.name)

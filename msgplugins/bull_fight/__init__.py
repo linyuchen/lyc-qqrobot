@@ -20,7 +20,8 @@ class BullFightPlugin(MsgHandler):
     群游戏：斗牛
     """
     name = "斗牛"
-    desc = "斗牛游戏，示例：斗牛 100，金额0为坐庄"
+    desc = "斗牛棋牌游戏"
+    example = "斗牛 100，金额0为坐庄"
     bind_msg_types = (GroupMsg,)
 
     def __init__(self, **kwargs):

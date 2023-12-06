@@ -215,7 +215,8 @@ meme_interval_config: dict = get_config(CONFIG_KEY_MEME_INTERVAL, {})
 
 @on_command("拍一拍",
             alias=("戳一戳", "摸一摸", "拍拍", "摸摸", "戳戳"),
-            desc="@群员后发送 拍一拍 生成表情包, 如@喵了个咪 拍一拍",
+            desc="@群员后发送 拍一拍 生成表情包",
+            example="@喵了个咪 拍一拍",
             # desc="手机双击群员头像随机发送表情包",
             param_len=0,
             bind_msg_type=(GroupNudgeMsg, GroupMsg),

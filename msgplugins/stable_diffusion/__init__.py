@@ -70,7 +70,8 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
 
 @on_command("sd",
             alias=("SD", ) + CMD_ALIAS_DRAW,
-            desc="sd画图，支持图生图，示例：sd 猫耳女孩\n重绘幅度参数：-d 如: sd -d 0.5",
+            desc="sd画图，支持图生图，支持重绘幅度参数：-d",
+            example="sd 一只猫 -d 0.5",
             param_len=-1,
             priority=3,
             cmd_group_name="SD画图")

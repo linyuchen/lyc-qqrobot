@@ -12,9 +12,11 @@ bingai_task_pool.start()
 
 @on_command("bing",
             alias=("#",),
-            desc="获取bing ai的回复,如: bing 上海的天气",
+            ignores=("#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"),
+            desc="向bing ai提问",
             example="bing 上海的天气",
             param_len=1,
+            sep="",
             cmd_group_name="bingai"
             )
 def bing(msg: GeneralMsg, params: list[str]):
@@ -33,7 +35,8 @@ def bing(msg: GeneralMsg, params: list[str]):
     alias=("bing画图", "de3", "微软画图") + CMD_ALIAS_DRAW,
     priority=5,
     param_len=1,
-    desc="DALL·E 3画图,如: DE3 一只会飞的猫猫",
+    desc="DALL·E 3画图",
+    example="de3 一只猫",
     cmd_group_name="bingai",
 )
 def bingai_draw(msg: GeneralMsg, params: list[str]):

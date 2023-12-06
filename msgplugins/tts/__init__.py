@@ -4,29 +4,28 @@ from .genshinvoice_top import tts, speakers
 
 
 @on_command("tts列表", param_len=0,
-            desc="tts列表, 语音角色列表",
+            desc="获取文字转语音角色列表",
             cmd_group_name="tts")
 def tts_list(msg: GroupMsg | FriendMsg, params: list[str]):
     msg.reply("语音可用的人物列表:\n" + ", ".join(speakers))
 
 
 @on_command("tts", param_len=-1,
-            desc="文字转语音,如:tts 你好，"
-                 "或:tts 可莉 你好",
+            desc="文字转语音, 可以指定角色声音",
+            example="tts 你好 或 tts 可莉 你好",
             cmd_group_name="tts")
 def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
+    default_speaker = "可莉"
     if len(params) == 0:
         msg.reply("请输入要转换的文字")
         return
+
+    text = params[0]
+    speaker = default_speaker
     if len(params) > 1:
-        text = " ".join(params[1:])
-        speaker = params[0]
-        if speaker not in speakers:
-            msg.reply(f"没有 {speaker} 这个人物")
-            return
-    else:
-        text = params[0]
-        speaker = "可莉"
+        if params[0] in speakers:
+            speaker = params[0]
+            text = " ".join(params[1:])
 
     max_len = 200
     if len(text) > max_len:

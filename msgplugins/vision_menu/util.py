@@ -1,26 +1,40 @@
 from pathlib import Path
 from tempfile import mktemp
 
+import fitz
+
 from PIL import Image
 from fitz import Document
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import A3
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle, SimpleDocTemplate, Spacer
 
-import fitz
+from common.stringplus import split_lines
 
 
 pdfmetrics.registerFont(
-    TTFont('zh', Path(__file__).parent.parent.parent / "common" / "fonts" / "仓耳今楷01-9128-W05.ttf"))
+    TTFont('zh', Path(__file__).parent.parent.parent / "common" / "fonts" / "仓耳舒圆体.ttf"))
 
 
 def create_menu_image(data: list[list[str, str, str]]) -> Path:
+    for line in data:
+        desc = line[1]
+        example = line[2]
+        desc_new = []
+        for desc_line in desc.splitlines():
+            desc_new.append("\n".join(split_lines(desc_line, 10)))
+        line[1] = "\n".join(desc_new)
+        example_new = []
+        for example_line in example.splitlines():
+            example_new.append("\n".join(split_lines(example_line, 10)))
+        line[2] = "\n".join(example_new)
+
     pdf_path = Path(mktemp(suffix=".pdf"))
     # c = canvas.Canvas(str(pdf_path), pagesize=letter)
-    c = SimpleDocTemplate(str(pdf_path), pagesize=letter, topMargin=5, bottomMargin=0)
+    c = SimpleDocTemplate(str(pdf_path), pagesize=A3, topMargin=5, bottomMargin=0)
     # c.setFont("zh", 18)
 
     data = [['命令', '说明', '示例']] + data
@@ -31,8 +45,9 @@ def create_menu_image(data: list[list[str, str, str]]) -> Path:
         ('BACKGROUND', (0, 0), (-1, -1), colors.whitesmoke),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),  # 设置表格内容垂直居中
         ('FONT', (0, 0), (-1, -1), 'zh', 22),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('PADDING', (0, 0), (-1, -1), 20),
         # ('BACKGROUND', (0, 0), (-1, -1), colors.beige),
         ('GRID', (0, 0), (-1, -1), 1, colors.black)])
     # table.setStyle(style)
@@ -40,8 +55,8 @@ def create_menu_image(data: list[list[str, str, str]]) -> Path:
     # table.wrapOn(c, 0, 0)
     # table.drawOn(c, 100, 100)
     elements = []
-    for i in range(0, len(data), 40):
-        part_of_data = data[i:i + 40]
+    for i in range(0, len(data), 80):
+        part_of_data = data[i:i + 80]
         tbl = Table(part_of_data)
         tbl.setStyle(style)
         elements.append(tbl)
@@ -72,6 +87,6 @@ def create_menu_image(data: list[list[str, str, str]]) -> Path:
 
 
 if __name__ == '__main__':
-    test_data = [['画图', 'AI画图大森撒扥看阿龙\n但凡阿是扥收到', '画图 一只会飞的喵\n画图xxxx']] * 50
+    test_data = [['画图', 'AI画图大森撒看阿龙\n但凡阿是扥收到', '画图 一只会飞的喵\n画图xxxx']] * 50
     p = create_menu_image(test_data)
     print(p)

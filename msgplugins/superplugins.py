@@ -19,7 +19,7 @@ from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 
 class GroupMsgEvent(MsgHandler):
     name = "群活跃度"
-    desc = "签到\n活跃度\n活跃度排名"
+    cmd_name = desc = "签到\n活跃度\n活跃度排名"
     bind_msg_types = (GroupMsg,)
 
     def handle(self, msg: GroupMsg):

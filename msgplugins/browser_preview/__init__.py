@@ -10,7 +10,8 @@ zhihu_previewer = ZhihuPreviewer()
 
 @on_command("百度",
             param_len=1,
-            desc="百度 搜索内容",
+            desc="获取百度搜索结果截图",
+            example="百度 猫娘",
             cmd_group_name="百度"
             )
 def baidu(msg: GeneralMsg, params: list[str]):
@@ -22,7 +23,10 @@ def baidu(msg: GeneralMsg, params: list[str]):
     img_path.unlink()
 
 
-@on_command("", cmd_group_name="知乎预览")
+@on_command("", cmd_group_name="知乎预览",
+            desc="知乎链接获取预览图",
+            example="https://www.zhihu.com/question/123456"
+            )
 def zhihu_preview(msg: GeneralMsg, params: list[str]):
     if "//www.zhihu.com/question" in msg.msg:
 
@@ -57,7 +61,10 @@ def zhihu_preview(msg: GeneralMsg, params: list[str]):
                 img_path.unlink()
 
 
-@on_command("", cmd_group_name="github预览")
+@on_command("", cmd_group_name="github预览",
+            desc="github链接获取README预览图",
+            example="https://github.com/linyuchen/qqrobot-plugin"
+            )
 def github_preview(msg: GeneralMsg, params: list[str]):
     if "//github.com/" in msg.msg:
         # 获取github链接
@@ -71,7 +78,10 @@ def github_preview(msg: GeneralMsg, params: list[str]):
                 img_path.unlink()
 
 
-@on_command("萌娘百科", param_len=1, desc="萌娘百科搜索,如:萌娘百科 猫娘")
+@on_command("萌娘百科", param_len=1,
+            desc="萌娘百科搜索预览图",
+            example="萌娘百科 猫娘",
+            )
 def moe_wiki_cmd(msg: GeneralMsg, params: list[str]):
     msg.reply("正在为您搜索萌娘百科...")
     img_path = moe_wiki(params[0])
@@ -80,7 +90,10 @@ def moe_wiki_cmd(msg: GeneralMsg, params: list[str]):
         img_path.unlink()
 
 
-@on_command("", cmd_group_name="微信文章预览")
+@on_command("", cmd_group_name="微信文章预览",
+            desc="微信文章链接获取预览图",
+            example="https://mp.weixin.qq.com/s/xa33f"
+            )
 def wx_article_preview(msg: GeneralMsg, params: list[str]):
     if "mp.weixin.qq.com" in msg.msg:
         # 获取github链接

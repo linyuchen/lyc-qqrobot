@@ -32,7 +32,8 @@ def manage_global_cmd(enabled: bool, msg: GroupMsg | FriendMsg, params: list[str
 
 
 @on_command("开启插件",
-            desc="开启插件 插件名，如：开启插件 斗牛",
+            desc="开启插件 插件名",
+            example="开启插件 斗牛",
             alias=("插件开启", "打开插件", "插件打开"),
             param_len=1,
             bind_msg_type=(GroupMsg,),
@@ -43,7 +44,8 @@ def open_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭插件",
-            desc="关闭插件 插件名，如：关闭插件 斗牛",
+            desc="关闭插件 插件名",
+            example="关闭插件 斗牛",
             alias=("插件关闭", "关闭插件", "插件关闭"),
             param_len=1,
             bind_msg_type=(GroupMsg,),
@@ -54,7 +56,8 @@ def close_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启全局插件",
-            desc="开启全局插件 插件名，让插件在所有群都开启，如：开启全局插件 斗牛",
+            desc="让插件在所有群都开启，需要机器人主人权限",
+            example="开启全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -63,7 +66,8 @@ def open_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭全局插件",
-            desc="关闭全局插件 插件名，让插件在所有群都关闭，如：关闭全局插件 斗牛",
+            desc="让插件在所有群都关闭，需要机器人主人权限",
+            example="关闭全局插件 斗牛",
             param_len=1,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -72,7 +76,8 @@ def close_global_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("开启他群插件",
-            desc="开启他群插件 插件名 群号，如：开启他群插件 斗牛 123456",
+            desc="在某个群开启某个插件，需要机器人主人权限",
+            example="开启他群插件 斗牛 114551",
             param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -81,7 +86,8 @@ def open_group_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("关闭他群插件",
-            desc="关闭他群插件 插件名 群号，如：关闭他群插件 斗牛 123456",
+            desc="在某个群关闭某个插件，需要机器人主人权限",
+            example="关闭他群插件 斗牛 114551",
             param_len=2,
             permission=CMDPermissions.SUPER_ADMIN,
             cmd_group_name=CMD_GROUP)
@@ -155,6 +161,7 @@ def unignore_cmd(msg: GroupMsg, params: list[str]):
 
 
 @on_command("查看屏蔽命令",
+            desc="查看屏蔽的命令列表",
             cmd_group_name="命令屏蔽管理",
             permission=CMDPermissions.GROUP_ADMIN)
 def list_ignore_cmd(msg: GroupMsg, params: list[str]):

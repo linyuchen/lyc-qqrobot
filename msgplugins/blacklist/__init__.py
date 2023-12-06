@@ -20,7 +20,8 @@ def check_ignore_cmd(msg: GeneralMsg, params: list[str]):
 
 @on_command("加入黑名单", cmd_group_name="黑名单",
             param_len=1,
-            desc="加入黑名单 QQ号",
+            desc="把QQ号加入黑名单后，机器人将不会回复该用户的消息",
+            example="加入黑名单 1234568",
             permission=CMDPermissions.SUPER_ADMIN)
 def ignore_user(msg: GeneralMsg, params: list[str]):
     qq = params[0]
@@ -35,7 +36,8 @@ def ignore_user(msg: GeneralMsg, params: list[str]):
 
 @on_command("取消黑名单", cmd_group_name="黑名单",
             param_len=1,
-            desc="取消黑名单 QQ号",
+            desc="取消黑名单 QQ号，从黑名单中移除该用户",
+            example="取消黑名单 123456",
             permission=CMDPermissions.SUPER_ADMIN)
 def unignore_user(msg: GeneralMsg, params: list[str]):
     qq = params[0]
