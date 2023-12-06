@@ -132,6 +132,7 @@ class BingAIPlayWright:
         async def check_error() -> str:
             error_ele = await page.query_selector("#girer")
             if error_ele:
+                await (await error_ele.query_selector(".gie_btns")).evaluate("el => el.style.display = 'none'")
                 return await error_ele.inner_text()
             return ""
 
@@ -311,6 +312,6 @@ if __name__ == '__main__':
     # test.put_task(BingAIChatTask("1", "你好", print))
     # time.sleep(2)
     # test.put_task(BingAIChatTask("2", "你是谁", print))
-    test.put_task(BingAIDrawTask("三只猫", print, print))
+    test.put_task(BingAIDrawTask("没有衣服的阿狸", print, print))
     # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
