@@ -265,10 +265,7 @@ class BinAITaskPool(threading.Thread):
                         async_tasks.append(handle_draw_task(t))
 
                 if async_tasks:
-                    try:
-                        await asyncio.gather(*async_tasks)
-                    except Exception as e:
-                        traceback.print_exc()
+                    await asyncio.gather(*async_tasks)
                 await asyncio.sleep(1)
 
         async def listen_chat_task():

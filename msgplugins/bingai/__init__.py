@@ -12,7 +12,8 @@ bingai_task_pool.start()
 
 @on_command("bing",
             alias=("#",),
-            desc="bing 问题，获取bing ai的回复,如: bing 上海的天气",
+            desc="获取bing ai的回复,如: bing 上海的天气",
+            example="bing 上海的天气",
             param_len=1,
             cmd_group_name="bingai"
             )
