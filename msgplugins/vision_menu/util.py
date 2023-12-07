@@ -76,12 +76,25 @@ def create_menu_image(data: list[list[str, str, str]]) -> Path:
     image_width, image_height = image_list[0].size
     total_width = image_width
     total_height = image_height * len(image_list)
-    new_image = Image.new('RGBA', (total_width, total_height))
+    new_image = Image.new('RGBA', (total_width, total_height), (255, 255, 255, 50))
     y_offset = 0
     for im in image_list:
         new_image.paste(im, (0, y_offset))
         y_offset += im.size[1]
-    new_image.save(menu_image_path)
+    bg_image = Image.open(Path(__file__).parent / "bg.png").convert('RGBA')
+    bg_image = bg_image.resize((total_width, total_height))
+    # 创建一个相同尺寸的透明图层
+    transparent_layer = Image.new('RGBA', bg_image.size, (255, 255, 255, 0))  # 完全透明
+
+    # 混合背景图像和透明图层
+    alpha = 0.3  # 设置透明度系数，例如0.5（可以根据需要调整）
+    blended_image = Image.blend(new_image, transparent_layer, alpha)
+
+    # 将混合后的图像粘贴到new_image上
+    bg_image.paste(blended_image, (0, 0), blended_image)
+    bg_image.save(menu_image_path)
+    # bg_image.paste(new_image, (0, 0), new_image)
+    # bg_image.save(menu_image_path)
 
     return menu_image_path
 
