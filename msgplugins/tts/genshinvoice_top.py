@@ -3,8 +3,11 @@ from pathlib import Path
 from urllib.parse import quote
 
 import requests
+import gradio_client
 
 from .utils import wav2silk_base64, wav2amr
+
+client = gradio_client.Client("https://v2.genshinvoice.top/")
 
 speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿', '晴霓', '杰帕德', '素裳', '绿芙蓉', '罗刹', '艾丝妲',
             '黑塔', '丹枢', '希露瓦', '白露', '费斯曼', '停云', '可可利亚', '景元', '螺丝咕姆', '青镞', '公输师傅',
@@ -32,10 +35,12 @@ speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿',
 
 
 def tts(text: str, speaker: str = "可莉") -> Path:
-    url = f"https://genshinvoice.top/api?speaker={quote(speaker)}_ZH&text={quote(text)}=wav&length=1&noise=0.5&noisew=0.9&sdp_ratio=0.2&language=ZH"
-    data = requests.get(url).content
-    wav_path = Path(tempfile.mktemp(suffix=".wav"))
-    with open(wav_path, "wb") as f:
-        f.write(data)
+    res = client.predict(text, f"{speaker}_ZH", 0, 0.2, 0.6, 0.8, 1, "ZH", None, fn_index=2)
+    wav_path = res[1]
+    # url = f"https://genshinvoice.top/api?speaker={quote(speaker)}_ZH&text={quote(text)}=wav&length=1&noise=0.5&noisew=0.9&sdp_ratio=0.2&language=ZH"
+    # data = requests.get(url).content
+    # wav_path = Path(tempfile.mktemp(suffix=".wav"))
+    # with open(wav_path, "wb") as f:
+    #     f.write(data)
     return wav2amr(wav_path)
     # return data
