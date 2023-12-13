@@ -35,6 +35,7 @@ speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿',
 
 
 def tts(text: str, speaker: str = "可莉") -> Path:
+    text += "]]]]"
     res = client.predict(text, f"{speaker}_ZH", 0.2, 0.6, 0.8, 1, "auto", None, "Happy", "Text prompt", fn_index=0)
     wav_path = res[1]
     # url = f"https://genshinvoice.top/api?speaker={quote(speaker)}_ZH&text={quote(text)}=wav&length=1&noise=0.5&noisew=0.9&sdp_ratio=0.2&language=ZH"
