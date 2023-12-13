@@ -26,6 +26,8 @@ def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
         if params[0] in speakers:
             speaker = params[0]
             text = " ".join(params[1:])
+        else:
+            text = " ".join(params)
 
     max_len = 200
     if len(text) > max_len:

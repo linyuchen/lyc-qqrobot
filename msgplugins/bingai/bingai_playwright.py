@@ -10,7 +10,7 @@ from typing import Callable
 
 from playwright.async_api import async_playwright, Page, BrowserContext
 
-CHROME_DATA_DIR = tempfile.gettempdir() + "/playwright_chrome_data_bingai"
+CHROME_DATA_DIR = Path(tempfile.gettempdir() + "/playwright_chrome_data_bingai")
 
 
 @dataclass
@@ -29,20 +29,21 @@ class BingAIPlayWright:
     browser: BrowserContext = None
     browser_context_manager = None
 
-    def __init__(self, proxy: str = "", headless=False):
+    def __init__(self, proxy: str = "", headless=False, data_path: Path = CHROME_DATA_DIR):
         self.proxy = proxy
         self.headless = headless
         self.timeout = 90
         self.page_lifecycle_time = 5 * 60
         # self.page.pause()
         self.pages: dict[str, PageLifeCycle] = {}
+        self.data_path = data_path
 
     async def init(self):
         if self.browser:
             return
         self.browser_context_manager = await async_playwright().start()
         self.browser = await self.browser_context_manager.chromium.launch_persistent_context(
-            CHROME_DATA_DIR,
+            self.data_path,
             headless=self.headless,
             base_url="https://www.bing.com",
             proxy={
@@ -215,7 +216,7 @@ class BingAIDrawTask:
 
 
 class BinAITaskPool(threading.Thread):
-    def __init__(self, proxy: str = "", headless=True):
+    def __init__(self, proxy: str = "", headless=True, data_path: Path = CHROME_DATA_DIR):
         self.proxy = proxy
         self.headless = headless
         self.chat_concurrency = 1
@@ -223,6 +224,7 @@ class BinAITaskPool(threading.Thread):
         super().__init__(daemon=True)
         self.chat_task_queue: queue.Queue[BingAIChatTask] = queue.Queue()
         self.draw_task_queue: queue.Queue[BingAIDrawTask] = queue.Queue()
+        self.data_path = data_path
 
     def put_task(self, task: BingAIChatTask | BingAIDrawTask):
         if isinstance(task, BingAIChatTask):
@@ -231,7 +233,7 @@ class BinAITaskPool(threading.Thread):
             self.draw_task_queue.put(task)
 
     def run(self):
-        bing = BingAIPlayWright(proxy=self.proxy, headless=self.headless)
+        bing = BingAIPlayWright(proxy=self.proxy, headless=self.headless, data_path=self.data_path)
 
         async def handle_chat_task(chat_task: BingAIChatTask):
             try:
@@ -309,6 +311,6 @@ if __name__ == '__main__':
     # test.put_task(BingAIChatTask("1", "你好", print))
     # time.sleep(2)
     # test.put_task(BingAIChatTask("2", "你是谁", print))
-    test.put_task(BingAIDrawTask("没有衣服的阿狸", print, print))
+    test.put_task(BingAIDrawTask("丧尸大战老鼠", print, print))
     # test.put_task(BingAIDrawTask("两只猫", print))
     test.join()
