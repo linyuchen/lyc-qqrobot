@@ -87,7 +87,7 @@ def create_menu_image(data: list[list[str, str, str]]) -> Path:
     transparent_layer = Image.new('RGBA', bg_image.size, (255, 255, 255, 0))  # 完全透明
 
     # 混合背景图像和透明图层
-    alpha = 0.3  # 设置透明度系数，例如0.5（可以根据需要调整）
+    alpha = 0.2  # 设置透明度系数，例如0.5（可以根据需要调整）
     blended_image = Image.blend(new_image, transparent_layer, alpha)
 
     # 将混合后的图像粘贴到new_image上
