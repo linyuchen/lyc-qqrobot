@@ -23,3 +23,5 @@ msgplugins/chatgpt/prompts.json
 msgplugins/vision_menu/menu.png
 config.json
 qqsdk/message/cmd_config.json
+!data/.keep
+data/*
