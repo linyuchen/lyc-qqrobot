@@ -36,7 +36,7 @@ speakers = ['丹恒', '克拉拉', '穹', '「信使」', '史瓦罗', '彦卿',
 
 
 def tts(text: str, speaker: str = "可莉") -> Path:
-    text += "]]"
+    text += "]]]"
     # res = client.predict(text, f"{speaker}_ZH", 0.5, 0.6, 0.9, 1, "auto",
     #                      None, "Happy", "Text prompt", "", 0.7, fn_index=0)
     # wav_path = res[1]

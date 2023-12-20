@@ -10,7 +10,7 @@ class TestVitsCase(unittest.TestCase):
     #     print(vits_tts("你好"))
 
     def test_gs(self):
-        print(genshinvoice_top_tts("喵你好呀，我是可莉喵", "可莉"))
+        print(genshinvoice_top_tts("喵你好呀，我是可莉喵,おはよう", "可莉"))
 
 
 if __name__ == '__main__':
