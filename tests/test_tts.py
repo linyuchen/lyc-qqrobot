@@ -1,4 +1,5 @@
 import unittest
+import requests
 
 from msgplugins.tts.genshinvoice_top import tts as genshinvoice_top_tts
 # from msgplugins.tts.vits import tts as vits_tts
