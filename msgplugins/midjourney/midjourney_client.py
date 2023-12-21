@@ -139,7 +139,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             return False
         msg_content = msg.content
         status_content = msg_content.split("**")[-1]
-        if "(Waiting to start)" in status_content or "(paused)" in status_content:
+        if "(Waiting to start)" in status_content or "(paused)" in status_content or "%)":
             return False
         prompt = task.prompt
         # 去掉链接
