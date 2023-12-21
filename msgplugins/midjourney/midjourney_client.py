@@ -101,7 +101,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
 
         # 自动加上版本
         if "--v" not in params and "--niji" not in params:
-            params += " --v 5.2"
+            params += " --v 6"
         if is_chinese(prompt):
             prompt = trans(prompt).lower()
 

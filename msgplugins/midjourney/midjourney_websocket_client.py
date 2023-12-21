@@ -47,7 +47,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
             "application_id": "936929561302675456",  # 固定的
             "type": 2,
             'data': {
-                "version": "1118961510123847772",  # 固定的
+                "version": "1166847114203123795",  # 固定的
                 "id": "938956540159881230",  # command id，固定的
                 'name': 'imagine',
                 'type': 1,
