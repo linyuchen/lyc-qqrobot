@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import re
 import secrets
@@ -24,7 +25,7 @@ class PostImagCC:
             async with session.get("https://postimages.org/web") as resp:
                 html = await resp.text()
             # open("test.html", "w", encoding="utf-8").write(html)
-            token = re.findall(r"'token':'(\w+)'", html)
+            token = re.findall(r"'token':.?'(\w+)'", html)
             if not token:
                 raise Exception("获取token失败")
             token = token[0]
@@ -66,3 +67,8 @@ class PostImagCC:
                 html = await resp.text()
         direct_url = get_tag_attrs(html, tag="input", attrs={"id": "code_direct"})[0]["value"]
         return direct_url
+
+
+if __name__ == '__main__':
+    t = PostImagCC()
+    asyncio.run(t.post(""))
