@@ -48,6 +48,7 @@ class Message:
 
 
 class DiscordWebsocketClientBase:
+    local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
 
     def __init__(self, token: str, channel_id: str, guild_id: str, proxy: str = None):
         self.token = token
@@ -193,10 +194,9 @@ class DiscordWebsocketClientBase:
                         time_str = data.get("timestamp")
                         if time_str:
                             utc_time = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S.%f%z")
-                            local_timezone = pytz.timezone('Asia/Shanghai')  # 替换为本地时区
-                            msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(local_timezone)
+                            msg_datetime = utc_time.replace(tzinfo=pytz.utc).astimezone(self.local_timezone)
                         else:
-                            msg_datetime = datetime.now()
+                            msg_datetime = datetime.now(tz=self.local_timezone)
                         new_msg = Message(msg_id=data.get("id"),
                                           content=content,
                                           sender_name=data.get("author", {}).get("username"),

@@ -87,7 +87,7 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
     def upscale(self, reply_task: TaskCallbackResponse, index: int):
         task = deepcopy(reply_task.task)
         task.task_type = TaskType.UPSCALE
-        task.datetime = datetime.now()
+        task.datetime = datetime.now(tz=self.local_timezone)
         task.upscale_index = index
         task.reply_msg = deepcopy(reply_task.reply_msg)
         self._putted_tasks.put(task)

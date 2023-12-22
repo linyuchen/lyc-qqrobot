@@ -12,7 +12,7 @@ from typing import Callable, NewType
 
 import pytz
 
-from common.discord_client import DiscordSeleniumClient, Message, download_images
+from common.discord_client import DiscordSeleniumClient, Message, download_images, DiscordWebsocketClientBase
 from common.logger import logger
 from common.utils.translator import is_chinese, trans
 from common.utils.nsfw_detector import BANNED_WORDS
@@ -75,7 +75,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
     def __listen_cmd(self):
         while True:
             task = self._putted_tasks.get()
-            now = datetime.now(pytz.timezone('Asia/Shanghai'))
+            now = datetime.now(tz=DiscordWebsocketClientBase.local_timezone)
             task.datetime = now
             with self._lock:
                 self.tasks.append(task)
@@ -117,7 +117,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
                 continue
             prompt_list.append(prompt_word)
         prompt = " ".join(prompt_list)
-        task = Task(prompt=prompt, callback=callback, datetime=datetime.now())
+        task = Task(prompt=prompt, callback=callback, datetime=datetime.now(tz=pytz.timezone('Asia/Shanghai')))
         if not prompt:
             error = "提示词不能为空"
             if have_banned_words:
@@ -139,7 +139,7 @@ class MidjourneyClientBase(metaclass=ABCMeta):
             return False
         msg_content = msg.content
         status_content = msg_content.split("**")[-1]
-        if "(Waiting to start)" in status_content or "(paused)" in status_content or "%)":
+        if "(Waiting to start)" in status_content or "(paused)" in status_content or "%)" in status_content:
             return False
         prompt = task.prompt
         # 去掉链接
