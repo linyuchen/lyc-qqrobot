@@ -12,15 +12,6 @@ bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False,
 bingai_task_pool.start()
 
 
-@on_command("bing",
-            alias=("#",),
-            ignores=("#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"),
-            desc="向bing ai提问",
-            example="bing 上海的天气",
-            param_len=1,
-            sep="",
-            cmd_group_name="bingai"
-            )
 def bing(msg: GeneralMsg, params: list[str]):
     msg.reply("正在思考中……")
     if isinstance(msg, FriendMsg):
@@ -30,6 +21,30 @@ def bing(msg: GeneralMsg, params: list[str]):
 
     task = BingAIChatTask(user_id, params[0], msg.reply)
     bingai_task_pool.put_task(task)
+
+
+@on_command(
+    cmd_name='#',
+    ignores=("#include", "#define", "#pragma", "#ifdef", "#ifndef", "#ph"),
+    desc="向机器人提问",
+    example="#上海的天气",
+    param_len=1,
+    sep="",
+    cmd_group_name="bingai"
+)
+def bing_ai(msg: GeneralMsg, params: list[str]):
+    bing(msg, params)
+
+
+@on_command("bing",
+            desc="向bing ai提问",
+            example="bing 上海的天气",
+            param_len=1,
+            sep=" ",
+            cmd_group_name="bingai"
+            )
+def bing_ai2(msg: GeneralMsg, params: list[str]):
+    bing(msg, params)
 
 
 @on_command(
