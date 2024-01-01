@@ -74,7 +74,7 @@ class BingAIPlayWright:
         else:
             page = await self.new_page()
             self.pages[user_id] = PageLifeCycle(page, time.time())
-            await page.goto("https://www.bing.com/chat?cc=us", timeout=30000)
+            await page.goto("https://www.bing.com/chat?cc=us", timeout=60000)
             for i in range(30):
                 time.sleep(1)
                 if await page.query_selector("textarea"):

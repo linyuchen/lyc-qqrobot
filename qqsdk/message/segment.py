@@ -157,7 +157,9 @@ class MessageSegment:
                     result.append(msg_data["url"])
             elif msg_data["type"] == "image":
                 # onebot 11
-                pass
+                uri = msg_data["data"]["file"]
+                if uri.startwith("http://") or uri.startwith("https://"):
+                    result.append(uri)
                 # result.append(msg_data["data"]["file"])
         return result
 
@@ -170,7 +172,9 @@ class MessageSegment:
                     result.append(Path(msg_data["path"]))
             elif msg_data["type"] == "image":
                 # onebot 11
-                result.append(Path(msg_data["data"]["file"]))
+                uri = msg_data["data"]["file"]
+                if uri.startwith("file:///"):
+                    result.append(Path(uri[8:]))
         return result
 
     def __str__(self):

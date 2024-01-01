@@ -11,7 +11,7 @@ from PIL import Image
 import config
 from common.cmd_alias import CMD_ALIAS_DRAW
 from common.logger import logger
-from common.utils.postimg import postimg_cc
+from common.utils.postimg import postimg_cc_url, postimg_cc_file
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg
 from qqsdk.message.segment import MessageSegment
@@ -62,7 +62,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             msg.reply(res.error)
         elif res.image_path:
             img_url = res.image_urls[0]
-            img_url = asyncio.run(postimg_cc(img_url))
+            img_url = asyncio.run(postimg_cc_url(img_url))
             reply_msg = MessageSegment.image_path(res.image_path[0])
             reply_msg += MessageSegment.text(f"提示词:{res.task.prompt}\n\n原图(复制到浏览器打开):{img_url}\n\n")
             if res.task.task_type == TaskType.DRAW:
@@ -77,15 +77,25 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
                 msg.reply(reply_msg, at=False)
             res.image_path[0].unlink(missing_ok=True)
 
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     # 获取图片
     img_urls = []
     if msg.quote_msg:
         urls = msg.quote_msg.msg_chain.get_image_urls()
         img_urls.extend(urls)
+        local_paths = msg.quote_msg.msg_chain.get_image_paths()
+        if local_paths:
+            url = loop.run_until_complete(postimg_cc_file(local_paths[0], resp_short=False))
+            img_urls.append(url)
     msg_chain = msg.msg_chain
     if msg_chain:
         urls = msg_chain.get_image_urls()
         img_urls.extend(urls)
+        local_paths = msg_chain.get_image_paths()
+        if local_paths:
+            url = loop.run_until_complete(postimg_cc_file(local_paths[0], resp_short=False))
+            img_urls.append(url)
 
     # 获取图片宽高比例
     img_ratio = ""
@@ -109,7 +119,7 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             try:
                 logger.debug(f"上传图片{__url}到图床")
                 start_time = time.time()
-                res_url = await postimg_cc(__url, resp_short=False)
+                res_url = await postimg_cc_url(__url, resp_short=False)
                 end_time = time.time()
                 used_time = end_time - start_time
                 logger.debug(f"上传图片{__url}到图床成功,耗时{int(used_time)}秒")
