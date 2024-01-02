@@ -74,7 +74,7 @@ class BingAIPlayWright:
         else:
             page = await self.new_page()
             self.pages[user_id] = PageLifeCycle(page, time.time())
-            await page.goto("https://www.bing.com/chat?cc=us", timeout=60000)
+            await page.goto("https://www.bing.com/chat?cc=us", timeout=self.timeout * 1000)
             for i in range(30):
                 time.sleep(1)
                 if await page.query_selector("textarea"):
@@ -133,11 +133,13 @@ class BingAIPlayWright:
         async def check_error() -> str:
             error_ele = await page.query_selector("#girer")
             if error_ele:
-                await (await error_ele.query_selector(".gie_btns")).evaluate("el => el.style.display = 'none'")
+                error_btn = await error_ele.query_selector(".gie_btns")
+                if error_btn:
+                    await error_btn.evaluate("el => el.style.display = 'none'")
                 return await error_ele.inner_text()
             return ""
 
-        for i in range(60 * 5):
+        for i in range(self.timeout):
             await asyncio.sleep(1)
             if error := await check_error():
                 await page.close()
@@ -145,7 +147,7 @@ class BingAIPlayWright:
             if await check_complete():
                 break
             if await check_need_reload():
-                await page.reload()
+                await page.reload(timeout=self.timeout * 1000)
                 await asyncio.sleep(3)
         else:
             await page.close()
@@ -189,7 +191,7 @@ class BingAIPlayWright:
 
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
-        await gir.screenshot(path=path)
+        await gir.screenshot(path=path, timeout=self.timeout * 1000)
         img_list = await gir.query_selector_all("img")
         img_urls = []
         for img in img_list:
@@ -252,7 +254,7 @@ class BinAITaskPool(threading.Thread):
             try:
                 draw_resp = await bing.draw(draw_task.prompt)
             except Exception as draw_error:
-                # traceback.print_exc()
+                traceback.print_exc()
                 if draw_task.error_callback:
                     threading.Thread(target=draw_task.error_callback, args=(f"画图发生了错误：{draw_error}",),
                                      daemon=True).start()

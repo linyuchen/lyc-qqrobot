@@ -23,7 +23,7 @@ class TestBingAI(unittest.TestCase):
             print(result)
         # asyncio.run(t())
         # input("按任意键退出")
-        bingai_pool.put_task(BingAIDrawTask("青椒炒肉", print))
+        bingai_pool.put_task(BingAIDrawTask("丧尸大战老鼠", print))
         bingai_pool.join()
 
 
