@@ -1,4 +1,5 @@
 import tempfile
+import traceback
 from pathlib import Path
 
 import requests
@@ -19,7 +20,11 @@ class BV2Fastapi:
         }
 
     def get_models(self) -> list[str]:
-        resp = requests.get(self.api_host + "/models/info")
+        try:
+            resp = requests.get(self.api_host + "/models/info")
+        except:
+            traceback.print_exc()
+            return []
         models_info = resp.json()
         self.models_info = models_info
         speakers = []
