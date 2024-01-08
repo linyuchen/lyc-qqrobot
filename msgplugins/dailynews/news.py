@@ -13,7 +13,7 @@ headers = {
                   "Chrome/83.0.4103.106 Safari/537.36"}
 
 
-def get_news2():
+def get_news2() -> Path | None:
     base_path.mkdir(exist_ok=True)
     today = time.strftime("%Y-%m-%d")
     yesterday = time.strftime("%Y-%m-%d", time.localtime(time.time() - 24 * 60 * 60))
@@ -25,16 +25,16 @@ def get_news2():
         if yesterday_img_path.exists() and yesterday_img_path.stat().st_size == today_img_path.stat().st_size:
             today_img_path.unlink()
         else:
-            return str(today_img_path)
+            return today_img_path
     url = "http://dwz.2xb.cn/zaob"
     url = requests.get(url).json().get("imageUrl")
     if not url:
         return
-    with open(today_img_path, "wb") as f:
+    with (open(today_img_path, "wb") as f):
         try:
             img_data = requests.get(url, headers=headers).content
             f.write(img_data)
-            return str(today_img_path)
+            return today_img_path
         except:
             return
 

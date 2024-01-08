@@ -2,6 +2,7 @@ import tempfile
 from pathlib import Path
 
 import requests
+from tqdm import tqdm
 
 
 def download2temp(url, suffix="", http_proxy="") -> Path:
@@ -12,8 +13,21 @@ def download2temp(url, suffix="", http_proxy="") -> Path:
     return Path(tmp_path)
 
 
+def download_file_with_progressbar(url: str, file_path: Path | str):
+    print(f"download {url} to {file_path}")
+    response = requests.get(url, stream=True)
+    total_size_in_bytes = int(response.headers.get('content-length', 0))
+    block_size = 1024  # 1 Kilobyte
+    progress_bar = tqdm(total=total_size_in_bytes, unit='iB', unit_scale=True)
+    with open(file_path, 'wb') as file:
+        for data in response.iter_content(block_size):
+            progress_bar.update(len(data))
+            file.write(data)
+    progress_bar.close()
+    if total_size_in_bytes != 0 and progress_bar.n != total_size_in_bytes:
+        print("ERROR, something went wrong")
+
+
 if __name__ == '__main__':
-    p = download2temp(
-        "https://tusi-images.oss-cn-shanghai.aliyuncs.com/workspace%2Fimages%2F615869302058359338%2Fe35fd282eaa8ded707ec2662df948812.png?Expires=1689717889&OSSAccessKeyId=LTAI5tA9wgpRFMZ23PwaJcL4&Signature=DfoIahIvSy69%2BPMA9TyuFQ8472A%3D",
-        ".png")
-    print(p)
+    download_file_with_progressbar("https://s3.amazonaws.com/ir_public/nsfwjscdn/nsfw_mobilenet2.224x224.h5", "./nsfw.h5")
+
