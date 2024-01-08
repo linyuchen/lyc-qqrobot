@@ -1,4 +1,5 @@
 import openai
+import requests
 
 
 class ChatGPT:
@@ -7,7 +8,9 @@ class ChatGPT:
                  prompt="",
                  api_key: str = "",
                  api_base: str = "",
-                 model: str = "gpt-3.5-turbo-0613"):
+                 http_proxy: str = "",
+                 model: str = "gpt-3.5-turbo-0613"
+                 ):
         self.api_key = api_key
         self.api_base = api_base
         self.model = model
@@ -15,6 +18,18 @@ class ChatGPT:
         self.history_max = 10
         self.prompt = prompt
         self.history = []  # messages
+        if http_proxy:
+            # Set up the proxy
+            proxies = {
+                'http': http_proxy,
+                'https': http_proxy
+            }
+
+            # Apply the proxy to the session
+            session = requests.Session()
+            session.proxies = proxies
+            openai.api_engine = session
+
         self.openai_client = openai.Client(api_key=self.api_key, base_url=self.api_base)
 
     def get_prompt(self):
