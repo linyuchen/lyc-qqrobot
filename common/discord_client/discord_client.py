@@ -42,6 +42,7 @@ class Message:
     sender_name: str
     datetime: datetime
     content: str = ""
+    channel_id: str = ""
     attachment_urls: list[str] = field(default_factory=list)
     attachments: list[Attachment] = field(default_factory=list)
     read = False
@@ -203,7 +204,8 @@ class DiscordWebsocketClientBase:
                                           attachment_urls=attachment_urls,
                                           attachments=attachments,
                                           datetime=msg_datetime,
-                                          origin_data=data
+                                          origin_data=data,
+                                          channel_id=data.get("channel_id")
                                           )
                         logger.debug(f"MJ收到新消息{new_msg.content}")
                         self._handle_new_msg(new_msg)

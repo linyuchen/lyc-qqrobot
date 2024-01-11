@@ -94,3 +94,8 @@ class MidjourneyClient(MidjourneyClientBase, DiscordWebsocketClientBase):
 
     def _listen_msg(self):
         pass
+
+    def _handle_new_msg(self, reply_msg: Message):
+        if reply_msg.channel_id != self.channel_id:
+            return
+        return super()._handle_new_msg(reply_msg)
