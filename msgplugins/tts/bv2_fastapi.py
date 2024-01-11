@@ -7,7 +7,7 @@ import requests
 
 class BV2Fastapi:
 
-    def __init__(self, api_host="http://localhost:5000"):
+    def __init__(self, api_host="http://localhost:5001"):
         self.api_host = api_host
         self.models_info = {}
         self.default_params = {

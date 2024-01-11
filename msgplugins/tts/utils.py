@@ -25,8 +25,9 @@ def wav2silk_base64(wav_path: Path) -> str:
     return data
 
 
-def wav2amr(wav_path: Path) -> Path:
-    amr_path = tempfile.mktemp(suffix=".amr")
+def wav2amr(wav_path: Path, amr_path: Path = None) -> Path:
+    if not amr_path:
+        amr_path = tempfile.mktemp(suffix=".amr")
     pcm_path = tempfile.mktemp(suffix=".pcm")
     subprocess.call(f"{ffmpeg_path} -y -i {wav_path} -f s16le -ar 24000 -ac 1 {pcm_path}")
     subprocess.call(f"{silk_encoder_path} {pcm_path} {amr_path} -tencent")
