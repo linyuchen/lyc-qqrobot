@@ -2,6 +2,7 @@ import abc
 import asyncio
 import random
 import socket
+import ssl
 import tempfile
 import threading
 import time
@@ -92,6 +93,9 @@ class DiscordWebsocketClientBase:
             connector=aiohttp.TCPConnector(limit=0, family=socket.AF_INET),
             trace_configs=None,
         )
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
         kwargs = {
             'proxy_auth': None,
             'proxy': self.proxy,
@@ -102,6 +106,7 @@ class DiscordWebsocketClientBase:
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
             },
             'compress': 0,
+            'ssl': ssl_context,
         }
         while True:
             try:
