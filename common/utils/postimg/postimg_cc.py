@@ -19,7 +19,7 @@ class PostImagCC:
 
     @staticmethod
     def __get_common_post_data(html: str):
-        token = re.findall(r'"token",\W+"(\w+)"', html)
+        token = re.findall(r'["\']token["\'].*?[\'"](\w+)["\']', html)
         now = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
         ui = f'[24,2294,960,"true","","","{now}"]'
         upload_session = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
@@ -55,7 +55,7 @@ class PostImagCC:
             data.update({"url": url})
             async with session.post("https://postimages.org/json/rr", data=data) as resp:
                 res = await resp.json()
-            if res["status"] != "OK":
+            if res.get("status") != "OK":
                 raise Exception("上传失败")
             res_url = res["url"]
             if resp_short:
