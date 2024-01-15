@@ -1,26 +1,44 @@
-import subprocess
 import tempfile
+
 from pathlib import Path
+
+import av
+import pilk
 
 from gradio_client.utils import encode_url_or_file_to_base64
 
-from common.utils.downloader import download_file_with_progressbar
 
-current_path = Path(__file__).parent
-ffmpeg_path = current_path / "ffmpeg.exe"
-silk_encoder_path = current_path / "silk_v3_encoder.exe"
+def to_pcm(in_path: Path) -> Path:
+    out_path = Path(tempfile.mktemp(suffix='.pcm'))
+    with av.open(str(in_path)) as in_container:
+        in_stream = in_container.streams.audio[0]
+        sample_rate = 24000
+        with av.open(str(out_path), 'w', 's16le') as out_container:
+            out_stream = out_container.add_stream(
+                'pcm_s16le',
+                rate=sample_rate,
+                layout='mono'
+            )
+            try:
+                for frame in in_container.decode(in_stream):
+                    frame.pts = None
+                    for packet in out_stream.encode(frame):
+                        out_container.mux(packet)
+            except:
+                pass
+    return out_path
 
-if not ffmpeg_path.exists():
-    ffmpeg_url = ("https://mirror.ghproxy.com/"
-                  "https://github.com/linyuchen/qqrobot-plugin/releases/download/mmpeg/ffmpeg.exe")
-    download_file_with_progressbar(ffmpeg_url, ffmpeg_path)
+
+def convert_to_silk(media_path: Path, silk_path: Path = None) -> Path:
+    pcm_path = to_pcm(media_path)
+    if not silk_path:
+        silk_path = tempfile.mktemp(suffix='.silk')
+    pilk.encode(str(pcm_path), silk_path, pcm_rate=24000, tencent=True)
+    return Path(silk_path)
 
 
 def wav2silk_base64(wav_path: Path) -> str:
-    pcm_path = tempfile.mktemp(suffix=".pcm")
-    silk_path = tempfile.mktemp(suffix=".silk")
-    subprocess.call(f"{ffmpeg_path} -y -i {wav_path} -f s16le -ar 24000 -ac 1 {pcm_path}")
-    subprocess.call(f"{silk_encoder_path} {pcm_path} {silk_path} -tencent -rate 8000")
+    silk_path = convert_to_silk(wav_path)
     data = encode_url_or_file_to_base64(silk_path)
     return data
 
@@ -28,7 +46,9 @@ def wav2silk_base64(wav_path: Path) -> str:
 def wav2amr(wav_path: Path, amr_path: Path = None) -> Path:
     if not amr_path:
         amr_path = tempfile.mktemp(suffix=".amr")
-    pcm_path = tempfile.mktemp(suffix=".pcm")
-    subprocess.call(f"{ffmpeg_path} -y -i {wav_path} -f s16le -ar 24000 -ac 1 {pcm_path}")
-    subprocess.call(f"{silk_encoder_path} {pcm_path} {amr_path} -tencent")
+    convert_to_silk(wav_path, silk_path=amr_path)
     return Path(amr_path)
+
+
+if __name__ == '__main__':
+    print(convert_to_silk(Path("G:/audio.wav")))

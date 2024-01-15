@@ -24,3 +24,5 @@ playwright
 pymupdf
 reportlab
 tqdm
+av
+pilk

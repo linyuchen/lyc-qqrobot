@@ -251,6 +251,6 @@ if __name__ == "__main__":
     # print(gen_text(bvid))
     _video_info = get_video_info(bvid)
     print(gen_image(_video_info))
-    # _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
+    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
     # print(_r)
     # print(b32_to_bv("LPrGvRX"))

@@ -25,4 +25,3 @@ config.json
 qqsdk/message/cmd_config.json
 !data/.keep
 data/*
-msgplugins/tts/ffmpeg.exe
