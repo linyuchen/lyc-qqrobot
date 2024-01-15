@@ -1,4 +1,4 @@
-from common import DATA_DIR
+from common import DATA_DIR, PLAYWRIGHT_DATA_DIR
 from common.cmd_alias import CMD_ALIAS_DRAW
 from common.utils.nsfw_detector import nsfw_words_filter
 from config import get_config
@@ -7,8 +7,8 @@ from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
 
 from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright, BingAIDrawTask, BingAIImageResponse
 
-bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False,
-                                 data_path=DATA_DIR / "playwright_chrome_data_bingai")
+bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=True,
+                                 data_path=PLAYWRIGHT_DATA_DIR)
 bingai_task_pool.start()
 
 
