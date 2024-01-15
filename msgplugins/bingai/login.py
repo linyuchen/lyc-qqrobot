@@ -10,8 +10,9 @@ async def login():
                                     data_path=PLAYWRIGHT_DATA_DIR).init()
     page = await bingai.new_page()
     await page.goto("https://login.live.com/")
+    input("login Microsoft then press Enter to continue...")
+    await bingai.browser_context_manager.stop()
 
 
 if __name__ == '__main__':
     asyncio.run(login())
-    input("login Microsoft then Press Enter to close...")
