@@ -1,5 +1,6 @@
 import asyncio
 import io
+import math
 import re
 import threading
 import time
@@ -106,7 +107,9 @@ def mj_draw(msg: GroupMsg | FriendMsg, msg_param: str):
             logger.error(f"获取图片宽高比例失败:{e}")
         else:
             img = Image.open(io.BytesIO(img_data))
-            img_ratio = f" --ar {img.width}:{img.height} "
+            # 比例进行约分
+            gcd = math.gcd(img.width, img.height)
+            img_ratio = f" --ar {img.width // gcd}:{img.height // gcd} "
 
     # 批量上传到图床,这里要用异步
     img_post_urls = []

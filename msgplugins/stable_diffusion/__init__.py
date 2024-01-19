@@ -41,7 +41,7 @@ def txt2img(msg: GroupMsg | FriendMsg, args: list[str]):
         msg.reply("图片违规，已被删除")
 
 
-def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
+def img2img(msg: GroupMsg | FriendMsg, args: list[str], url_or_path: str | Path):
     # 解析重绘幅度参数 -d
     prompt = " ".join(args)
     pattern = re.compile(r"-d\s*(0?\.?\d+)")
@@ -49,7 +49,7 @@ def img2img(msg: GroupMsg | FriendMsg, args: list[str], url):
     prompt = re.sub(pattern, "", prompt)
     ds = 0.5 if not ds else min(float(ds[0]), 1.0)
     try:
-        image = sd.img2img(url, prompt, denoising_strength=ds)
+        image = sd.img2img(url_or_path, prompt, denoising_strength=ds)
         img_path = Path(tempfile.mktemp(suffix=".png"))
         image.save(img_path)
         if nsfw_detect(img_path):
