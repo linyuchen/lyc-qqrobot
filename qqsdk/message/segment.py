@@ -96,7 +96,7 @@ class MessageSegment:
             data.update({"type": "image", "data": {"file": f"base64://{image_path}"}})
         elif msg_type == "VoicePath":
             base64_data = base64.b64encode(Path(image_path).read_bytes()).decode()
-            data.update({"type": "voice", "data": {"file": f"base64://{base64_data}"}})
+            data.update({"type": "record", "data": {"file": f"base64://{base64_data}"}})
         # elif msg_type == "VoiceBase64":
         #     data.update({"type": "Voice", "base64": content})
         elif msg_type == "reply":

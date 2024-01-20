@@ -145,7 +145,7 @@ class Onebot11QQClient(ABC, QQClientBase):
             def reply(content, at=True, quote=True):
                 if isinstance(content, str):
                     content = MessageSegment.text(content)
-                if not list(filter(lambda ms: ms["type"] == "voice", content.onebot11_data)):
+                if not list(filter(lambda ms: ms["type"] == "record", content.onebot11_data)):
                     if quote:
                         content = MessageSegment.reply(group_msg.msg_id) + content
                 # if at:
