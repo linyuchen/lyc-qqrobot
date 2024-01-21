@@ -7,7 +7,7 @@ from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
 
 from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright, BingAIDrawTask, BingAIImageResponse
 
-bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=True,
+bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False,
                                  data_path=PLAYWRIGHT_DATA_DIR)
 bingai_task_pool.start()
 
