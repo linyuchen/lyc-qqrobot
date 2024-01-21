@@ -85,13 +85,10 @@ def github_readme(url: str, http_proxy: str = "") -> Path | None:
             return None
         e.evaluate(
             """
-            e = document.getElementsByClassName("markdown-body")[0]
-            e.style.padding = "40px";
-            e = document.getElementsByTagName("nav")
-            // 循环删除
-            for (let i of e){
-                i.remove()
-            }
+            let readme = document.getElementsByClassName("markdown-body")[0]
+            readme.style.padding = "40px";
+            let nav = document.querySelector("nav[aria-label='Repository files']")
+            nav.parentElement.remove()
             """
         )
         path = Path(tempfile.mktemp(suffix=".png"))
