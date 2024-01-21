@@ -79,15 +79,18 @@ def search_baidu(keyword: str) -> Path:
 
 
 def github_readme(url: str, http_proxy: str = "") -> Path | None:
-    with new_page(url, http_proxy) as page:
-        e = page.locator("css=#readme")
+    with new_page(url, http_proxy, headless=True) as page:
+        e = page.locator("css=.markdown-body")
         if e.count() == 0:
             return None
         e.evaluate(
             """
-            e = document.getElementsByClassName("top-0 d-flex")[0]
-            if (e){
-                e.remove()
+            e = document.getElementsByClassName("markdown-body")[0]
+            e.style.padding = "40px";
+            e = document.getElementsByTagName("nav")
+            // 循环删除
+            for (let i of e){
+                i.remove()
             }
             """
         )

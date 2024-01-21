@@ -4,6 +4,9 @@ from PIL import Image
 
 from msgplugins.browser_preview.browser_screenshot import github_readme, search_baidu, ZhihuPreviewer, moe_wiki, \
     wx_article
+from config import get_config
+
+GFW_PROXY = get_config("GFW_PROXY")
 
 
 class TestBrowserPreview(TestCase):
@@ -13,7 +16,7 @@ class TestBrowserPreview(TestCase):
         Image.open(search_baidu("python")).show()
 
     def test_github_readme(self):
-        Image.open(github_readme("https://github.com/linyuchen/qqrobot-plugin")).show()
+        Image.open(github_readme("https://github.com/linyuchen/qqrobot-plugin", http_proxy=GFW_PROXY)).show()
 
         self.assertIsNone(github_readme("https://github.com/microsoft/playwright-python/issues/2087"))
 
