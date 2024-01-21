@@ -1,10 +1,10 @@
 # -*- coding:UTF-8 -*-
 
-from msgplugins.superplugin import GroupAction
-from msgplugins.superplugin import UserAction
-from msgplugins.superplugin import AdminAction
 from msgplugins.msgcmd.cmdaz import CMD, on_command
 from msgplugins.msgcmd.permission import CMDPermissions
+from msgplugins.superplugin import AdminAction
+from msgplugins.superplugin import GroupAction
+from msgplugins.superplugin import UserAction
 from qqsdk.message import MsgHandler, GroupMsg, FriendMsg
 
 cmd_group_name = "群活跃度"
@@ -84,7 +84,7 @@ class GroupMsgEvent(MsgHandler):
                 handle_func=group_action.get_point_rank),
             CMD("清负活跃度", handle_func=group_action.clear_point),
             CMD("清负次数", handle_func=group_action.get_clear_chance),
-            CMD("我的状态", handle_func=user_action.get_point),
+            # CMD("我的状态", handle_func=user_action.get_point),
             # CMD("我的金币", handle_func=user_action.get_point),
             # CMD("转活跃度", param_len=2, int_param_index=[1], alias=["转账"],
             #     handle_func=group_action.transfer_point),
@@ -132,22 +132,35 @@ def add_group_point(msg: GroupMsg | FriendMsg, params: list[int]):
     msg.reply(result)
 
 
+@on_command("查活跃度", cmd_group_name=cmd_group_name,
+            desc="查活跃度，需要超级管理员权限",
+            example="查活跃度 QQ号",
+            permission=CMDPermissions.SUPER_ADMIN,
+            param_len=1,
+            int_param_index=[0],
+            )
+def add_group_point(msg: GroupMsg | FriendMsg, params: list[int]):
+    result = AdminAction().get_point(str(params[0]))
+    msg.reply(result)
+
+
 class AdminMsgEvent(MsgHandler):
     name = "群活跃度"
     bind_msg_types = (FriendMsg, GroupMsg)
 
     def __init__(self, **kwargs):
         super(AdminMsgEvent, self).__init__(**kwargs)
-        self.cmds = [CMD("查活跃度", handle_func=AdminAction.get_point, param_len=1),
-                     CMD("加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
-                         int_param_index=[2]),
-                     CMD("设活跃度", handle_func=AdminAction.set_group_point, param_len=3,
-                         int_param_index=[2]),
-                     CMD("查清负次数", handle_func=AdminAction.get_clear_chance, param_len=1,
-                         int_param_index=[0]),
-                     CMD("加清负次数", handle_func=AdminAction.add_clear_chance, param_len=2,
-                         int_param_index=[1])
-                     ]
+        self.cmds = [
+            # CMD("查活跃度", handle_func=AdminAction.get_point, param_len=1),
+            # CMD("加活跃度", handle_func=AdminAction.add_group_point, param_len=3,
+            #     int_param_index=[2]),
+            # CMD("设活跃度", handle_func=AdminAction.set_group_point, param_len=3,
+            #     int_param_index=[2]),
+            CMD("查清负次数", handle_func=AdminAction.get_clear_chance, param_len=1,
+                int_param_index=[0]),
+            CMD("加清负次数", handle_func=AdminAction.add_clear_chance, param_len=2,
+                int_param_index=[1])
+        ]
 
     def handle(self, msg: FriendMsg):
         result = ""

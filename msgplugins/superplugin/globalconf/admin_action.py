@@ -48,26 +48,26 @@ class AdminAction(object):
         group_users = GroupUser.objects.filter(user__qq=qq)
         result = ""
         for group_user in group_users:
-            result += u"群:%s, 点数:%s\n\n" % (group_user.group_qq, group_user.point)
+            result += "群:%s, 点数:%s\n\n" % (group_user.group_qq, group_user.point)
 
         if not result:
-            result = u"无数据"
+            result = "无数据"
         return result
 
     @staticmethod
     def get_clear_chance(qq):
         user = MyUser.objects.filter(qq=qq).first()
         if not user:
-            return u"QQ号有误"
-        return u"%s的清负次数：%d" % (qq, user.clear_point_chance)
+            return "QQ号有误"
+        return "%s的清负次数：%d" % (qq, user.clear_point_chance)
 
     @staticmethod
     def add_clear_chance(qq, num):
         num = int(num)
         user = MyUser.objects.filter(qq=qq).first()
         if not user:
-            return u"QQ号有误"
+            return "QQ号有误"
 
         user.clear_point_chance += num
         user.save()
-        return u"ok"
+        return "ok"
