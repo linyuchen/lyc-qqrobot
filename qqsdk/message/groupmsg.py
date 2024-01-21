@@ -26,6 +26,13 @@ class GroupMsg(BaseMsg):
         """
 
     @property
+    def qq(self):
+        """
+        发送者qq
+        """
+        return self.group_member.qq
+
+    @property
     def is_from_admin(self):
         """
         是否是管理员发的消息

@@ -94,6 +94,12 @@ class CMD(object):
 
         if self.param_length == 0:
             return self.params == [""]
+
+        for int_index in self.int_param_index:
+            param = self.params[int_index]
+            if not param.isdigit():
+                return False
+
         return self.params
 
     def handle(self, cmd_content):
@@ -125,7 +131,10 @@ class CMD(object):
         :return: 参数列表
         """
 
-        return list(filter(bool, self.params))
+        params: list = list(filter(bool, self.params))
+        for int_index in self.int_param_index:
+            params[int_index] = int(params[int_index])
+        return params
 
     def get_original_param(self):
         """

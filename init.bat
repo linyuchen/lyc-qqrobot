@@ -1,3 +1,5 @@
+"venv/scripts/activate"
+set PYTHONPATH=.
 playwright install chromium
 meme download
 python msgplugins/bingai/login.py

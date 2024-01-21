@@ -17,7 +17,7 @@ class GroupAction(object):
         """
         self.group_qq = group_qq
         self.user_qq = user_qq
-        self.group_user = GroupUser.get_user(group_qq, user_qq)
+        self.group_user: GroupUser = GroupUser.get_user(group_qq, user_qq)
 
     def __get_sign_info(self):
 
@@ -78,17 +78,17 @@ class GroupAction(object):
         """
         other_user = GroupUser.objects.filter(group_qq=self.group_qq, user__qq=qq).first()
         if not other_user:
-            return u"对不起，您要转账的对象不存在！"
-
-        if point > self.group_user.get_point():
-            return u"对不起，您的余额不够要转的额度！"
+            return "对不起，您要转账的对象不存在！请先让他在群里发言。"
+        rest_point = self.group_user.get_point()
+        if point > rest_point:
+            return "对不起，您的余额不够要转的额度！"
         if other_user.user.qq == self.group_user.user.qq:
-            return u"自己转给自己闲得慌吗"
+            return "自己转给自己闲得慌吗"
 
         self.group_user.add_point(-point)
         other_user.add_point(point)
         TransferPointRecord(user=self.group_user, to_user=other_user, point=str(point)).save()
-        return u"转账成功"
+        return "转账成功"
 
     def get_clear_chance(self):
         return u"【%s】(%s)还有%d次清负机会" % \
@@ -143,28 +143,30 @@ class GroupAction(object):
         users = self.__get_point_rank()[:10]
         result = ""
         for index, user in enumerate(users):
-            result += u"第%d名：%s(%s)，%s\n" % \
-                      (index + 1, user.nick, user.user.qq, user.get_point())
+            item = f"{index + 1}. {user.nick}: {user.get_point()}\n"
+            result += item
+            # result += "第%d名：%s(%s)，%s\n" % \
+            #           (index + 1, user.nick, user.user.qq, user.get_point())
 
         return result
 
-    def group_point2private_point(self, private_point):
+    def group_point2private_point(self, group_point: int):
         """
         群积分，转到个人积分
-        :param private_point: 要转成多少个人积分, int
+        :param group_point: 消耗的群积分, int
         :return:
         """
-        need_group_point = self.group_setting.group2private_point_percentage * private_point
-        if self.group_user.get_point() < need_group_point:
-            return u"%s账户额度不够足%d，无法转换" % (self.group_setting.currency, need_group_point)
-        self.group_user.add_point(-need_group_point)
+        private_point = group_point / self.group_setting.group2private_point_percentage
+        if group_point < self.group_user.get_point():
+            return f"{self.group_setting.currency}不足，无法兑换"
+        self.group_user.add_point(-group_point)
         self.group_user.user.add_point(private_point)
-        return u"花费%d%s兑换成功!" % (need_group_point, self.group_setting.currency)
+        return "花费%d%s兑换成功!" % (group_point, self.group_setting.currency)
 
-    def private_point2group_point(self, private_point):
+    def private_point2group_point(self, private_point: int):
         """
         个人积分兑换成群积分
-        :param private_point: 要转多少个人积分, int
+        :param private_point: 消耗的个人积分, int
         :return:
         """
         group_point = self.group_setting.private2group_point_percentage * private_point

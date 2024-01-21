@@ -19,6 +19,13 @@ class FriendMsg(BaseMsg):
     def is_from_super_admin(self):
         return self.friend.is_super_admin
 
+    @property
+    def qq(self):
+        """
+        发送者qq
+        """
+        return self.friend.qq
+
 
 @dataclass
 class FriendSignatureChangedMsg(FriendMsg):

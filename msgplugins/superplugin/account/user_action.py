@@ -9,6 +9,6 @@ class UserAction(object):
         self.user = MyUser.get_user(qq)
 
     def get_point(self):
-        result = u"金币: %s" % self.user.point
+        result = "金币: %s" % self.user.point
         return result
 

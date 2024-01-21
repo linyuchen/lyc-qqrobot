@@ -33,7 +33,7 @@ def convert_to_silk(media_path: Path, silk_path: Path = None) -> Path:
     pcm_path = to_pcm(media_path)
     if not silk_path:
         silk_path = tempfile.mktemp(suffix='.silk')
-    pilk.encode(str(pcm_path), silk_path, pcm_rate=24000, tencent=True)
+    pilk.encode(str(pcm_path), str(silk_path), pcm_rate=24000, tencent=True)
     return Path(silk_path)
 
 
@@ -51,4 +51,5 @@ def wav2amr(wav_path: Path, amr_path: Path = None) -> Path:
 
 
 if __name__ == '__main__':
-    print(convert_to_silk(Path("G:/audio.wav")))
+    # print(convert_to_silk(Path("d:/audio.wav")))
+    print(wav2amr(Path("D:\\audio.wav"), Path("D:\\audio.amr")))

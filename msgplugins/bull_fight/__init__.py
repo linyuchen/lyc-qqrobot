@@ -3,7 +3,7 @@ import threading
 
 from msgplugins.bull_fight import bullfight
 from msgplugins.msgcmd.cmdaz import CMD
-from msgplugins.superplugins import GroupPointAction
+from msgplugins.superplugin import GroupPointAction
 from qqsdk.message import MsgHandler, GroupMsg
 
 

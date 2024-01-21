@@ -48,7 +48,7 @@ class GroupUser(models.Model):
         self.save()
 
     @staticmethod
-    def get_user(group_qq, qq):
+    def get_user(group_qq, qq) -> "GroupUser":
         u = MyUser.get_user(qq)
         gu, e = GroupUser.objects.get_or_create(user=u, group_qq=group_qq)
         return gu
