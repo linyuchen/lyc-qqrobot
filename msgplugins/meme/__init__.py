@@ -1,16 +1,19 @@
 import asyncio
 import random
 import tempfile
-import time
+from io import BytesIO
 from pathlib import Path
 from typing import Callable
 
 from filetype import filetype
+from meme_generator import get_memes
 from meme_generator.cli import get_meme
+from meme_generator.utils import render_meme_list, TextProperties
 
 from config import get_config, set_config
 from msgplugins.msgcmd import on_command, CMDPermissions
-from qqsdk.message import GroupNudgeMsg, MessageSegment, GroupMsg
+from qqsdk.message import GroupNudgeMsg, MessageSegment, GroupMsg, GeneralMsg
+from .generate import generate
 
 
 def create_meme_func(key: str, texts: list[str] = None,
@@ -259,3 +262,51 @@ def set_meme_interval(msg: GroupMsg, params: list[str]):
     meme_interval_config[msg.group.qq] = int(interval)
     set_config(CONFIG_KEY_MEME_INTERVAL, meme_interval_config)
     msg.reply("戳一戳表情频率设置成功")
+
+
+@on_command("", cmd_group_name="表情包", ignore_at_other=False)
+def meme_generate(msg: GeneralMsg, params: list[str]):
+    images = msg.msg_chain.get_image_paths()
+
+    if isinstance(msg, GroupMsg):
+        if msg.at_member:
+            images.append(msg.at_member.avatar.path)
+        images.append(msg.group_member.avatar.path)
+
+    image_path = generate(msg.msg.strip(), images)
+    if image_path:
+        msg.reply(MessageSegment.image_path(image_path))
+        image_path.unlink()
+
+
+@on_command("表情包列表", alias=("表情列表", ), cmd_group_name="表情包",
+            example="表情包列表", desc="查看表情包列表")
+def meme_list(msg: GeneralMsg, params: list[str]):
+    meme_list_image_bytes_io = render_meme_list([(m, TextProperties()) for m in get_memes()])
+    image_path = Path(tempfile.mktemp(suffix=".png"))
+    image_path.write_bytes(meme_list_image_bytes_io.getvalue())
+    msg.reply(MessageSegment.image_path(image_path))
+
+
+@on_command("表情包详情", alias=("表情详情",), cmd_group_name="表情包", param_len=1)
+def meme_info(msg: GeneralMsg, params: list[str]):
+    loop = asyncio.new_event_loop()
+    keyword = params[0]
+    for meme in get_memes():
+        if keyword in meme.keywords:
+            image_length = f"{meme.params_type.min_images} ~ {meme.params_type.max_images}"
+            if meme.params_type.min_images == meme.params_type.max_images:
+                image_length = str(meme.params_type.min_images)
+
+            text_length = f"{meme.params_type.min_texts} ~ {meme.params_type.max_texts}"
+            if meme.params_type.min_texts == meme.params_type.max_texts:
+                text_length = str(meme.params_type.min_texts)
+            info = (f"关键字: {','.join(meme.keywords)}\n"
+                    f"需要图片数目: {image_length}\n"
+                    f"需要文字数目: {text_length}\n")
+            preview: BytesIO = loop.run_until_complete(meme.generate_preview())
+            preview_ext = filetype.guess_extension(preview.getvalue())
+            preview_image_path = Path(tempfile.mktemp(suffix=f".{preview_ext}"))
+            preview_image_path.write_bytes(preview.getvalue())
+            msg.reply(MessageSegment.text(info) + MessageSegment.image_path(preview_image_path))
+            return
