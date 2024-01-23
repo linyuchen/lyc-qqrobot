@@ -275,7 +275,7 @@ def meme_generate(msg: GeneralMsg, params: list[str]):
 
     image_path = generate(msg.msg.strip(), images)
     if image_path:
-        msg.reply(MessageSegment.image_path(image_path))
+        msg.reply(MessageSegment.image_path(image_path), quote=False)
         image_path.unlink()
 
 
@@ -285,7 +285,7 @@ def meme_list(msg: GeneralMsg, params: list[str]):
     meme_list_image_bytes_io = render_meme_list([(m, TextProperties()) for m in get_memes()])
     image_path = Path(tempfile.mktemp(suffix=".png"))
     image_path.write_bytes(meme_list_image_bytes_io.getvalue())
-    msg.reply(MessageSegment.image_path(image_path), quote=False)
+    msg.reply(MessageSegment.image_path(image_path))
 
 
 @on_command("表情包详情", alias=("表情详情",), cmd_group_name="表情包", param_len=1,
