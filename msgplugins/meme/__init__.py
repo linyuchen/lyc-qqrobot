@@ -288,7 +288,8 @@ def meme_list(msg: GeneralMsg, params: list[str]):
     msg.reply(MessageSegment.image_path(image_path))
 
 
-@on_command("表情包详情", alias=("表情详情",), cmd_group_name="表情包", param_len=1)
+@on_command("表情包详情", alias=("表情详情",), cmd_group_name="表情包", param_len=1,
+            example="表情包详情 二次元入口", desc="查看表情包详情")
 def meme_info(msg: GeneralMsg, params: list[str]):
     loop = asyncio.new_event_loop()
     keyword = params[0]
