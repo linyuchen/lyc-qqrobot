@@ -267,6 +267,7 @@ def set_meme_interval(msg: GroupMsg, params: list[str]):
 @on_command("", cmd_group_name="表情包", ignore_at_other=False)
 def meme_generate(msg: GeneralMsg, params: list[str]):
     images = msg.msg_chain.get_image_paths()
+    images += msg.quote_msg.msg_chain.get_image_paths()
 
     if isinstance(msg, GroupMsg):
         if msg.at_member:
