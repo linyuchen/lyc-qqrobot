@@ -67,7 +67,8 @@ def bingai_draw(msg: GeneralMsg, params: list[str]):
     def reply(resp: BingAIImageResponse):
         msg.reply(
             MessageSegment.image_path(resp.preview) +
-            MessageSegment.text(f"提示词:{prompt}\n\n原图：" + '\n'.join(resp.img_urls))
+            MessageSegment.text(f"提示词:{prompt}\n\n原图：\n" +
+                                "\n".join([f"{index + 1}. {url}" for index, url in enumerate(resp.img_urls)]))
         )
 
     bingai_task_pool.put_task(BingAIDrawTask(prompt, reply, msg.reply))
