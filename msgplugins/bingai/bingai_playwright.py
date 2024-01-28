@@ -5,9 +5,12 @@ import threading
 import time
 import traceback
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
 from typing import Callable
 
+import httpx
+from PIL import Image
 from playwright.async_api import async_playwright, Page, BrowserContext
 
 CHROME_DATA_DIR = Path(tempfile.gettempdir() + "/playwright_chrome_data_bingai")
@@ -114,6 +117,7 @@ class BingAIPlayWright:
 
     async def draw(self, prompt: str):
         page = await self.new_page()
+        await page.set_viewport_size({'width': 1920 * 2, 'height': 1080 * 2})
         await page.goto("https://www.bing.com/images/create/")
         await page.fill("#sb_form_q", prompt)
         await page.click("#create_btn_c")
@@ -154,7 +158,6 @@ class BingAIPlayWright:
             raise Exception("网络超时")
 
         gir = await page.query_selector("#gir_async")
-
         await gir.evaluate("""
                 () => {
             var images = document.querySelectorAll('#gir_async img');
@@ -191,6 +194,7 @@ class BingAIPlayWright:
 
         path = tempfile.mktemp(suffix=".png")
         path = Path(path)
+        # 生成预览图
         await gir.screenshot(path=path, timeout=self.timeout * 1000)
         img_list = await gir.query_selector_all("img")
         img_urls = []
@@ -200,6 +204,15 @@ class BingAIPlayWright:
                 continue
             img_urls.append(img_url)
         await page.close()
+        # 下载img并合成一张预览图
+        # with httpx.AsyncClient() as httpx_client:
+        #     async def download_img(url: str):
+        #         img_content = (await httpx_client.get(url)).content
+        #         image = Image.open(BytesIO(img_content))
+        #         return image
+        #
+        #     images = await asyncio.gather(*[download_img(url) for url in img_urls])
+
         return BingAIImageResponse(path, img_urls)
 
 
