@@ -35,7 +35,7 @@ config_data = {
     "CHATGPT": [
         {
             "key": "API_KEY",
-            "api": "https://",
+            "api": "https://api.openai.com/v1",
             "model": "gpt-3.5-turbo-0613"
         }
     ]

@@ -114,13 +114,13 @@ class Onebot11QQClient(ABC, QQClientBase):
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
                     case MessageItemType.image:
                         image_uri = resp_message["data"]["file"]
-                        if image_uri.startswith("base64://,"):
-                            image_data = image_uri.split("base64://,")[1]
+                        if image_uri.startswith("base64://"):
+                            image_data = image_uri.split("base64://")[1]
                             image_path = Path(tempfile.mktemp(suffix=".png"))
                             image_path.write_bytes(base64.b64decode(image_data))
                             message_segments.append(MessageSegment.image_path(image_path))
-                        elif image_uri.startswith("file:///"):
-                            image_path = image_uri.split("file:///")[1]
+                        elif image_uri.startswith("file://"):
+                            image_path = image_uri.split("file://")[1]
                             message_segments.append(MessageSegment.image_path(image_path))
                     case MessageItemType.reply:
                         reply_msg_id = resp_message["data"].get("id")
