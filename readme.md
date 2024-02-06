@@ -56,7 +56,7 @@ Python3.11
 
 ## 对接onebot(墙裂推荐)
 
-运行[client/onebot/main.py](client/onebot/main.py)即可
+运行[client/onebot/main.py](client/onebot11/main.py)即可
 
 然后配置LLOneBot,详情见[LLOneBot](https://github.com/linyuchen/LiteLoaderQQNT-OneBotApi)
 

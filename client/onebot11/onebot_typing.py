@@ -1,5 +1,5 @@
 from enum import StrEnum
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, Optional
 
 
 class MessageItemType(StrEnum):
@@ -7,11 +7,6 @@ class MessageItemType(StrEnum):
     image = "image"
     at = "at"
     reply = "reply"
-
-
-class _OnebotSelf(TypedDict):
-    user_id: str
-    platform: Literal["qq"]
 
 
 class _OnebotMessageItemDataAt(TypedDict):
@@ -54,9 +49,8 @@ class _OnebotMessageItemReply(TypedDict):
 
 
 class OnebotRespNewMessage(TypedDict):
-    self: _OnebotSelf
+    self_id: str
     type: Literal["message"]
-    detail_type: Literal["group", "private"]
     message_type: Literal["group", "private"]
     message: list[_OnebotMessageItemAt | _OnebotMessageItemText | _OnebotMessageItemImage | _OnebotMessageItemReply]
     message_id: str

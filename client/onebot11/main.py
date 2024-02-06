@@ -1,18 +1,16 @@
 import base64
-import sys
 import tempfile
 from abc import ABC
 from functools import reduce
-from pathlib import PurePath, Path
-from typing import Type, Union
+from pathlib import Path
 
 import requests
 from flask import request, Flask
 
-sys.path.append(str(PurePath(__file__).parent.parent.parent))
-
-from client.onebot.onebot_typing import OnebotRespNewMessage, OnebotRespGroupMember, OnebotRespFriend, OnebotRespGroup, \
-    MessageItemType
+from client.onebot11.onebot_typing import (OnebotRespNewMessage, OnebotRespGroupMember,
+                                           OnebotRespFriend, OnebotRespGroup,
+                                           MessageItemType)
+from common.logger import logger
 from config import get_config
 from qqsdk.entity import GroupMember, Friend, Group
 from qqsdk.message import MessageSegment, GroupMsg, GroupSendMsg, GeneralMsg
@@ -36,6 +34,7 @@ class Onebot11QQClient(ABC, QQClientBase):
         resp = self.__post("/delete_msg", {
             "message_id": msg_id
         })
+        logger.debug(f"call api /delete_msg, return: {resp}")
 
     def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         """
@@ -55,6 +54,7 @@ class Onebot11QQClient(ABC, QQClientBase):
         else:
             path = "/send_private_msg"
         resp = self.__post(path, post_data)
+        logger.debug(f"call api {path}, return {resp}")
 
     def get_friends(self) -> list[Friend]:
         resp = self.__post("/", {
@@ -86,7 +86,7 @@ class Onebot11QQClient(ABC, QQClientBase):
         ) for i in members]
 
     def get_msg(self, data: OnebotRespNewMessage):
-        if data["detail_type"] == "group":
+        if data["message_type"] == "group":
             group = self.get_group(data["group_id"])
             group_member = group.get_member(data["user_id"])
             if not group_member:
@@ -142,14 +142,14 @@ class Onebot11QQClient(ABC, QQClientBase):
                 at_member=at_member,
                 msg_id=data["message_id"])
 
-            def reply(content, at=True, quote=True):
+            def reply(content, at=False, quote=True):
                 if isinstance(content, str):
                     content = MessageSegment.text(content)
                 if not list(filter(lambda ms: ms["type"] == "record", content.onebot11_data)):
                     if quote:
                         content = MessageSegment.reply(group_msg.msg_id) + content
-                # if at:
-                #     content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
+                    elif at:
+                        content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
                 self.send_msg(group.qq, content, is_group=True)
 
             group_msg.reply = reply
@@ -166,7 +166,7 @@ class QQClientFlask:
 
     def get_msg(self):
         json_data: OnebotRespNewMessage = request.json
-        qq = json_data["self"]["user_id"]
+        qq = json_data["self_id"]
         client: Onebot11QQClient = self.qq_clients[qq]
         client.get_msg(json_data)
 
