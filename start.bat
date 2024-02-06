@@ -1,2 +1,2 @@
 set PYTHONPATH=.
-"venv/scripts/activate" && python "client/onebot/main.py"
+"venv/scripts/activate" && python "client/onebot11/main.py"
