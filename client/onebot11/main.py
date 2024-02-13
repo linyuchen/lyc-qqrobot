@@ -27,6 +27,8 @@ class Onebot11QQClient(ABC, QQClientBase):
         self.host = get_config("ONEBOT_HTTP_API")
 
     def __post(self, url, data: dict = None) -> dict | list[dict]:
+        if url == "/":
+            url += data.get("action", "")
         resp = requests.post(self.host + url, json=data).json()
         return resp
 

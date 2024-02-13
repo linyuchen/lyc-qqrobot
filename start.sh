@@ -1,2 +1,2 @@
-sudo docker-compose down
-sudo docker-compose up -d
+export PYTHONPATH=.
+python client/onebot11/main.py
