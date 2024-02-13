@@ -29,6 +29,8 @@ class Onebot11QQClient(ABC, QQClientBase):
     def __post(self, url, data: dict = None) -> dict | list[dict]:
         if url == "/":
             url += data.get("action", "")
+        if data.get("params"):
+            data.update(data.get("params"))
         resp = requests.post(self.host + url, json=data).json()
         return resp
 
@@ -83,8 +85,8 @@ class Onebot11QQClient(ABC, QQClientBase):
         group = self.get_group(group_qq)
         group.members = [GroupMember(
             qq=i["user_id"],
-            nick=i["user_name"],
-            card=i["user_display_name"]
+            nick=i["nickname"],
+            card=i["card"]
         ) for i in members]
 
     def get_msg(self, data: OnebotRespNewMessage):
@@ -93,6 +95,7 @@ class Onebot11QQClient(ABC, QQClientBase):
             group_member = group.get_member(data["user_id"])
             if not group_member:
                 self.get_group_members(data["group_id"])
+                group = self.get_group(data["group_id"])
                 group_member = group.get_member(data["user_id"])
                 if not group_member:
                     return
@@ -150,10 +153,10 @@ class Onebot11QQClient(ABC, QQClientBase):
                 if not list(filter(lambda ms: ms["type"] == "record", content.onebot11_data)):
                     if quote:
                         content = MessageSegment.reply(group_msg.msg_id) + content
-                    elif at:
+                    if at:
                         content = MessageSegment.at(group_member.qq) + MessageSegment.text("\n") + content
                 self.send_msg(group.qq, content, is_group=True)
-
+                
             group_msg.reply = reply
             group_msg.recall = lambda: self.recall_msg(group_msg.msg_id)
             self.add_msg(group_msg)
@@ -169,9 +172,8 @@ class QQClientFlask:
     def get_msg(self):
         json_data: OnebotRespNewMessage = request.json
         qq = json_data["self_id"]
-        client: Onebot11QQClient = self.qq_clients[qq]
+        client: Onebot11QQClient = self.qq_clients[str(qq)]
         client.get_msg(json_data)
-
         return {}
 
     def start(self) -> None:

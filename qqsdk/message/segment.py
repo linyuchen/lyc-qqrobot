@@ -75,32 +75,32 @@ class MessageSegment:
         return ms
 
     @staticmethod
-    def to_onebot11_data(msg_type: str, image_path: str):
+    def to_onebot11_data(msg_type: str, content: str):
         data = {"type": msg_type}
         if msg_type == "Plain":
-            data.update({"data": {"text": image_path}, "type": "text"})
+            data.update({"data": {"text": content}, "type": "text"})
         elif msg_type == "ImagePath":
-            image_path = Path(image_path)
-            base64_data = base64.b64encode(image_path.read_bytes()).decode()
+            content = Path(content)
+            base64_data = base64.b64encode(content.read_bytes()).decode()
             data.update({"type": "image", "data": {"file": "base64://" + base64_data}})
             # uri_file = "file://"
             # data.update({"type": "image", "data": {"file": uri_file + str(image_path)}})
         elif msg_type == "At":
-            data.update({"type": "at", "data": {"qq": image_path}})
+            data.update({"type": "at", "data": {"qq": content}})
         # elif msg_type == "ImageUrl":
         #     data.update({"type": "Image", "data": {"url": content}})
         elif msg_type == "ImageBase64":
             # content = base64.b64decode(content)
             # temp_path = Path(tempfile.mktemp(".png"))
             # temp_path.write_bytes(content)
-            data.update({"type": "image", "data": {"file": f"base64://{image_path}"}})
+            data.update({"type": "image", "data": {"file": f"base64://{content}"}})
         elif msg_type == "VoicePath":
-            base64_data = base64.b64encode(Path(image_path).read_bytes()).decode()
+            base64_data = base64.b64encode(Path(content).read_bytes()).decode()
             data.update({"type": "record", "data": {"file": f"base64://{base64_data}"}})
         # elif msg_type == "VoiceBase64":
         #     data.update({"type": "Voice", "base64": content})
         elif msg_type == "reply":
-            data.update({"type": "reply", "data": {"id": image_path}})
+            data.update({"type": "reply", "data": {"id": str(content)}})
         return data
 
     @staticmethod

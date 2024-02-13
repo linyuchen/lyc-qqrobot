@@ -65,5 +65,5 @@ class Group(object):
 
     def get_member(self, qq: str):
         for member in self.members:
-            if member.qq == qq:
+            if str(member.qq) == str(qq):
                 return member
