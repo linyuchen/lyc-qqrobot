@@ -164,6 +164,7 @@ class Onebot11QQClient(ABC, QQClientBase):
 
 class QQClientFlask:
     _flask_app = Flask(__name__)
+    _flask_app.debug = True
 
     def __init__(self):
         self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])

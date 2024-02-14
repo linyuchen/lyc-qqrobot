@@ -77,7 +77,8 @@ def set_prompt_cmd(msg: GeneralMsg, params: list[str]):
 
 @on_command("清除人格", alias=("恢复人格", "清空人格", "重置人格"),
             cmd_group_name="ChatGPT",
-            desc="清除AI人格")
+            desc="清除AI人格",
+            example="")
 def clear_prompt_cmd(msg: GeneralMsg, params: list[str]):
     clear_prompt(get_context_id(msg))
     msg.reply("人格清除成功")
@@ -86,7 +87,7 @@ def clear_prompt_cmd(msg: GeneralMsg, params: list[str]):
 @on_command("查看人格",
             cmd_group_name="ChatGPT",
             desc="查看AI人格")
-def clear_prompt_cmd(msg: GeneralMsg, params: list[str]):
+def get_prompt_cmd(msg: GeneralMsg, params: list[str]):
     clear_prompt(get_context_id(msg))
     msg.reply("当前人格:\n\n" + get_prompt(get_context_id(msg)))
 
