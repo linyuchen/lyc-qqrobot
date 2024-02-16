@@ -48,8 +48,17 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
     def start(self) -> None:
         super().start()
 
-    @abstractmethod
     def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
+        content_str = content
+        if isinstance(content, MessageSegment):
+            content_str = content.get_text()
+        if "出脚本" in content_str:
+            return
+
+        self._send_msg(qq, content, is_group)
+
+    @abstractmethod
+    def _send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
         # content: 要发送的内容，unicode编码
@@ -61,7 +70,7 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         群发消息
         """
         for group in self.qq_user.groups:
-            self.send_msg(group.qq, content, is_group=True)
+            self._send_msg(group.qq, content, is_group=True)
 
     @abstractmethod
     def get_friends(self) -> list[entity.Friend]:

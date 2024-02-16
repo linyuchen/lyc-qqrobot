@@ -20,7 +20,7 @@ from qqsdk.qqclient import QQClientBase
 # MessageSegment.to_data = MessageSegment.to_onebot_data
 
 
-class Onebot11QQClient(ABC, QQClientBase):
+class OneBot11QQClient(ABC, QQClientBase):
     def __init__(self, qq: str):
         super().__init__()
         self.qq_user.qq = qq
@@ -40,7 +40,7 @@ class Onebot11QQClient(ABC, QQClientBase):
         })
         logger.debug(f"call api /delete_msg, return: {resp}")
 
-    def send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
+    def _send_msg(self, qq: str, content: str | MessageSegment, is_group=False):
         """
         # qq: 好友或陌生人或QQ群号
         # content: 要发送的内容，unicode编码
@@ -168,21 +168,21 @@ class QQClientFlask:
 
     def __init__(self):
         self._flask_app.add_url_rule("/", view_func=self.get_msg, methods=["POST"])
-        self.qq_clients: [str, Onebot11QQClient] = {}
+        self.qq_clients: [str, OneBot11QQClient] = {}
 
     def get_msg(self):
         json_data: OnebotRespNewMessage = request.json
         qq = json_data["self_id"]
-        client: Onebot11QQClient = self.qq_clients[str(qq)]
+        client: OneBot11QQClient = self.qq_clients[str(qq)]
         client.get_msg(json_data)
         return {}
 
     def start(self) -> None:
         for qq in get_config("QQ"):
-            client = Onebot11QQClient(str(qq))
+            client = OneBot11QQClient(str(qq))
             self.qq_clients[str(qq)] = client
             client.start()
-        self._flask_app.run(host="0.0.0.0", port=get_config("LISTEN_PORT"))
+        self._flask_app.run(host="0.0.0.0", port=get_config("LISTEN_PORT"), use_reloader=False)
 
 
 QQClientFlask().start()

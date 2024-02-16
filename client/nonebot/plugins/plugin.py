@@ -36,7 +36,7 @@ async def msg_handle(event: Event):
     elif sub_type == "normal" or sub_type == "anonymous":
         group = qq_client.get_group(str(event.group_id))
         msg = GroupMsg(group=group, msg=msg, group_member=group.get_member(str(event.user_id)))
-        msg.reply = lambda _msg: asyncio.run_coroutine_threadsafe(qq_client.send_msg(group.qq, _msg, is_group=True),
+        msg.reply = lambda _msg: asyncio.run_coroutine_threadsafe(qq_client._send_msg(group.qq, _msg, is_group=True),
                                                                   loop)
 
         qq_client.add_msg(msg)

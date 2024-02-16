@@ -26,7 +26,7 @@ class QQClient(QQClientBase):
         self.loop.run_until_complete(self.get_friends())
         self.loop.run_until_complete(self.get_groups())
 
-    async def send_msg(self, qq: str, content: Message_T, is_group=False):
+    async def _send_msg(self, qq: str, content: Message_T, is_group=False):
 
         max_length = 1500
         num = math.ceil(len(content) / float(max_length))

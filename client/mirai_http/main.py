@@ -75,9 +75,9 @@ class MiraiQQClient(QQClientBase):
             if not isinstance(content, MessageSegment):
                 content = MessageSegment.text(content)
             content = MessageSegment.at(msg.group_member.qq) + MessageSegment.text("\n") + content
-        self.send_msg(msg.group.qq, content, is_group=True)
+        self._send_msg(msg.group.qq, content, is_group=True)
 
-    def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
+    def _send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         path = "/sendFriendMessage"
         if is_group:
             path = '/sendGroupMessage'
@@ -244,7 +244,7 @@ class MiraiQQClient(QQClientBase):
                             quote_msg=quote_msg,
                             msg_chain=msg_chain)
 
-            msg.reply = lambda _msg, at=False: self.send_msg(friend.qq, _msg)
+            msg.reply = lambda _msg, at=False: self._send_msg(friend.qq, _msg)
             self.add_msg(msg)
         elif message_type == "GroupMessage":
             group_qq = str(data["sender"]["group"]["id"])

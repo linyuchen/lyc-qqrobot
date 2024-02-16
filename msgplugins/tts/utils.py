@@ -52,4 +52,4 @@ def wav2amr(wav_path: Path, amr_path: Path = None) -> Path:
 
 if __name__ == '__main__':
     # print(convert_to_silk(Path("d:/audio.wav")))
-    print(wav2amr(Path("D:\\1.wav"), Path("D:\\1.amr")))
+    print(wav2amr(Path("/Users/linyuchen/Downloads/1.wav"), Path("/Users/linyuchen/Downloads/1.amr")))

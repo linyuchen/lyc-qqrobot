@@ -27,7 +27,7 @@ class QQClient(QQClientBase):
             except:
                 continue
     
-    def send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
+    def _send_msg(self, qq: str, content: Union[str, MessageSegment], is_group=False):
         post_data = {"message": str(content)}
         if is_group:
             post_data["group_id"] = qq
@@ -75,7 +75,7 @@ class QQClient(QQClientBase):
         if message_type == "private":
             friend = qq_client.get_friend(str(data["sender"]["user_id"]))
             msg = FriendMsg(friend=friend, msg=msg)
-            msg.reply = lambda _msg: qq_client.send_msg(friend.qq, _msg)
+            msg.reply = lambda _msg: qq_client._send_msg(friend.qq, _msg)
             qq_client.add_msg(msg)
         elif message_type == "group":
             group = qq_client.get_group(str(data.get("group_id")))
@@ -85,7 +85,7 @@ class QQClient(QQClientBase):
                 group = qq_client.get_group(str(data.get("group_id")))
                 group_member = group.get_member(str(data["sender"]["user_id"]))
             msg = GroupMsg(group=group, msg=msg, group_member=group_member)
-            msg.reply = lambda _msg: qq_client.send_msg(group.qq, _msg, is_group=True)
+            msg.reply = lambda _msg: qq_client._send_msg(group.qq, _msg, is_group=True)
             qq_client.add_msg(msg)
         return {}
 
