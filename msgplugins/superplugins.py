@@ -104,7 +104,7 @@ class GroupMsgEvent(MsgHandler):
 
         if result:
             at = not (trigger_cmd_name in ["签到", "我的活跃度"])
-            msg.reply(result, at)
+            msg.reply(result)
             msg.destroy()
 
 
