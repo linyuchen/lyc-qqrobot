@@ -1,15 +1,12 @@
-from common import DATA_DIR, PLAYWRIGHT_DATA_DIR
+import requests
+
 from common.cmd_alias import CMD_ALIAS_DRAW
 from common.utils.nsfw_detector import nsfw_words_filter
 from config import get_config
 from msgplugins.msgcmd import on_command
 from qqsdk.message import GeneralMsg, FriendMsg, MessageSegment
 
-from .bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIPlayWright, BingAIDrawTask, BingAIImageResponse
-
-bingai_task_pool = BinAITaskPool(proxy=get_config("GFW_PROXY"), headless=False,
-                                 data_path=PLAYWRIGHT_DATA_DIR)
-bingai_task_pool.start()
+bingai_host = get_config("BING_AI_API")
 
 
 def bing(msg: GeneralMsg, params: list[str]):
@@ -19,8 +16,8 @@ def bing(msg: GeneralMsg, params: list[str]):
     else:
         user_id = msg.group.qq + "g"
 
-    task = BingAIChatTask(user_id, params[0], msg.reply)
-    bingai_task_pool.put_task(task)
+    result = requests.post(bingai_host + "/chat", json={"user_id": user_id, "question": params[0]}).json()
+    msg.reply(result["result"])
 
 
 @on_command(
@@ -63,12 +60,12 @@ def bingai_draw(msg: GeneralMsg, params: list[str]):
         msg.reply("提示词中含有敏感词汇，请重新输入")
         return
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
-
-    def reply(resp: BingAIImageResponse):
-        msg.reply(
-            MessageSegment.image_path(resp.preview) +
-            MessageSegment.text(f"提示词:{prompt}\n\n原图：\n" +
-                                "\n".join([f"{index + 1}. {url}" for index, url in enumerate(resp.img_urls)]))
-        )
-
-    bingai_task_pool.put_task(BingAIDrawTask(prompt, reply, msg.reply))
+    result = requests.post(bingai_host + "/draw", json={"prompt": prompt}).json()
+    preview = result["result"]["preview"]
+    img_urls = result["result"]["img_urls"]
+    msg.reply(result["result"])
+    msg.reply(
+        MessageSegment.image_b64(preview) +
+        MessageSegment.text(f"提示词:{prompt}\n\n原图：\n" +
+                            "\n".join([f"{index + 1}. {url}" for index, url in enumerate(img_urls)]))
+    )

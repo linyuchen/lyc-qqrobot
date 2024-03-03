@@ -21,6 +21,7 @@ class _OnebotMessageItemDataText(TypedDict):
 class _OnebotMessageItemDataImage(TypedDict):
     path: str
     file: str
+    url: str
 
 
 class _OnebotMessageItemDataReply(TypedDict):

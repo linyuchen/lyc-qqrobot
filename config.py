@@ -22,6 +22,7 @@ config_data = {
     "SD_HTTP_API": "http://192.168.1.4:7860",
     "VITS_GRADIO_SPACE": "zomehwh/vits-uma-genshin-honkai",
     "BV2_FASTAPI": "http://localhost:5001",
+    "BING_AI_API": "http://localhost:9000",
     "TTS_ENABLED": True,
     "MJ_DISCORD_TOKEN": "",
     "MJ_DISCORD_CHANNEL_ID": "",

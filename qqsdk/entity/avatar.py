@@ -14,7 +14,7 @@ class Avatar:
 
     @property
     def url(self):
-        return f"https://q1.qlogo.cn/g?b=qq&nk={self.qq}&s=640"
+        return f"https://thirdqq.qlogo.cn/g?b=qq&nk={self.qq}&s=640"
 
     @property
     def path(self):

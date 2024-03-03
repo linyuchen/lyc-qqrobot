@@ -65,7 +65,7 @@ class OneBot11QQClient(ABC, QQClientBase):
             "action": "get_friend_list",
         })
         friends: list[OnebotRespFriend] = resp["data"]
-        self.qq_user.friends = [Friend(qq=i["user_id"], nick=i["user_name"]) for i in friends]
+        self.qq_user.friends = [Friend(qq=str(i["user_id"]), nick=i["user_name"]) for i in friends]
         return self.qq_user.friends
 
     def get_groups(self) -> list[Group]:
@@ -73,7 +73,7 @@ class OneBot11QQClient(ABC, QQClientBase):
             "action": "get_group_list",
         })
         groups: list[OnebotRespGroup] = resp["data"]
-        self.qq_user.groups = [Group(qq=i["group_id"], name=i["group_name"], members=[]) for i in groups]
+        self.qq_user.groups = [Group(qq=str(i["group_id"]), name=i["group_name"], members=[]) for i in groups]
         return self.qq_user.groups
 
     def get_group_members(self, group_qq: str):
@@ -84,7 +84,7 @@ class OneBot11QQClient(ABC, QQClientBase):
         members: list[OnebotRespGroupMember] = resp["data"]
         group = self.get_group(group_qq)
         group.members = [GroupMember(
-            qq=i["user_id"],
+            qq=str(i["user_id"]),
             nick=i["nickname"],
             card=i["card"]
         ) for i in members]
@@ -118,15 +118,8 @@ class OneBot11QQClient(ABC, QQClientBase):
                         at_member = group.get_member(at_qq)
                         message_segments.append(MessageSegment.at(at_qq, is_at_me, is_at_other))
                     case MessageItemType.image:
-                        image_uri = resp_message["data"]["file"]
-                        if image_uri.startswith("base64://"):
-                            image_data = image_uri.split("base64://")[1]
-                            image_path = Path(tempfile.mktemp(suffix=".png"))
-                            image_path.write_bytes(base64.b64decode(image_data))
-                            message_segments.append(MessageSegment.image_path(image_path))
-                        elif image_uri.startswith("file://"):
-                            image_path = image_uri.split("file://")[1]
-                            message_segments.append(MessageSegment.image_path(image_path))
+                        image_url = resp_message["data"]["url"]
+                        message_segments.append(MessageSegment.image(image_url))
                     case MessageItemType.reply:
                         reply_msg_id = resp_message["data"].get("id")
                         quote_msg = self.get_history_msg(reply_msg_id)
