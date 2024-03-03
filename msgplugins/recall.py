@@ -1,13 +1,6 @@
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, GroupSendMsg
-
-history: dict[str, list[GroupSendMsg]] = {}  # group_qq: [msg, ...]
-
-
-@on_command("", bind_msg_type=(GroupSendMsg, ), cmd_group_name="群消息撤回")
-def group_msg_history(msg: GroupSendMsg, params: list[str]):
-    history.setdefault(msg.group.qq, [])
-    history[msg.group.qq].append(msg)
+from qqsdk.qqclient import QQClientBase
 
 
 @on_command("撤回",
@@ -19,12 +12,13 @@ def recall_group_msg(msg: GroupMsg, params: list[str]):
     if msg.quote_msg:
         msg.quote_msg.recall()
         return
-    group_history = history.get(msg.group.qq, [])
+    qq_client: QQClientBase = msg.qq_client
+    sent_ids = msg.qq_client.sent_group_msg_ids.get(msg.group.qq, [])
     msg_len = 1
     if params:
         if params[0].isdigit():
             msg_len = int(params[0])
     for i in range(msg_len):
-        if len(group_history) != 0:
-            group_history.pop().recall()
+        if len(sent_ids) != 0:
+            qq_client.recall_msg(sent_ids.pop())
 

@@ -21,6 +21,7 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
         self.online = True
         self.msg_handlers = self.setup_plugins()
         self.msg_history: list[BaseMsg] = []
+        self.sent_group_msg_ids: dict[str, list[str]] = {}  # key group qq, value [msg id,...]
 
     def setup_plugins(self) -> list[MsgHandler]:
         plugins_path = pathlib.PurePath(__file__).parent.parent / "msgplugins"
@@ -119,3 +120,6 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
             if getattr(msg, "msg_id") == msg_id:
                 return msg
         return None
+
+    def recall_msg(self, msg_id: str):
+        pass

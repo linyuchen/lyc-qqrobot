@@ -36,7 +36,7 @@ class OneBot11QQClient(ABC, QQClientBase):
 
     def recall_msg(self, msg_id: str):
         resp = self.__post("/delete_msg", {
-            "message_id": msg_id
+            "message_id": int(msg_id)
         })
         logger.debug(f"call api /delete_msg, return: {resp}")
 
@@ -58,6 +58,10 @@ class OneBot11QQClient(ABC, QQClientBase):
         else:
             path = "/send_private_msg"
         resp = self.__post(path, post_data)
+        if is_group:
+            resp_message_id = resp.get("data", {}).get("message_id")
+            self.sent_group_msg_ids.setdefault(str(qq), [])
+            self.sent_group_msg_ids[str(qq)].append(str(resp_message_id))
         logger.debug(f"call api {path}, return {resp}")
 
     def get_friends(self) -> list[Friend]:
