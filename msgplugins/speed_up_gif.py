@@ -32,6 +32,6 @@ def random_speed_up_gif(msg: GeneralMsg, params: list[str]):
             return
         history[qq] = time.time()
         re_path = re_speed(img_path, random.choice([30, 40, 50]))
-        msg.reply(MessageSegment.image_path(re_path), at=False)
+        msg.reply(MessageSegment.image_path(re_path), at=False, quote=False)
         img_path.unlink()
         re_path.unlink()
