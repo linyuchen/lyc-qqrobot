@@ -33,9 +33,9 @@ class BiliCardPlugin(MsgHandler):
         avid = bilicard.get_av_id(msg_text)
 
         if bvid or avid:
-            if len(bvid) < 6:
+            if bvid and len(bvid) < 6:
                 return
-            if len(avid) < 6:
+            if avid and len(avid) < 6:
                 return
             msg.destroy()
             msg.destroy()
