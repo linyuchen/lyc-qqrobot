@@ -1,9 +1,6 @@
 import base64
-import tempfile
 from pathlib import Path
 from typing import Optional, List, Tuple, Self
-
-from PIL import Image
 
 
 # from .friendmsg import FriendMsg
@@ -57,9 +54,11 @@ class MessageSegment:
 
     @staticmethod
     def voice_base64(base64_data):
-        if "base64," in base64_data:
-            base64_data = base64_data.split("base64,")[1]
         return MessageSegment("VoiceBase64", base64_data)
+
+    @staticmethod
+    def video_url(video_url: str):
+        return MessageSegment("VideoUrl", video_url)
 
     @staticmethod
     def at(qq: str, is_at_me: bool = False, is_at_other=False, is_at_all=False):
@@ -97,8 +96,8 @@ class MessageSegment:
         elif msg_type == "VoicePath":
             base64_data = base64.b64encode(Path(content).read_bytes()).decode()
             data.update({"type": "record", "data": {"file": f"base64://{base64_data}"}})
-        # elif msg_type == "VoiceBase64":
-        #     data.update({"type": "Voice", "base64": content})
+        elif msg_type == "VideoUrl":
+            data.update({"type": "video", "data": {"file": content}})
         elif msg_type == "reply":
             data.update({"type": "reply", "data": {"id": str(content)}})
         return data
@@ -147,7 +146,8 @@ class MessageSegment:
 
     def get_text(self):
         """获取纯文本"""
-        return "".join([msg_data.get("text") or msg_data.get("data", {}).get("text") for msg_data in self.data if msg_data["type"] == "Plain"])
+        return "".join([msg_data.get("text") or msg_data.get("data", {}).get("text") for msg_data in self.data if
+                        msg_data["type"] == "Plain"])
 
     def get_image_urls(self) -> list[str]:
         """获取图片链接"""
