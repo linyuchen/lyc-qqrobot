@@ -27,7 +27,7 @@ def tts_list(msg: GroupMsg | FriendMsg, params: list[str]):
             example="tts 你好 或 tts 可莉 你好",
             cmd_group_name="tts")
 def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
-    default_speaker = "可莉"
+    default_speaker = "阿梓"
     if len(params) == 0:
         msg.reply("请输入要转换的文字")
         return

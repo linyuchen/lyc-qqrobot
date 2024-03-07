@@ -62,8 +62,11 @@ def bingai_draw(msg: GeneralMsg, params: list[str]):
     msg.reply("正在努力画画中（吭哧吭哧~），请稍等...")
     result = requests.post(bingai_host + "/draw", json={"prompt": prompt}).json()
     preview = result["result"]["preview"]
-    img_urls = result["result"]["img_urls"]
-    msg.reply(result["result"])
+    img_urls = result["result"]["urls"]
+    err = result.get('err')
+    if err:
+        return msg.reply(err)
+    # msg.reply(result["result"])
     msg.reply(
         MessageSegment.image_b64(preview) +
         MessageSegment.text(f"提示词:{prompt}\n\n原图：\n" +
