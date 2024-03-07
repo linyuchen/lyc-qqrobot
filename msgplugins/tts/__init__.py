@@ -1,8 +1,8 @@
 from pathlib import Path
 
+from config import get_config
 from msgplugins.msgcmd.cmdaz import on_command
 from qqsdk.message import GroupMsg, FriendMsg, MessageSegment
-from config import get_config
 from .bv2_fastapi import BV2Fastapi
 from .genshinvoice_top import tts, speakers
 from .utils import wav2amr
@@ -35,17 +35,16 @@ def tts_cmd(msg: GroupMsg | FriendMsg, params: list[str]):
     text = params[0]
     speaker = default_speaker
     tts_func = tts
+    bv2_speakers = bv2.get_models()
     if len(params) > 1:
         user_speaker = params[0]
-        bv2_speakers = bv2.get_models()
         if user_speaker in speakers + bv2_speakers:
             speaker = user_speaker
             text = " ".join(params[1:])
-            if user_speaker in bv2_speakers:
-                tts_func = bv2_tts
         else:
             text = " ".join(params)
-
+    if speaker in bv2_speakers:
+        tts_func = bv2_tts
     max_len = 200
     if len(text) > max_len:
         msg.reply(f"文字长度超过{max_len}字")
