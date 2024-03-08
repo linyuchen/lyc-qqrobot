@@ -27,7 +27,8 @@ def bing(msg: GeneralMsg, params: list[str]):
     example="#上海的天气",
     param_len=1,
     sep="",
-    cmd_group_name="bingai"
+    cmd_group_name="bingai",
+    is_async=True
 )
 def bing_ai(msg: GeneralMsg, params: list[str]):
     bing(msg, params)
@@ -38,7 +39,8 @@ def bing_ai(msg: GeneralMsg, params: list[str]):
             example="bing 上海的天气",
             param_len=1,
             sep=" ",
-            cmd_group_name="bingai"
+            cmd_group_name="bingai",
+            is_async=True
             )
 def bing_ai2(msg: GeneralMsg, params: list[str]):
     bing(msg, params)
@@ -52,6 +54,7 @@ def bing_ai2(msg: GeneralMsg, params: list[str]):
     desc="DALL·E 3画图",
     example="de3 一只猫",
     cmd_group_name="bingai",
+    is_async=True
 )
 def bingai_draw(msg: GeneralMsg, params: list[str]):
     prompt = params[0]
