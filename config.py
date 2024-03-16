@@ -69,4 +69,3 @@ def get_config(key: str, default=None):
 
 def set_config(key: str, value):
     __setattr__(key, value)
-
