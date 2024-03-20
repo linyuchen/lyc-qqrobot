@@ -44,8 +44,8 @@ def tts(text: str, speaker: str = "可莉") -> Path:
     # wav_path = Path(tempfile.mktemp(suffix=".wav"))
     # with open(wav_path, "wb") as f:
     #     f.write(data)
-    # url = "http://bv2.firefly.matce.cn/run/predict"
-    url = "https://v2.genshinvoice.top/run/predict"
+    url = "https://bv2.firefly.matce.cn/run/predict"
+    # url = "https://v2.genshinvoice.top/run/predict"
     data = {
         "data": [text, f"{speaker}_ZH", 0.5, 0.6, 0.9, 1, "auto", True, 1, 0.2, None, "Happy", "", "", 0.7],
         "fn_index": 0,
@@ -56,7 +56,8 @@ def tts(text: str, speaker: str = "可莉") -> Path:
     wav_url = data.get("data", ['', {}])[1].get("name")
     if not wav_url:
         raise Exception("生成语音失败")
-    wav_url = "https://v2.genshinvoice.top/file=" + wav_url
+    # wav_url = "https://v2.genshinvoice.top/file=" + wav_url
+    wav_url = "https://bv2.firefly.matce.cn/file=" + wav_url
     wav_path = Path(tempfile.mktemp(suffix=".wav"))
     data = requests.get(wav_url).content
     with open(wav_path, "wb") as f:
