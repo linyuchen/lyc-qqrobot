@@ -156,11 +156,11 @@ class MessageSegment:
             if msg_data["type"] == "Image":
                 if "url" in msg_data:
                     result.append(msg_data["url"])
-            elif msg_data["type"] == "image":
+            elif msg_data["type"] == "image" or msg_data["type"] == "mface":
                 # onebot 11
-                uri = msg_data["data"]["file"]
-                if uri.startwith("http://") or uri.startwith("https://"):
-                    result.append(uri)
+                url = msg_data["data"]["url"]
+                if url:
+                    result.append(url)
                 # result.append(msg_data["data"]["file"])
         return result
 

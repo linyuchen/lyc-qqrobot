@@ -5,6 +5,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Callable
 
+import requests
 from filetype import filetype
 from meme_generator import get_memes
 from meme_generator.cli import get_meme
@@ -266,16 +267,34 @@ def set_meme_interval(msg: GroupMsg, params: list[str]):
 
 @on_command("", cmd_group_name="表情包", ignore_at_other=False)
 def meme_generate(msg: GeneralMsg, params: list[str]):
-    images = msg.msg_chain.get_image_paths()
+    image_urls = msg.msg_chain.get_image_urls()
     if msg.quote_msg:
-        images += msg.quote_msg.msg_chain.get_image_paths()
+        image_urls += msg.quote_msg.msg_chain.get_image_urls()
+
+    download_images = []
+    # 下载图片
+    for index, image_url in enumerate(image_urls):
+        image_url = image_url.replace("https://", "http://")
+        image_path = Path(tempfile.mktemp(suffix=".png"))
+        try:
+            image = requests.get(image_url, headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/58.0.3029.110 Safari/537.3"
+            }).content
+            if image:
+                image_path.write_bytes(image)
+                download_images.append(image_path)
+        except Exception as e:
+            print(e)
+
+        # images[index] = image_path
 
     if isinstance(msg, GroupMsg):
         if msg.at_member:
-            images.append(msg.at_member.avatar.path)
-        images.append(msg.group_member.avatar.path)
+            download_images.append(msg.at_member.avatar.path)
+        download_images.append(msg.group_member.avatar.path)
 
-    image_path = generate(msg.msg.strip(), images)
+    image_path = generate(msg.msg.strip(), download_images)
     if image_path:
         msg.reply(MessageSegment.image_path(image_path), quote=False)
         image_path.unlink()

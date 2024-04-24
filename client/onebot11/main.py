@@ -31,6 +31,9 @@ class OneBot11QQClient(ABC, QQClientBase):
             url += data.get("action", "")
         if data.get("params"):
             data.update(data.get("params"))
+        token = get_config("ONEBOT_TOKEN")
+        if token:
+            url += "?access_token=" + token
         resp = requests.post(self.host + url, json=data).json()
         return resp
 
@@ -57,6 +60,7 @@ class OneBot11QQClient(ABC, QQClientBase):
             path = "/send_group_msg"
         else:
             path = "/send_private_msg"
+
         resp = self.__post(path, post_data)
         if is_group:
             resp_message_id = resp.get("data", {}).get("message_id")

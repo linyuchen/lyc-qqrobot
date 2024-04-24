@@ -117,7 +117,7 @@ class QQClientBase(EventListener, metaclass=ABCMeta):
 
     def get_history_msg(self, msg_id: str | int):
         for msg in self.msg_history:
-            if getattr(msg, "msg_id") == msg_id:
+            if str(getattr(msg, "msg_id")) == str(msg_id):
                 return msg
         return None
 
