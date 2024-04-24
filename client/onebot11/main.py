@@ -128,6 +128,9 @@ class OneBot11QQClient(ABC, QQClientBase):
                     case MessageItemType.image:
                         image_url = resp_message["data"]["url"]
                         message_segments.append(MessageSegment.image(image_url))
+                    case MessageItemType.mface:
+                        image_url = resp_message["data"]["url"]
+                        message_segments.append(MessageSegment.image(image_url))
                     case MessageItemType.reply:
                         reply_msg_id = resp_message["data"].get("id")
                         quote_msg = self.get_history_msg(reply_msg_id)

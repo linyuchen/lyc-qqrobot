@@ -5,6 +5,7 @@ from typing import Literal, TypedDict, Optional
 class MessageItemType(StrEnum):
     text = "text"
     image = "image"
+    mface = "mface"
     at = "at"
     reply = "reply"
 
