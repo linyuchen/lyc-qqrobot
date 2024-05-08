@@ -1,17 +1,14 @@
 import re
 import tempfile
 import time
-import uuid
 from io import BytesIO
 from pathlib import Path, PurePath
-from urllib import request
 
 import requests
 from PIL import Image, ImageDraw, ImageFont
 
-from common.stringplus import split_lines
-from msgplugins.chatgpt.chatgpt import chat
-
+from ..stringplus import split_lines
+from ..chatgpt.chatgpt import chat
 
 session = requests.session()
 headers = {
@@ -148,7 +145,7 @@ def get_video_summary_by_ai(aid, cid) -> str:
         return ""
 
 
-def gen_image(video_info: dict) -> str:
+def gen_image(video_info: dict) -> BytesIO:
     base_path = Path(__file__).parent
     # save_path = base_path / f"test.png"
     save_path = tempfile.mktemp(suffix=".png")
@@ -220,8 +217,10 @@ def gen_image(video_info: dict) -> str:
     text_draw.text((20, cover.height + 140), f"UP: {video_info['owner']}", font=font, fill=(0, 0, 0))
     # 添加视频上传时间
     text_draw.text((340, cover.height + 140), f" {video_info['upload_time']}", font=font, fill=(0, 0, 0))
-    image.save(save_path)
-    return str(save_path)
+    temp_img = BytesIO()
+    image.save(temp_img, format='PNG')
+    return temp_img
+
 
 
 def get_font(size=20):

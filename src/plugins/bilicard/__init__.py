@@ -1,12 +1,12 @@
-import os
 import time
+from io import BytesIO
 
-from nonebot import Bot, on_message
+from nonebot import Bot
 from PIL.Image import Image
 from nonebot.adapters.onebot.v11 import Event, GroupMessageEvent, PrivateMessageEvent, MessageSegment
 from nonebot.message import event_preprocessor
 
-from . import bilicard
+from ...common.bilicard import bilicard
 
 cached = {}
 
@@ -43,9 +43,9 @@ async def _(bot: Bot, event: Event):
             video_info = bilicard.get_video_info(bvid, avid)
 
             bvid = video_info.get("bvid", "")
-            if check_in_cache(bvid + event.group_id if is_group else event.user_id):
+            if check_in_cache(bvid + str(event.group_id) if is_group else str(event.user_id)):
                 return
-            img: Image = bilicard.gen_image(video_info)
+            img = bilicard.gen_image(video_info)
             summary = bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
             # 没有简介内容或者简介等于标题的，且是卡片分享的，而且AI无法总结的就不需要发送了
             if ((len(video_info["desc"]) < 4 or video_info["desc"] == video_info["title"])
@@ -54,7 +54,7 @@ async def _(bot: Bot, event: Event):
             summary = "AI总结：" + (summary if summary else "此视频不支持")
             url = f"https://bilibili.com/video/{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
             if img:
-                reply_msg = MessageSegment.image(img.tobytes()) + \
+                reply_msg = MessageSegment.image(img) + \
                             MessageSegment.text("简介：" + video_info["desc"] + "\n\n" + summary +
                                                 "\n\n" + url)
                 await bot.send(event, reply_msg)

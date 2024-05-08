@@ -6,11 +6,10 @@ from nonebot import on_command, on_message
 from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent, PrivateMessageEvent, Bot, \
     MessageSegment
 from nonebot.params import CommandArg
-from nonebot.rule import is_type
 
 import config
 from src.common.logger import logger
-from .chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
+from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
 from ..common import is_at_me
 
 # todo: 仅限管理员操作

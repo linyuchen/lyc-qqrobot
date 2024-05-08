@@ -15,8 +15,8 @@ tts_list_cmd = on_command("tts列表")
 
 
 @tts_list_cmd.handle()
-def _():
-    tts_list_cmd.finish("语音可用的人物列表:\n" + ", ".join(speakers + auto_speaker_tts.bv2.get_models()))
+async def _():
+    await tts_list_cmd.finish("语音可用的人物列表:\n" + ", ".join(speakers + auto_speaker_tts.bv2.get_models()))
 
 
 tts_cmd = on_command("tts")

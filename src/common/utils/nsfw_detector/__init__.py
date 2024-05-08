@@ -3,7 +3,7 @@ import re
 from pathlib import Path
 
 from .predict import classify
-from common.utils.downloader import download_file_with_progressbar
+from src.common.utils.downloader import download_file_with_progressbar
 
 cur_path = Path(__file__).parent
 

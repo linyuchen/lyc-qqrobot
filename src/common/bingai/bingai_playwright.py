@@ -18,7 +18,7 @@ CHROME_DATA_DIR = Path(tempfile.gettempdir() + "/playwright_chrome_data_bingai")
 
 @dataclass
 class BingAIImageResponse:
-    preview: Path
+    preview: bytes
     img_urls: list[str]
 
 
@@ -192,10 +192,8 @@ class BingAIPlayWright:
         }
             """)
 
-        path = tempfile.mktemp(suffix=".png")
-        path = Path(path)
         # 生成预览图
-        await gir.screenshot(path=path, timeout=self.timeout * 1000)
+        preview_img_bytes = await gir.screenshot(timeout=self.timeout * 1000)
         img_list = await gir.query_selector_all("img")
         img_urls = []
         for img in img_list:
@@ -213,7 +211,7 @@ class BingAIPlayWright:
         #
         #     images = await asyncio.gather(*[download_img(url) for url in img_urls])
 
-        return BingAIImageResponse(path, img_urls)
+        return BingAIImageResponse(preview_img_bytes, img_urls)
 
 
 @dataclass
