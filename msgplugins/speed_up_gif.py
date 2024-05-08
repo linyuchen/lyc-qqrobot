@@ -12,10 +12,11 @@ from qqsdk.message import GeneralMsg, MessageSegment
 history: dict[str, float] = {}
 
 
-@on_command("", alias=("加速", ), cmd_group_name="随机加速gif")
+@on_command("", cmd_group_name="随机加速gif")
 def random_speed_up_gif(msg: GeneralMsg, params: list[str]):
     r_int = random.randint(0, 10)
-    if r_int != 0 and msg.msg.strip() != "加速":
+    manual = msg.msg.strip() == "加速"
+    if r_int != 0 and not manual:
         return
     img_urls = msg.msg_chain.get_image_urls()
     if img_urls:
@@ -28,7 +29,7 @@ def random_speed_up_gif(msg: GeneralMsg, params: list[str]):
             return
         qq = msg.group.qq if msg.group else msg.friend.qq
         last_time = history.get(qq, 0)
-        if (time.time() - last_time) < 5 * 60:
+        if (time.time() - last_time) < 5 * 60 and not manual:
             return
         history[qq] = time.time()
         re_path = re_speed(img_path, random.choice([30, 40, 50]))
