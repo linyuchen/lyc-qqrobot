@@ -28,3 +28,4 @@ av
 pilk
 nonebot2~=2.3.0
 nonebot-adapter-onebot~=2.4.3
+nonebot-plugin-waiter
