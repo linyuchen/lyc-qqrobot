@@ -1,7 +1,6 @@
 import asyncio
 
-import requests
-from nonebot import on_command
+from nonebot import on_command, Bot
 from nonebot.adapters.onebot.v11 import MessageSegment, MessageEvent, GroupMessageEvent, Message
 from nonebot.params import CommandArg
 
@@ -17,11 +16,11 @@ bingai_host = get_config("BING_AI_API")
 
 bing_chat_cmd = on_command("#", aliases={"bing"})
 
-bing_draw_cmd = on_command("DE3", aliases={"bing画图", "de3", "微软画图"})
+bing_draw_cmd = on_command("DE3", aliases={"bing画图", "de3", "微软画图", "画图", "画画"})
 
 
 @bing_chat_cmd.handle()
-async def _(msg: MessageEvent, params: Message = CommandArg()):
+async def _(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
     await bing_chat_cmd.send("正在努力思考中，请稍等...")
     if isinstance(msg, GroupMessageEvent):
         user_id = str(msg.user_id) + "f"
@@ -31,14 +30,13 @@ async def _(msg: MessageEvent, params: Message = CommandArg()):
     question = params.extract_plain_text()
 
     def reply(result: str):
-        # 同步调用
-        asyncio.run(bing_chat_cmd.finish(result))
+        asyncio.run(bot.send(msg, result))
 
     bingai.put_task(BingAIChatTask(user_id, question, reply))
 
 
 @bing_draw_cmd.handle()
-async def _(event: MessageEvent, params: Message = CommandArg()):
+async def _(bot: Bot, event: MessageEvent, params: Message = CommandArg()):
     prompt = params.extract_plain_text()
     prompt = nsfw_words_filter(prompt)
     if not prompt:
@@ -48,12 +46,12 @@ async def _(event: MessageEvent, params: Message = CommandArg()):
 
     def reply(r: BingAIImageResponse):
         asyncio.run(
-            bing_draw_cmd.finish(
-                MessageSegment.image(r.preview) +
-                MessageSegment.text(f"提示词:{prompt}\n\n" +
-                                    "\n".join([f"{index + 1}. {url}" for index, url in enumerate(r.img_urls)])
-                                    )
-            )
+            bot.send(event,
+                     MessageSegment.image(r.preview) +
+                     MessageSegment.text(f"提示词:{prompt}\n\n" +
+                                         "\n".join([f"{index + 1}. {url}" for index, url in enumerate(r.img_urls)])
+                                         )
+                     )
         )
 
     def reply_error(err: str):

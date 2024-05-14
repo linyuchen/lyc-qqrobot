@@ -6,7 +6,7 @@ from PIL.Image import Image
 from nonebot.adapters.onebot.v11 import Event, GroupMessageEvent, PrivateMessageEvent, MessageSegment
 from nonebot.message import event_preprocessor
 
-from ...common.bilicard import bilicard
+from src.common.bilicard import bilicard
 
 cached = {}
 
@@ -40,13 +40,13 @@ async def _(bot: Bot, event: Event):
 
             if bvid and check_in_cache(bvid):
                 return
-            video_info = bilicard.get_video_info(bvid, avid)
+            video_info = await bilicard.get_video_info(bvid, avid)
 
             bvid = video_info.get("bvid", "")
             if check_in_cache(bvid + str(event.group_id) if is_group else str(event.user_id)):
                 return
-            img = bilicard.gen_image(video_info)
-            summary = bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
+            img = await bilicard.gen_image(video_info)
+            summary = await bilicard.get_video_summary_by_ai(video_info["aid"], video_info["cid"])
             # 没有简介内容或者简介等于标题的，且是卡片分享的，而且AI无法总结的就不需要发送了
             if ((len(video_info["desc"]) < 4 or video_info["desc"] == video_info["title"])
                     and is_from_card and not summary):

@@ -1,3 +1,4 @@
+import asyncio
 import re
 import threading
 import time
@@ -8,8 +9,8 @@ from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent
 from nonebot.params import CommandArg
 
 import config
-from src.common.logger import logger
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
+from src.common.logger import logger
 from ..common import is_at_me
 
 # todo: 仅限管理员操作
@@ -121,8 +122,12 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
     _chat_text = event.get_plaintext()
     if event.reply:
         _chat_text = event.reply.message.extract_plain_text() + '\n' + _chat_text
-    _res = chat(get_context_id(event), _chat_text)
-    await chatgpt_cmd.send(_res)
-    voice_bytes = gen_voice(_res)
-    if voice_bytes:
-        await chatgpt_cmd.send(MessageSegment.record(voice_bytes))
+
+    async def gptchat():
+        _res = chat(get_context_id(event), _chat_text)
+        await bot.send(event, MessageSegment.reply(event.message_id) + _res)
+        voice_bytes = gen_voice(_res)
+        if voice_bytes:
+            await bot.send(event, MessageSegment.record(voice_bytes))
+
+    threading.Thread(target=lambda: asyncio.run(gptchat()), daemon=True).start()

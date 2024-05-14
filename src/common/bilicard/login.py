@@ -3,7 +3,7 @@ from pathlib import Path
 
 from playwright.async_api import async_playwright
 
-from common import PLAYWRIGHT_DATA_DIR
+from src.common import PLAYWRIGHT_DATA_DIR
 
 
 async def login():

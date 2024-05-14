@@ -4,20 +4,20 @@ import time
 from io import BytesIO
 from pathlib import Path, PurePath
 
-import requests
+import httpx
 from PIL import Image, ImageDraw, ImageFont
 
-from ..stringplus import split_lines
 from ..chatgpt.chatgpt import chat
+from ..stringplus import split_lines
 
-session = requests.session()
+# session = requests.session()
 headers = {
     "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.35 ",
+                  "Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.35",
     "Referer": "https://www.bilibili.com/",
     "Accept": "application/json;charset=UTF-8"
 }
-session.headers.update(headers)
+session = httpx.AsyncClient(headers=headers, follow_redirects=True)
 
 
 def get_cookie():
@@ -26,7 +26,7 @@ def get_cookie():
         cookies = f.read()
         cookies = re.findall("(.*?)=(.*?); ", cookies)
         cookies = dict(cookies)
-        session.cookies.update(cookies)
+        session.cookies = cookies
 
 
 def check_is_b23(text: str) -> []:
@@ -34,12 +34,12 @@ def check_is_b23(text: str) -> []:
     return b23tv
 
 
-def b32_to_bv(b23tv: str):
+async def b32_to_bv(b23tv: str):
     """
     b23.tv链接转BV链接
     """
     url = f"https://b23.tv/{b23tv}"
-    url = session.get(url).url
+    url = (await session.get(url)).url
     return url
 
 
@@ -54,13 +54,15 @@ def get_av_id(text: str):
     return result and result[0] or ""
 
 
-def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
+async def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
+    # get_cookie()
     url = ""
     if bv_id:
         url = f"http://api.bilibili.com/x/web-interface/view?bvid={bv_id}"
     elif av_id:
         url = f"http://api.bilibili.com/x/web-interface/view?aid={av_id}"
-    response_body = session.get(url).json().get("data", {})
+    res = await session.get(url)
+    response_body = res.json().get("data", {})
     if not response_body:
         return
     video_info = {
@@ -86,8 +88,8 @@ def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
 # 获取评论，https://api.bilibili.com/x/v2/reply/wbi/main?oid=683107021&type=1&mode=3
 # todo: 获取指定评论，然后判断是否是up的评论，将此评论也放到ai总结里面去
 
-def gen_text(bv_id: str) -> str:
-    video_info = get_video_info(bv_id)
+async def gen_text(bv_id: str) -> str:
+    video_info = await get_video_info(bv_id)
     if not video_info:
         return ""
     # 利用video_info生成视频简要说明
@@ -116,11 +118,11 @@ def gen_text(bv_id: str) -> str:
     return text
 
 
-def get_subtitle(aid: str, cid: str):
+async def get_subtitle(aid: str, cid: str):
     get_cookie()
     url = f"https://api.bilibili.com/x/player/v2?aid={aid}&cid={cid}"
 
-    res = session.get(url).json()
+    res = (await session.get(url)).json()
     subtitles = res["data"]["subtitle"]["subtitles"]
     subtitle_urls = []
     for sub_t in subtitles:
@@ -129,15 +131,15 @@ def get_subtitle(aid: str, cid: str):
 
     subtitle_content = []
     for subtitle_url in subtitle_urls:
-        res = session.get(subtitle_url).json()
+        res = (await session.get(subtitle_url)).json()
         for i in res["body"]:
             subtitle_content.append(i["content"])
     subtitle = "\n".join(subtitle_content)
     return subtitle
 
 
-def get_video_summary_by_ai(aid, cid) -> str:
-    subtitle = get_subtitle(aid, cid)
+async def get_video_summary_by_ai(aid, cid) -> str:
+    subtitle = await get_subtitle(aid, cid)
     if subtitle:
         res = chat("", "#有如下一个视频，请用中文完整的总结:\n" + subtitle)
         return res
@@ -145,14 +147,14 @@ def get_video_summary_by_ai(aid, cid) -> str:
         return ""
 
 
-def gen_image(video_info: dict) -> BytesIO:
+async def gen_image(video_info: dict) -> BytesIO:
     base_path = Path(__file__).parent
     # save_path = base_path / f"test.png"
     save_path = tempfile.mktemp(suffix=".png")
     image = Image.new("RGBA", (560, 470 + 15), (255, 255, 255, 255))
     # image.paste((220, 220, 220), (0, 480, 530, 620))
     cover = Image.open(BytesIO(
-        session.get(video_info["cover_url"]).content)).resize((560, 315), Image.LANCZOS)
+        (await session.get(video_info["cover_url"])).content)).resize((560, 315), Image.LANCZOS)
     cover_size = (0, 0, 560, 315)
 
     # mask = Image.new("L", image.size, (255, 255, 255))
@@ -220,7 +222,6 @@ def gen_image(video_info: dict) -> BytesIO:
     temp_img = BytesIO()
     image.save(temp_img, format='PNG')
     return temp_img
-
 
 
 def get_font(size=20):
