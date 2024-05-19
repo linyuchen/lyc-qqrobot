@@ -22,11 +22,11 @@ class TestBrowserPreview(TestCase):
 
     def test_zhihu_question(self):
         url = "https://www.zhihu.com/question/68611994/answer/3188443851"
-        Image.open(self.zhihu_previewer.zhihu_question(url)).show()
+        Image.open(self.zhihu_previewer.screenshot_zhihu_question(url)).show()
 
     def test_zhihu_article(self):
         url = "https://zhuanlan.zhihu.com/p/191600009"
-        Image.open(self.zhihu_previewer.zhihu_zhuanlan(url)).show()
+        Image.open(self.zhihu_previewer.screenshot_zhihu_zhuanlan(url)).show()
 
     def test_moe_wiki(self):
         keyword = "39music"

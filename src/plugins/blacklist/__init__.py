@@ -8,7 +8,7 @@ from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 
 from src.common import DATA_DIR
-from src.common.jsondb import PickleDB
+from src.common.pickledb import PickleDB
 
 BLACK_DB_PATH = pathlib.Path(DATA_DIR) / 'blacklist.pickle'
 
