@@ -1,16 +1,14 @@
 # coding=UTF8
 import threading
 
-from msgplugins.bull_fight import bullfight
-from msgplugins.msgcmd.cmdaz import CMD
-from msgplugins.superplugin import GroupPointAction
-from qqsdk.message import MsgHandler, GroupMsg
+from .bullfight import BullFight
+from archive.msgplugins.superplugin import GroupPointAction
 
 
-class BullGame(GroupPointAction, bullfight.BullFight):
+class BullGame(GroupPointAction, bullfight):
 
-    def __init__(self, group_qq, qq_client):
-        bullfight.BullFight.__init__(self, group_qq, qq_client)
+    def __init__(self, group_qq):
+        bullfight.BullFight.__init__(self, group_qq)
         GroupPointAction.__init__(self)
 
 
@@ -32,7 +30,7 @@ class BullFightPlugin(MsgHandler):
 
     def get_game_instance(self, group_qq):
 
-        group_plugin = BullGame(group_qq, self.qq_client)
+        group_plugin = BullGame(group_qq)
         return self.group_instances.setdefault(group_qq, group_plugin)
 
     def handle(self, msg: GroupMsg):

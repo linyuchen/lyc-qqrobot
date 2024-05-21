@@ -2,7 +2,7 @@
 
 from ..msgcmd import cmdaz
 from .import game24point
-from ..superplugin import GroupPointAction
+from archive.msgplugins.superplugin import GroupPointAction
 from qqsdk.message import MsgHandler, GroupMsg
 CMD = cmdaz.CMD
 
