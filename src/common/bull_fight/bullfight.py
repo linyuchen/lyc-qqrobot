@@ -3,12 +3,12 @@
 import threading
 import time
 
-from msgplugins.bull_fight import bullfight_base
+from .bullfight_base import BullFightBase
 
 
-class BullFight(bullfight_base.BullFightBase):
+class BullFight(BullFightBase):
 
-    def __init__(self, group_qq, qq_client):
+    def __init__(self, group_qq):
         """
         :param group_qq: 群号，str
         """
@@ -16,11 +16,9 @@ class BullFight(bullfight_base.BullFightBase):
         self.mutex = threading.RLock()
         super(BullFight, self).__init__()
 
-        self.qq_client = qq_client
         self.group_qq = group_qq
         self.currency = ""
         self.robot_name = ""
-        self.add_handle_func = None
         self.game_start = False
         self.max_player_count = 9
         self.limit_second = 15
