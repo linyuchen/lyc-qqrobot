@@ -106,6 +106,7 @@ class GroupPointAction:
         member = self.get_member(group_qq, member_qq)
         member.point += point
         session.commit()
+        return member.point
 
     def transfer_point(self, group_qq: str, my_qq: str, other_qq: str, point: int):
         point = abs(point)

@@ -52,7 +52,7 @@ class BullFight(BullFightBase):
             self.player_total_gold = 0  # 闲家所有下注金额
             self.max_multiple = 1
 
-    def add_point(self, group_qq, qq, point):
+    def add_point(self, group_qq, qq, point) -> int:
         """
 
         :param group_qq: str
@@ -62,7 +62,7 @@ class BullFight(BullFightBase):
         """
         raise NotImplementedError
 
-    def get_point(self, group_qq, qq):
+    def get_point(self, group_qq, qq) -> int:
         """
 
         :param group_qq: str
@@ -97,7 +97,7 @@ class BullFight(BullFightBase):
 
         with self.mutex:
             if self.overing:
-                for i in range(10):
+                for i in range(2):
                     time.sleep(1)
                     if not self.overing:
                         break
@@ -127,7 +127,7 @@ class BullFight(BullFightBase):
         with self.mutex:
             if not self.running:
                 self.running = True
-            threading.Thread(target=self.timer, daemon=True).start()
+                threading.Thread(target=self.timer, daemon=True).start()
         self.current_second = 0
         # 庄家参与
         if gold == 0:
@@ -234,18 +234,20 @@ class BullFight(BullFightBase):
         if master_win_count == len(self.players_info_list):
             result += u"庄家通杀！\n"
         elif master_win_count == 0:
-            result += u"庄家通赔！\n"
+            result += "庄家通赔！\n"
         if master_win_gold > 0:
             master_win_state = u"赢得了"
         else:
             master_win_state = u"输掉了"
-        result += u"庄家%s %d %s\n" % \
+        result += "庄家%s %d %s\n" % \
                   (master_win_state, abs(master_win_gold), self.currency)
         if self.master_info_dic["qq_number"] != "admin":
             self.add_point(self.group_qq, self.master_info_dic["qq_number"], master_win_gold + self.master_deposit_gold)
 
         self.send_func(result)
+
         self.reset_game_info()
+
 
     @staticmethod
     def get_poker_list_info(player_info_dic):
