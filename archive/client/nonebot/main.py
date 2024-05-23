@@ -7,13 +7,12 @@ import os
 import nonebot
 import asyncio
 from typing import List
-from nonebot.message import MessageSegment
 from nonebot.typing import Message_T
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 
 from qqsdk import entity
-from client.nonebot import config
+from archive.client.nonebot import config
 from qqsdk.qqclient import QQClientBase
 
 

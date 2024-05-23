@@ -1,6 +1,6 @@
 # 对接第三方QQapi
 
-这里我已经写好了一个对接mirai的，如果想使用mirai的http api直接使用[client/mirai_http/main.py](../client/mirai_http/main.py)即可
+这里我已经写好了一个对接mirai的，如果想使用mirai的http api直接使用[client/mirai_http/main.py](../archive/client/mirai_http/main.py)即可
 
 一般第三方QQ框架都提供http api，
 
@@ -21,5 +21,5 @@
 
 然后实例化刚刚复写的类，并执行它的start()
 
-mirai的话直接使用[client/mirai_http/main.py](../client/mirai_http/main.py)即可
+mirai的话直接使用[client/mirai_http/main.py](../archive/client/mirai_http/main.py)即可
 
