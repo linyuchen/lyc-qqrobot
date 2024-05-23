@@ -110,7 +110,7 @@ class GroupAction(object):
         if self.group_user.user.clear_point_chance <= 0:
             return u"清负次数不足！"
         other_user = GroupUser.objects.filter(group_qq=self.group_qq, user__qq=other_qq).first()
-        if other_user and other_user.get_point() < 0:
+        if other_user and other_user.get_point_info() < 0:
             other_user.point = "0"
             other_user.save()
             self.group_user.user.clear_point_chance -= 1
@@ -127,7 +127,7 @@ class GroupAction(object):
         """
         users = GroupUser.objects.filter(group_qq=self.group_qq)
         users = list(users)
-        users = sorted(users, key=lambda a: -a.get_point())
+        users = sorted(users, key=lambda a: -a.get_point_info())
         return users
 
     def __get_point_rank_index(self):
@@ -143,7 +143,7 @@ class GroupAction(object):
         users = self.__get_point_rank()[:10]
         result = ""
         for index, user in enumerate(users):
-            item = f"{index + 1}. {user.nick}: {user.get_point()}\n"
+            item = f"{index + 1}. {user.nick}: {user.get_point_info()}\n"
             result += item
             # result += "第%d名：%s(%s)，%s\n" % \
             #           (index + 1, user.nick, user.user.qq, user.get_point())
@@ -170,7 +170,7 @@ class GroupAction(object):
         :return:
         """
         group_point = self.group_setting.private2group_point_percentage * private_point
-        if self.group_user.user.get_point() < private_point:
+        if self.group_user.user.get_point_info() < private_point:
             return u"%s账户额度不足%d，无法转换" % (self.global_setting.private_currency_name, private_point)
         self.group_user.add_point(group_point)
         self.group_user.user.add_point(-private_point)

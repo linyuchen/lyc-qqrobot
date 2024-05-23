@@ -19,7 +19,7 @@ my_group_point_cmd = on_command('活跃度', aliases={'我的活跃度', '查询
 
 @my_group_point_cmd.handle()
 async def _(event: GroupMessageEvent):
-    point_result = group_point_action.get_point(str(event.group_id), str(event.user_id))
+    point_result = group_point_action.get_point_info(str(event.group_id), str(event.user_id))
     await my_group_point_cmd.finish(MessageSegment.reply(event.message_id) + point_result)
 
 

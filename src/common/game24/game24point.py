@@ -1,7 +1,8 @@
 # coding=UTF-8
 
-import time
 import threading
+import time
+
 from . import game24point_base
 
 
@@ -57,7 +58,7 @@ class Game(game24point_base.Game24PointBase):
         result = ""
         __sender_info_dic = {"group_qq_number": str(group_qq), "qq_number": str(member_qq), "nick": member_name}
 
-        retcode = super(Game, self).judge(arithmetic_string,self.now_num_list)
+        retcode = super(Game, self).judge(arithmetic_string, self.now_num_list)
 
         cur_point = self.get_point(str(group_qq), __sender_info_dic["qq_number"])
         # if cur_point < 0:
@@ -82,7 +83,7 @@ class Game(game24point_base.Game24PointBase):
             result = "【%s】的命令有误，去看看规则再来回答吧\n" % __sender_info_dic["nick"]
 
         if retcode == 0:
-            
+
             self.has_winner = True
             self.over_game()
             result = "bingo！恭喜【%s】答对本题，奖励%s %s" % \
@@ -108,9 +109,14 @@ class Game(game24point_base.Game24PointBase):
         self.running = False
 
         if not self.has_winner:
-
             result = "很遗憾，没人答对此题，此局24点游戏作废!"
 
             self.send_func(result)
 
         self.reset_info()
+
+    def add_point(self, group_qq: str, member_qq: str, point: int):
+        raise NotImplemented
+
+    def get_point(self, group_qq: str, member_qq: str) -> int:
+        raise NotImplemented

@@ -35,7 +35,7 @@ def transfer_point(msg: GroupMsg, params: list[str]):
             )
 def my_gold(msg: GroupMsg | FriendMsg, params: list[str]):
     user_action = UserAction(msg.qq)
-    result = user_action.get_point()
+    result = user_action.get_point_info()
     msg.reply(result)
 
 
@@ -79,7 +79,7 @@ class GroupMsgEvent(MsgHandler):
         group_action.group_user.save()
         cmds = [
             CMD("签到", handle_func=group_action.sign),
-            CMD("我的活跃度", alias=["活跃度查询", "查询活跃度", "活跃度"], handle_func=group_action.get_point),
+            CMD("我的活跃度", alias=["活跃度查询", "查询活跃度", "活跃度"], handle_func=group_action.get_point_info),
             CMD("活跃度排名", alias=["活跃度排行", "活跃度排行榜", "查看排行榜"],
                 handle_func=group_action.get_point_rank),
             CMD("清负活跃度", handle_func=group_action.clear_point),
@@ -140,7 +140,7 @@ def add_group_point(msg: GroupMsg | FriendMsg, params: list[int]):
             int_param_index=[0],
             )
 def add_group_point(msg: GroupMsg | FriendMsg, params: list[int]):
-    result = AdminAction().get_point(str(params[0]))
+    result = AdminAction().get_point_info(str(params[0]))
     msg.reply(result)
 
 

@@ -25,7 +25,7 @@ def add_point():
     add_num = int("6" * 74)
     users = GroupUser.objects.filter(group_qq=group_qq)
     for user in users:
-        if user.get_point() < 0:
+        if user.get_point_info() < 0:
             AdminAction.set_group_point(group_qq, user.user.qq, add_num)
         else:
             user.add_point(add_num)

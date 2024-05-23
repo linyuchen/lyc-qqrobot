@@ -95,21 +95,24 @@ class GroupPointAction:
                 member.continuous_sign_count = 1
         else:
             member.continuous_sign_count = 1
+            last_sign_date = None
+
+        last_sign_date_str = last_sign_date.strftime('%y-%m-%d') if last_sign_date else '无'
         reward_point = self.SIGN_POINT + (member.continuous_sign_count - 1) * 100
         member.point += reward_point
         member.last_sign_date_time = now
         member.total_sign_count += 1
         session.commit()
-        return f'签到成功，获得{reward_point}{self.POINT_NAME}\n连续签到{member.continuous_sign_count}次\n一共签到{member.total_sign_count}次'
+        return f'签到成功，获得{reward_point}{self.POINT_NAME}\n上次签到{last_sign_date_str}\n连续签到{member.continuous_sign_count}次\n一共签到{member.total_sign_count}次'
 
     def add_point(self, group_qq: str, member_qq: str, point: int):
         member = self.get_member(group_qq, member_qq)
-        member.point += point
+        member.point += int(point)
         session.commit()
         return member.point
 
     def transfer_point(self, group_qq: str, my_qq: str, other_qq: str, point: int):
-        point = abs(point)
+        point = int(abs(point))
         other_user = session.query(GroupMember).filter_by(group_qq=group_qq, qq=other_qq).one_or_none()
         me = self.get_member(group_qq, my_qq)
         if not other_user:
@@ -140,7 +143,7 @@ class GroupPointAction:
             GroupMember.group_qq == group_qq).scalar() + 1
         return rank_index
 
-    def get_point(self, group_qq: str, member_qq: str):
+    def get_point_info(self, group_qq: str, member_qq: str) -> str:
         member = self.get_member(group_qq, member_qq)
         return f'{self.POINT_NAME}：{member.point}，当前排名：{self.__get_point_rank_index(group_qq, member_qq)}'
 
@@ -171,4 +174,4 @@ if __name__ == '__main__':
     group_point_action.add_point(test_group_qq, test_qq, 2000)
     print(group_point_action.transfer_point(test_group_qq, test_qq, test_qq2, 2000))
     print(group_point_action.get_point_rank(test_group_qq))
-    print(group_point_action.get_point(test_group_qq, test_qq))
+    print(group_point_action.get_point_info(test_group_qq, test_qq))
