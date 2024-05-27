@@ -21,7 +21,8 @@ async def random_speed_up_gif(bot: Bot, event: MessageEvent):
     img_urls = get_message_image_urls(event.message)
     img_urls = reply_img_urls + img_urls
     r_int = random.randint(0, 10)
-    if r_int != 0 and msg_text != '加速':
+    is_manual = msg_text == '加速'
+    if r_int != 0 and not is_manual:
         return
     if img_urls:
         img_url = img_urls[0]
@@ -34,7 +35,7 @@ async def random_speed_up_gif(bot: Bot, event: MessageEvent):
                 return
         qq = event.group_id if hasattr(event, 'group_id') else event.user_id
         last_time = history.get(qq, 0)
-        if (time.time() - last_time) < 5 * 60:
+        if (time.time() - last_time) < 5 * 60 and not is_manual:
             return
         history[qq] = time.time()
         re_path = re_speed(img_path, random.choice([30, 40, 50]))
