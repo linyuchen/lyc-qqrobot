@@ -1,4 +1,4 @@
-"venv/scripts/activate && "
+call venv/scripts/activate
 set PYTHONPATH=%~dp0
 playwright install chromium
 meme download
