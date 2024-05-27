@@ -29,7 +29,7 @@ bing_draw_cmd = on_command("DE3",
 @bing_chat_cmd.handle()
 async def _(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
     start_bingai_thread()
-    await bing_chat_cmd.send("正在努力思考中，请稍等...")
+    waiting_message_id = (await bing_chat_cmd.send("正在努力思考中，请稍等..."))['message_id']
     if isinstance(msg, GroupMessageEvent):
         user_id = str(msg.user_id) + "f"
     else:
@@ -38,6 +38,7 @@ async def _(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
     question = params.extract_plain_text()
 
     def reply(result: str):
+        asyncio.run(bot.delete_msg(message_id=waiting_message_id))
         asyncio.run(bot.send(msg, result))
 
     bingai.put_task(BingAIChatTask(user_id, question, reply))

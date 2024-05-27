@@ -11,19 +11,8 @@ def save_config():
 
 config_data = {
     "GFW_PROXY": "http://192.168.1.4:7890",
-    "ONEBOT_HTTP_API": "http://localhost:3000",
-    "ONEBOT_TOKEN": "",
-    "MIRAI_HTTP_API": "http://localhost:8080",
-    "MIRAI_HTTP_API_VERIFY_KEY": "1234567890",
-    "QQ": [721011692],
-    "ADMIN_QQ": [379450326],  # 机器人主人的QQ号,
-    "LISTEN_PORT": 5000,
-    "SEND2TIM": False,
-    "SEND2TIM_HTTP_API": "http://localhost:8088/",
     "SD_HTTP_API": "http://192.168.1.4:7860",
-    "VITS_GRADIO_SPACE": "zomehwh/vits-uma-genshin-honkai",
     "BV2_FASTAPI": "http://localhost:5001",
-    "BING_AI_API": "http://localhost:9000",
     "TTS_ENABLED": True,
     "MJ_DISCORD_TOKEN": "",
     "MJ_DISCORD_CHANNEL_ID": "",
@@ -31,9 +20,6 @@ config_data = {
     "MJ_DISCORD_CHANNEL_URL": "",
     "BAIDU_TRANSLATE_APPID": "",
     "BAIDU_TRANSLATE_SECRETKEY": "",
-    "TUSI_TOKENS": [
-
-    ],
     "CHATGPT": [
         {
             "key": "API_KEY",

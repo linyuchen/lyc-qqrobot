@@ -68,14 +68,17 @@ async def _(bot: Bot, event: MessageEvent, args: Message = CommandArg()):
             except Exception as e:
                 continue
 
-        song: SongDetail = (await httpx.AsyncClient().get(url + f'&n={song_index}')).json()['data']
-        await music_qq_cmd.send(MessageSegment.music_custom(
-            url=song['songurl'],
-            audio=song['src'],
-            title=song['songname'],
-            content=song['name'],
-            img_url=song['cover']
-        ))
+        song: SongDetail = (await httpx.AsyncClient().get(url + f'&n={song_index}')).json().get('data')
+        if not song:
+            await music_qq_cmd.send(MessageSegment.music('qq', song_list_data[song_index]['songid']))
+        else:
+            await music_qq_cmd.send(MessageSegment.music_custom(
+                url=song['songurl'],
+                audio=song['src'],
+                title=song['songname'],
+                content=song['name'],
+                img_url=song['cover']
+            ))
         await bot.delete_msg(message_id=song_list_msg_id)
 
     except Exception as e:

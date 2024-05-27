@@ -54,6 +54,9 @@ class GroupPointAction:
     CONTINUOUS_SIGN_POINT = 100  # 连续签到一次获得的积分
     POINT_NAME = '活跃度'
 
+    def save(self):
+        session.commit()
+
     def get_member(self, group_qq: str, member_qq: str, nick: str = None) -> GroupMember:
         member = session.query(GroupMember).filter_by(group_qq=group_qq, qq=member_qq).one_or_none()
         if not member:

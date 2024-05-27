@@ -1,8 +1,8 @@
 import asyncio
 
-from common import PLAYWRIGHT_DATA_DIR
+from src.common import PLAYWRIGHT_DATA_DIR
 from config import get_config
-from msgplugins.bingai.bingai_playwright import BingAIPlayWright
+from src.common.bingai.bingai_playwright import BingAIPlayWright
 
 
 async def login():
