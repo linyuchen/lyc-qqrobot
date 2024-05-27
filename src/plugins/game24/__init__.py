@@ -7,6 +7,7 @@ from nonebot.params import CommandArg
 
 from src.common.game24 import game24point
 from src.common.group_point import group_point_action
+from src.plugins.common.rules import rule_args_num
 
 
 class Game24(game24point.Game):
@@ -49,7 +50,7 @@ async def _(bot: Bot, event: GroupMessageEvent):
     await start_game24_cmd.finish(start_result)
 
 
-answer_game24_cmd = on_command('答24点')
+answer_game24_cmd = on_command('答24点', rule=rule_args_num(num=1))
 
 
 @answer_game24_cmd.handle()

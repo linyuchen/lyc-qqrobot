@@ -8,6 +8,7 @@ from config import get_config
 from .genshinvoice_top import tts, speakers
 from .auto_speaker import AutoSpeakerTTS
 from .utils import wav2amr
+from ..common.rules import rule_args_num
 
 auto_speaker_tts = AutoSpeakerTTS(get_config("BV2_FASTAPI"))
 
@@ -19,7 +20,7 @@ async def _():
     await tts_list_cmd.finish("语音可用的人物列表:\n" + ", ".join(speakers + auto_speaker_tts.bv2.get_models()))
 
 
-tts_cmd = on_command("tts")
+tts_cmd = on_command("tts", force_whitespace=True, rule=rule_args_num(min_num=1))
 
 
 @tts_cmd.handle()

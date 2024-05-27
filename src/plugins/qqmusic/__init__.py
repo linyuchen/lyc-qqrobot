@@ -7,6 +7,8 @@ from nonebot.params import CommandArg
 from nonebot.typing import T_State
 from nonebot_plugin_waiter import waiter
 
+from src.plugins.common.rules import rule_args_num
+
 
 class SongDetail(TypedDict):
     songname: str
@@ -24,7 +26,7 @@ class SearchResult(TypedDict):
     data: list[SongDetail]
 
 
-music_qq_cmd = on_command("点歌")
+music_qq_cmd = on_command("点歌", force_whitespace=True, rule=rule_args_num(min_num=1))
 
 TIMEOUT = 20
 

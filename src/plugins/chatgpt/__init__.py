@@ -10,8 +10,7 @@ from nonebot.params import CommandArg
 
 import config
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
-from src.common.logger import logger
-from ..common import is_at_me
+from ..common.rules import is_at_me, rule_args_num
 
 # todo: 仅限管理员操作
 wiki_cmd = on_command("百科", priority=2)
@@ -39,7 +38,7 @@ def gen_voice(text) -> bytes | None:
             voice_bytes = tts(text)
             return voice_bytes
         except Exception as e:
-            logger.error(e)
+            pass
 
 
 def get_url(text: str) -> str:
@@ -54,7 +53,7 @@ def summary_url(url: str) -> str:
         return result
 
 
-summary_web_cmd = on_command("总结网页")
+summary_web_cmd = on_command("总结网页", rule=rule_args_num(min_num=1))
 
 
 @summary_web_cmd.handle()
@@ -74,7 +73,7 @@ def get_context_id(msg: GroupMessageEvent | PrivateMessageEvent) -> str:
     return context_id
 
 
-set_prompt_cmd = on_command("设置人格")
+set_prompt_cmd = on_command("设置人格", rule=rule_args_num(1))
 
 
 @set_prompt_cmd.handle()

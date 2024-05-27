@@ -8,6 +8,8 @@ import threading
 from typing import Callable, Type
 
 from qqsdk.message import BaseMsg, GroupMsg, FriendMsg, MsgHandler
+
+import src.plugins.common.rules
 from .permission import CMDPermissions, CMDPermissionGroup, check_permission
 
 
@@ -187,7 +189,7 @@ def on_command(cmd_name,
     def decorator(func: Callable[[BaseMsg, list[str]], None]):
         def handle(self, msg: GroupMsg | FriendMsg):
             cmd = CMD(cmd_name,
-                      at_sep if isinstance(msg, GroupMsg) and msg.is_at_me else sep,
+                      at_sep if isinstance(msg, GroupMsg) and src.plugins.common.rules.is_at_me else sep,
                       int_param_index,
                       param_len,
                       alias=list(alias),

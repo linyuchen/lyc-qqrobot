@@ -7,6 +7,7 @@ from nonebot.params import CommandArg
 
 from src.common.bullfight import BullFight
 from src.common.group_point import group_point_action
+from src.plugins.common.rules import rule_args_num
 
 
 class BullGame(BullFight):
@@ -33,7 +34,7 @@ def get_game_instance(group_qq):
     return game
 
 
-bull_game_cmd = on_command('斗牛')
+bull_game_cmd = on_command('斗牛', force_whitespace=True, rule=rule_args_num(1))
 
 
 @bull_game_cmd.handle()

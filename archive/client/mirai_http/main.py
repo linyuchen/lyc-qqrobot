@@ -9,6 +9,8 @@ from typing import List, Union
 import requests
 from flask import Flask, request
 
+import src.plugins.common.rules
+
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config
 from qqsdk import entity
@@ -222,7 +224,7 @@ class MiraiQQClient(QQClientBase):
             msg_chain = reduce(lambda a, b: a + b, msg_chain)
         else:
             msg_chain = MessageSegment.text("")
-        msg_chain.is_at_me = is_at_me
+        src.plugins.common.rules.is_at_me = is_at_me
         msg_chain.is_at_other = is_at_other
         msg_chain.quote_msg = quote_msg
         msg_chain.msg_id = msg_id
@@ -260,7 +262,7 @@ class MiraiQQClient(QQClientBase):
                     group.members.append(group_member)
             robot_name = group.get_member(self.qq_user.qq).get_name()
             if msg.strip().startswith(f"@{robot_name}"):
-                msg_chain.is_at_me = True
+                src.plugins.common.rules.is_at_me = True
                 msg = msg.replace(f"@{robot_name}", "", 1)
             msg = GroupMsg(
                 msg_id=msg_chain.msg_id,
@@ -269,7 +271,7 @@ class MiraiQQClient(QQClientBase):
                 msg_chain=msg_chain,
                 quote_msg=quote_msg,
                 group_member=group_member,
-                is_at_me=msg_chain.is_at_me,
+                is_at_me=src.plugins.common.rules.is_at_me,
                 is_at_other=msg_chain.is_at_other,
             )
             msg.reply = lambda _msg, at=True: self.reply_group_msg(_msg, msg, at)
