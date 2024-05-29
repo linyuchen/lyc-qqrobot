@@ -19,15 +19,16 @@ def start_bingai_thread():
     bingai.start()
 
 
-bing_chat_cmd = on_command("#", aliases={"bing"}, force_whitespace=True, rule=rule_args_num(min_num=1))
+bing_chat_cmd = on_command("bing", force_whitespace=True, rule=rule_args_num(min_num=1))
+
+bing_chat_cmd2 = on_command("#", rule=rule_args_num(min_num=1))
 
 bing_draw_cmd = on_command("DE3",
                            aliases={"bing画图", "de3", "微软画图", "画图", "画画"},
                            force_whitespace=True, rule=rule_args_num(min_num=1))
 
 
-@bing_chat_cmd.handle()
-async def _(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
+async def bing_chat(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
     start_bingai_thread()
     waiting_message_id = (await bing_chat_cmd.send("正在努力思考中，请稍等..."))['message_id']
     if isinstance(msg, GroupMessageEvent):
@@ -42,6 +43,16 @@ async def _(bot: Bot, msg: MessageEvent, params: Message = CommandArg()):
         asyncio.run(bot.send(msg, result))
 
     bingai.put_task(BingAIChatTask(user_id, question, reply))
+
+
+@bing_chat_cmd.handle()
+async def _(bot: Bot, event: MessageEvent, params: Message = CommandArg()):
+    await bing_chat(bot, event, params)
+
+
+@bing_chat_cmd2.handle()
+async def _(bot: Bot, event: MessageEvent, params: Message = CommandArg()):
+    await bing_chat(bot, event, params)
 
 
 @bing_draw_cmd.handle()
