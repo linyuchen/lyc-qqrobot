@@ -1,4 +1,5 @@
 import asyncio
+import threading
 
 from nonebot import on_command, Bot
 from nonebot.adapters.onebot.v11 import MessageSegment, MessageEvent, GroupMessageEvent, Message
@@ -39,8 +40,8 @@ async def bing_chat(bot: Bot, msg: MessageEvent, params: Message = CommandArg())
     question = params.extract_plain_text()
 
     def reply(result: str):
-        asyncio.run(bot.delete_msg(message_id=waiting_message_id))
-        asyncio.run(bot.send(msg, result))
+        threading.Thread(target=lambda: asyncio.run(bot.delete_msg(message_id=waiting_message_id))).start()
+        threading.Thread(target=lambda: asyncio.run(bot.send(msg, result))).start()
 
     bingai.put_task(BingAIChatTask(user_id, question, reply))
 
