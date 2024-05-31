@@ -1,7 +1,7 @@
 import asyncio
 import threading
 
-from nonebot import on_command, Bot
+from nonebot import on_command, Bot, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
 from nonebot.params import CommandArg
 
@@ -39,10 +39,13 @@ game21_cmd = on_command("21点")
 @game21_cmd.handle()
 async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
     game = get_game_instance(str(event.group_id))
-    try:
-        point = int(args.extract_plain_text())
-    except Exception as e:
+    if not args.extract_plain_text():
         point = 100
+    else:
+        try:
+            point = int(args.extract_plain_text())
+        except Exception as e:
+            return
 
     def reply(text):
         threading.Thread(target=lambda: asyncio.run(bot.send(event, text)), daemon=True).start()
@@ -54,7 +57,7 @@ async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
     await game21_cmd.finish(start_result)
 
 
-game21_update_cmd = on_command("21点换牌")
+game21_update_cmd = on_fullmatch("21点换牌")
 
 
 @game21_update_cmd.handle()

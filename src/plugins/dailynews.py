@@ -1,8 +1,8 @@
 import httpx
-from nonebot import on_command
+from nonebot import on_command, on_fullmatch
 from nonebot.adapters.onebot.v11 import MessageSegment
 
-news_cmd = on_command("今日新闻", aliases={'早报', '晚报'})
+news_cmd = on_fullmatch(("今日新闻", '早报', '晚报'))
 
 
 @news_cmd.handle()

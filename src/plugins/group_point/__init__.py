@@ -1,10 +1,10 @@
-from nonebot import on_command
+from nonebot import on_command, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, MessageSegment, Message
 from nonebot.params import CommandArg
 
 from src.common.group_point import group_point_action
 
-sign_cmd = on_command('签到')
+sign_cmd = on_fullmatch('签到')
 
 
 @sign_cmd.handle()
@@ -14,7 +14,7 @@ async def _(event: GroupMessageEvent):
     await sign_cmd.finish(MessageSegment.reply(event.message_id) + sign_result)
 
 
-my_group_point_cmd = on_command('活跃度', aliases={'我的活跃度', '查询活跃度'})
+my_group_point_cmd = on_fullmatch(('活跃度', '我的活跃度', '查询活跃度'))
 
 
 @my_group_point_cmd.handle()
@@ -23,7 +23,7 @@ async def _(event: GroupMessageEvent):
     await my_group_point_cmd.finish(MessageSegment.reply(event.message_id) + point_result)
 
 
-point_rank_cmd = on_command('活跃度排名', aliases={'活跃度排行榜', '活跃度排名榜'})
+point_rank_cmd = on_fullmatch(('活跃度排名', '活跃度排行榜', '活跃度排名榜'))
 
 
 @point_rank_cmd.handle()

@@ -3,17 +3,17 @@ import re
 import threading
 import time
 
-from nonebot import on_command, on_message
+from nonebot import on_command, on_message, on_fullmatch
 from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent, PrivateMessageEvent, Bot, \
     MessageSegment
 from nonebot.params import CommandArg
+from nonebot.permission import SUPERUSER
 
 import config
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
 from ..common.rules import is_at_me, rule_args_num
 
-# todo: 仅限管理员操作
-wiki_cmd = on_command("百科", priority=2)
+wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
 
 
 @wiki_cmd.handle()
@@ -53,7 +53,7 @@ def summary_url(url: str) -> str:
         return result
 
 
-summary_web_cmd = on_command("总结网页", rule=rule_args_num(min_num=1))
+summary_web_cmd = on_command("总结网页", force_whitespace=True, rule=rule_args_num(min_num=1))
 
 
 @summary_web_cmd.handle()
@@ -73,7 +73,7 @@ def get_context_id(msg: GroupMessageEvent | PrivateMessageEvent) -> str:
     return context_id
 
 
-set_prompt_cmd = on_command("设置人格", rule=rule_args_num(1))
+set_prompt_cmd = on_command("设置人格", force_whitespace=True, rule=rule_args_num(1))
 
 
 @set_prompt_cmd.handle()
@@ -82,7 +82,7 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent, args: Message = Comm
     await set_prompt_cmd.finish("人格设置成功")
 
 
-clear_prompt_cmd = on_command("清除人格", aliases={"恢复人格", "清空人格", "重置人格"})
+clear_prompt_cmd = on_fullmatch(("清除人格", "恢复人格", "清空人格", "重置人格"))
 
 
 @clear_prompt_cmd.handle()
@@ -91,7 +91,7 @@ async def _(event: GroupMessageEvent | PrivateMessageEvent, args: Message = Comm
     clear_prompt_cmd.finish("人格清除成功")
 
 
-get_prompt_cmd = on_command("查看人格")
+get_prompt_cmd = on_fullmatch("查看人格")
 
 
 @get_prompt_cmd.handle()

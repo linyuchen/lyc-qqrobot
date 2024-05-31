@@ -2,7 +2,7 @@ import traceback
 
 from nonebot.adapters.onebot.v11 import Message, MessageSegment
 from nonebot.params import CommandArg
-from nonebot.plugin.on import on_command
+from nonebot.plugin.on import on_command, on_fullmatch
 
 from config import get_config
 from .genshinvoice_top import tts, speakers
@@ -12,7 +12,7 @@ from ..common.rules import rule_args_num
 
 auto_speaker_tts = AutoSpeakerTTS(get_config("BV2_FASTAPI"))
 
-tts_list_cmd = on_command("tts列表")
+tts_list_cmd = on_fullmatch("tts列表")
 
 
 @tts_list_cmd.handle()

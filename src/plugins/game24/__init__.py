@@ -1,7 +1,7 @@
 import asyncio
 import threading
 
-from nonebot import on_command, Bot
+from nonebot import on_command, Bot, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
 from nonebot.params import CommandArg
 
@@ -35,7 +35,7 @@ def get_game_instance(group_qq: str):
     return game
 
 
-start_game24_cmd = on_command('24点')
+start_game24_cmd = on_fullmatch('24点')
 
 
 @start_game24_cmd.handle()

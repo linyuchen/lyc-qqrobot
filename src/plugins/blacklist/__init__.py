@@ -1,7 +1,7 @@
 import pathlib
 from dataclasses import dataclass, field
 
-from nonebot import on_command, get_driver
+from nonebot import on_fullmatch, get_driver, on_command
 from nonebot.adapters.onebot.v11 import Message, MessageEvent
 from nonebot.message import event_preprocessor
 from nonebot.params import CommandArg
@@ -24,7 +24,7 @@ class BlackListDataType:
 
 black_list_db = PickleDB[BlackListDataType](BLACK_DB_PATH, BlackListDataType())
 
-black_list_cmd = on_command("黑名单", permission=SUPERUSER)
+black_list_cmd = on_fullmatch("黑名单", permission=SUPERUSER)
 
 
 @black_list_cmd.handle()
@@ -35,7 +35,7 @@ async def _():
     await black_list_cmd.finish(res)
 
 
-add_black_group_cmd = on_command('拉黑群', permission=SUPERUSER, rule=rule_args_num(num=1))
+add_black_group_cmd = on_command('拉黑群', force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(num=1))
 
 
 @add_black_group_cmd.handle()
@@ -46,7 +46,7 @@ async def _(args: Message = CommandArg()):
     await add_black_group_cmd.finish('done')
 
 
-add_black_user_cmd = on_command('拉黑用户', permission=SUPERUSER, rule=rule_args_num(1))
+add_black_user_cmd = on_command('拉黑用户', force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(1))
 
 
 @add_black_user_cmd.handle()
@@ -57,7 +57,7 @@ async def _(args: Message = CommandArg()):
     await add_black_user_cmd.finish('done')
 
 
-del_black_group_cmd = on_command('取消拉黑群', permission=SUPERUSER, rule=rule_args_num(1))
+del_black_group_cmd = on_command('取消拉黑群', force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(1))
 
 
 @del_black_group_cmd.handle()
@@ -71,7 +71,7 @@ async def _(args: Message = CommandArg()):
     await del_black_group_cmd.finish('done')
 
 
-del_black_user_cmd = on_command('取消拉黑用户', permission=SUPERUSER, rule=rule_args_num(1))
+del_black_user_cmd = on_command('取消拉黑用户', force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(1))
 
 
 @del_black_user_cmd.handle()

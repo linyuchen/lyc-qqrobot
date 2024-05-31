@@ -9,6 +9,7 @@ from nonebot.params import CommandArg
 
 import config
 from src.common.webpage_screenshot import screenshot_search_baidu, ZhihuPreviewer, screenshot_github_readme, screenshot_wx_article, screenshot_moe_wiki
+from src.plugins.common.rules import rule_args_num
 
 zhihu_previewer = ZhihuPreviewer()
 
@@ -30,7 +31,7 @@ def check_url_recent(qq: str, url: str) -> bool:
         return True
 
 
-baidu_screenshot_cmd = on_command("百度")
+baidu_screenshot_cmd = on_command("百度", force_whitespace=True, rule=rule_args_num(min_num=1))
 
 
 @baidu_screenshot_cmd.handle()
@@ -43,7 +44,7 @@ async def _(params: Message = CommandArg()):
     img_path.unlink()
 
 
-moe_wiki_cmd = on_command("萌娘百科")
+moe_wiki_cmd = on_command("萌娘百科", force_whitespace=True, rule=rule_args_num(min_num=1))
 
 
 @moe_wiki_cmd.handle()
