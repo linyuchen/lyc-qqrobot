@@ -106,7 +106,7 @@ class GroupPointAction:
         member.last_sign_date_time = now
         member.total_sign_count += 1
         session.commit()
-        return f'签到成功，获得{reward_point}{self.POINT_NAME}\n上次签到{last_sign_date_str}\n连续签到{member.continuous_sign_count}次\n一共签到{member.total_sign_count}次'
+        return f'签到成功，获得{reward_point}{self.POINT_NAME}\n上次签到：{last_sign_date_str}\n连续签到{member.continuous_sign_count}次\n一共签到{member.total_sign_count}次'
 
     def add_point(self, group_qq: str, member_qq: str, point: int):
         member = self.get_member(group_qq, member_qq)
