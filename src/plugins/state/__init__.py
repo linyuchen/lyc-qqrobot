@@ -1,8 +1,8 @@
-from nonebot import on_command
+from nonebot import on_fullmatch
 
 from src.common.state import state
 
-state_cmd = on_command('运行状态', aliases={'status', })
+state_cmd = on_fullmatch(('运行状态', 'status'))
 
 
 @state_cmd.handle()
