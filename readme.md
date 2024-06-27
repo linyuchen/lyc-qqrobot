@@ -51,6 +51,11 @@ Python3.11
 
 配置LLOneBot,详情见[LLOneBot](https://github.com/linyuchen/LiteLoaderQQNT-OneBotApi)
 
+# 启动
+
+```shell
+python bot.py
+```
 
 # 备份
 
