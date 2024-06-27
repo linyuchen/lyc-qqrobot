@@ -4,7 +4,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 import requests
-import gradio_client
+# import gradio_client
 
 from .utils import wav2silk_base64, wav2amr
 

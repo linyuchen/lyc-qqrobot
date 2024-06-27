@@ -1,11 +1,11 @@
+import base64
+import mimetypes
 import tempfile
 
 from pathlib import Path
 
 import av
 import pilk
-
-from gradio_client.utils import encode_url_or_file_to_base64
 
 
 def to_pcm(in_path: Path) -> Path:
@@ -39,8 +39,22 @@ def convert_to_silk(media_path: Path, silk_path: Path = None) -> Path:
 
 def wav2silk_base64(wav_path: Path) -> str:
     silk_path = convert_to_silk(wav_path)
-    data = encode_url_or_file_to_base64(silk_path)
-    return data
+    # data = encode_url_or_file_to_base64(silk_path)
+    with open(silk_path, "rb") as file:
+        encoded_string = base64.b64encode(file.read())
+        base64_str = str(encoded_string, "utf-8")
+        filename = str(silk_path)
+        if filename.endswith(".vtt"):
+            return "text/vtt"
+        mimetype = mimetypes.guess_type(filename)[0]
+        if mimetype is not None:
+            mimetype = mimetype.replace("x-wav", "wav").replace("x-flac", "flac")
+        return (
+            "data:"
+            + (mimetype if mimetype is not None else "")
+            + ";base64,"
+            + base64_str
+        )
 
 
 def wav2amr(wav_path: Path, amr_path: Path = None) -> Path:
