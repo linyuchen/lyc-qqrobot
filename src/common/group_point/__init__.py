@@ -102,6 +102,8 @@ class GroupPointAction:
 
         last_sign_date_str = last_sign_date.strftime('%Y-%m-%d') if last_sign_date else '无'
         reward_point = self.SIGN_POINT + (member.continuous_sign_count - 1) * 100
+        if member.point < 0:  # 清负
+            member.point = 0
         member.point += reward_point
         member.last_sign_date_time = now
         member.total_sign_count += 1
