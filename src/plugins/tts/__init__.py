@@ -5,8 +5,7 @@ from nonebot.params import CommandArg
 from nonebot.plugin.on import on_command, on_fullmatch
 
 from config import get_config
-from .genshinvoice_top import tts, speakers
-from .auto_speaker import AutoSpeakerTTS
+from .auto_speaker import AutoSpeakerTTS, fs_speakers
 from .utils import wav2amr
 from ..common.rules import rule_args_num
 
@@ -17,7 +16,7 @@ tts_list_cmd = on_fullmatch("tts列表")
 
 @tts_list_cmd.handle()
 async def _():
-    await tts_list_cmd.finish("语音可用的人物列表:\n" + ", ".join(speakers + auto_speaker_tts.bv2.get_models()))
+    await tts_list_cmd.finish("语音可用的人物列表:\n" + ", ".join(fs_speakers + auto_speaker_tts.bv2.get_models()))
 
 
 tts_cmd = on_command("tts", force_whitespace=True, rule=rule_args_num(min_num=1))
