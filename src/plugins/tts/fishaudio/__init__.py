@@ -43,6 +43,18 @@ def search_speaker(speaker: str, lang: LangType):
 
 
 async def fs_tts(speaker: str, text: str, lang: LangType):
+    err = None
+    for i in range(3):
+        try:
+            return await _fs_tts(speaker, text, lang)
+        except Exception as e:
+            err = e
+            pass
+
+    raise Exception(f'服务器出现错误 {err}')
+
+
+async def _fs_tts(speaker: str, text: str, lang: LangType):
     if len(speakers) == 0:
         await get_speakers()
     speaker = search_speaker(speaker, lang)
@@ -53,7 +65,7 @@ async def fs_tts(speaker: str, text: str, lang: LangType):
     async def call_fn(fn_index: int, data: list):
         async with websockets.connect(ws_url) as websocket:
             while True:
-                recv_data = await recv_json(websocket)
+                recv_data = await asyncio.wait_for(recv_json(websocket), 30)
                 msg = recv_data.get('msg')
                 if msg == 'process_completed':
                     return recv_data
