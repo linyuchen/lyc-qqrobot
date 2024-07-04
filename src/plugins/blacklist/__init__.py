@@ -2,7 +2,7 @@ import pathlib
 from dataclasses import dataclass, field
 
 from nonebot import on_fullmatch, get_driver, on_command
-from nonebot.adapters.onebot.v11 import Message, MessageEvent
+from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent
 from nonebot.message import event_preprocessor
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
