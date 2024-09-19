@@ -110,7 +110,8 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
     if isinstance(event, GroupMessageEvent):
         sender_qq = event.group_id
         if not is_at_me(event):
-            return
+            if not event.get_plaintext().strip().startswith('#'):
+                return
     else:
         sender_qq = event.user_id
 

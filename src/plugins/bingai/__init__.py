@@ -22,7 +22,7 @@ def start_bingai_thread():
 
 bing_chat_cmd = on_command("bing", force_whitespace=True, rule=rule_args_num(min_num=1))
 
-bing_chat_cmd2 = on_command("#", rule=rule_args_num(min_num=1))
+bing_chat_cmd2 = on_command("!", rule=rule_args_num(min_num=1))
 
 bing_draw_cmd = on_command("DE3",
                            aliases={"bing画图", "de3", "微软画图", "画图", "画画"},
