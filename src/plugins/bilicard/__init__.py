@@ -27,7 +27,7 @@ async def _(bot: Bot, event: Event):
         is_from_card = "__from__card" in msg_text
         b32_url = bilicard.check_is_b23(msg_text)
         if b32_url:
-            msg_text = bilicard.b32_to_bv(b32_url[0])
+            msg_text = await bilicard.b32_to_bv(b32_url[0])
 
         bvid = bilicard.get_bv_id(msg_text)
         avid = bilicard.get_av_id(msg_text)

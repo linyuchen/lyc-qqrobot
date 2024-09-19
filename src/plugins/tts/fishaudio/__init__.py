@@ -1,9 +1,9 @@
-from typing import Union, Literal, Type
 import asyncio
 import json
+from typing import Union, Literal
 
-import websockets
 import httpx
+import websockets
 
 from src.common.utils.random_hash import generate_random_hash
 
@@ -42,7 +42,17 @@ def search_speaker(speaker: str, lang: LangType):
             return s
 
 
-async def fs_tts(speaker: str, text: str, lang: LangType):
+async def fs_tts(speaker: str, text: str, lang: LangType) -> str:
+    for i in range(3):
+        try:
+            return await _fs_tts(speaker, text, lang)
+        except:
+            pass
+
+    raise Exception('服务端发生错误')
+
+
+async def _fs_tts(speaker: str, text: str, lang: LangType) -> str:
     err = None
     for i in range(3):
         try:

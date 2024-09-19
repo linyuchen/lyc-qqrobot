@@ -9,7 +9,7 @@ class ChatGPT:
                  api_key: str = "",
                  api_base: str = "",
                  http_proxy: str = "",
-                 model: str = "gpt-3.5-turbo-0613"
+                 model: str = "gpt-3.5-turbo-1106"
                  ):
         self.api_key = api_key
         self.api_base = api_base
@@ -72,5 +72,5 @@ class ChatGPT:
 
 
 if __name__ == '__main__':
-    c = ChatGPT("", "a", "https://gpt.dyum.link/v1")
+    c = ChatGPT("", "sk-x2OlFyj9BDsLyjMH9JWo3J7TJZRptLwy1ccwacsDyCex1dhr", "https://api.chatanywhere.tech/")
     print(c.chat("你好啊"))

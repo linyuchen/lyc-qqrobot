@@ -34,13 +34,13 @@ def check_is_b23(text: str) -> []:
     return b23tv
 
 
-async def b32_to_bv(b23tv: str):
+async def b32_to_bv(b23tv: str) -> str:
     """
     b23.tv链接转BV链接
     """
     url = f"https://b23.tv/{b23tv}"
     url = (await session.get(url)).url
-    return url
+    return str(url)
 
 
 def get_bv_id(text: str):
