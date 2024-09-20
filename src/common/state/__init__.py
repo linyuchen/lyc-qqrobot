@@ -13,7 +13,7 @@ def running_time(timestamp: int) -> str:
     hour = (t % (3600 * 24)) / 3600
     minute = t % 3600 / 60
     second = t % 60
-    start_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
+    start_time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp))
     state_str = "开始运行于%s\n已经运行了%d天%d小时%d分%d秒" % (start_time_str, day, hour, minute, second)
     return state_str
 
