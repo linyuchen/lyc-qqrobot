@@ -26,7 +26,8 @@ config_data = {
             "api": "https://api.openai.com/v1",
             "model": "gpt-3.5-turbo-0613"
         }
-    ]
+    ],
+    "AI_CHAT_SERVER": ""
 }
 
 if config_path.exists():

@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 
-from msgplugins.bingai.bingai_playwright import BingAIPlayWright, BinAITaskPool, BingAIChatTask, BingAIDrawTask
+from src.common.bingai.bingai_playwright import BingAIPlayWright, BinAITaskPool, BingAIChatTask, BingAIDrawTask
 
 bingai_pool = BinAITaskPool(proxy="http://localhost:7890", headless=False)
 bingai_pool.start()
