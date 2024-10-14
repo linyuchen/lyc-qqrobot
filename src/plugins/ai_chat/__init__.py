@@ -35,7 +35,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
         r = await client.post(f'{ai_server_host}/chat', json={
             "user_id": str(sender_qq),
             "question": _chat_text
-        })
+        }, timeout=30)
         res = r.json()
         ai_res = res['result']
         await bot.send(event, MessageSegment.reply(event.message_id) + ai_res)
