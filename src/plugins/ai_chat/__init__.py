@@ -21,6 +21,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
                 return
     else:
         sender_qq = event.user_id
+        return
 
     if time.time() - chat_records.setdefault(sender_qq, 0) < 5:
         return
