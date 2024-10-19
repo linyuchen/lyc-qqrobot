@@ -1,10 +1,16 @@
 import time
-from io import BytesIO
 
 from nonebot import Bot
-from PIL.Image import Image
 from nonebot.adapters.onebot.v11 import Event, GroupMessageEvent, PrivateMessageEvent, MessageSegment
 from nonebot.message import event_preprocessor
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="B站链接",
+    description="B站视频链接解析",
+    usage="直接发送B站视频链接即可",
+)
+
 
 from src.common.bilicard import bilicard
 

@@ -1,11 +1,21 @@
+
+
 import time
 
 import httpx
 from nonebot import on_message
 from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, PrivateMessageEvent, MessageSegment
+from nonebot.plugin import PluginMetadata
 
 from config import get_config
-from src.plugins.common.rules import is_at_me
+from src.plugins._common.rules import is_at_me
+
+__plugin_meta__ = PluginMetadata(
+    name="AI聊天",
+    description="让bot支持AI回复",
+    usage="@机器人+聊天内容，或者#聊天内容",
+)
+
 
 chat_records = {}
 

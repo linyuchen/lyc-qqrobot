@@ -1,63 +1,12 @@
 import asyncio
 import tempfile
-import time
-from contextlib import asynccontextmanager
 from pathlib import Path
 from urllib.parse import quote
 
-from PIL import Image
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import Page
 
-from src.common import DATA_DIR
-
-CHROME_DATA_DIR = DATA_DIR / "playwright_screenshot"
-
-
-@asynccontextmanager
-async def new_page(url: str, proxy: str = "", headless=True) -> Page:
-    async with async_playwright() as p:
-        browser = await p.chromium.launch_persistent_context(CHROME_DATA_DIR, headless=headless, proxy={
-            "server": proxy,
-        } if proxy else None, viewport={"width": 1920, "height": 1080})
-        page = await browser.new_page()
-        try:
-            await page.goto(url, timeout=30000)
-        except Exception as e:
-            error_msg = f"{e}"
-            pass
-        yield page
-        await page.close()
-        await browser.close()
-
-
-async def load_all(page: Page):
-    result = await page.evaluate("""
-        for(let i = 0; i <= document.body.scrollHeight; i+=500){
-            setTimeout(function(){
-                window.scrollTo(0, i);
-                if (i >= (document.body.scrollHeight - 500)){
-
-                    window.scrollTo(0, 0);
-                }
-            }, 200 * (i/500))
-        }
-        result = document.body.scrollHeight / 500
-    """)
-    time.sleep(result * 0.2)
-
-
-def merge_images(img_paths: list[Path]) -> Path:
-    imgs = [Image.open(img_path) for img_path in img_paths]
-    width = max([img.size[0] for img in imgs])
-    height = sum([img.size[1] for img in imgs])
-    merged_img = Image.new("RGB", (width, height), (255, 255, 255))
-    y = 0
-    for img in imgs:
-        merged_img.paste(img, (0, y))
-        y += img.size[1]
-    merged_path = Path(tempfile.mktemp(suffix=".png"))
-    merged_img.save(merged_path)
-    return merged_path
+from src.common.browser.playwright import new_page, load_all
+from src.common.utils.image import merge_images
 
 
 async def screenshot_search_baidu(keyword: str) -> Path:
@@ -129,7 +78,7 @@ class ZhihuPreviewer:
 
             question_path = Path(tempfile.mktemp(suffix=".png"))
             await question.screenshot(path=question_path)
-            time.sleep(1)
+            await asyncio.sleep(1)
 
             answer = page.locator("css=.AnswerItem")
             if answer.count() == 0:
@@ -198,7 +147,7 @@ async def screenshot_moe_wiki(keyword: str) -> Path | None:
         close_btn = page.locator("css=.n-base-close.n-base-close--absolute.n-card-header__close")
         if await close_btn.count() > 0:
             await close_btn.first.click()
-            time.sleep(1)
+            await asyncio.sleep(1)
         await load_all(page)
         content = await page.query_selector("#mw-content-text")
         if not content:
@@ -237,4 +186,3 @@ async def screenshot_wx_article(url: str) -> Path | None:
 
 if __name__ == '__main__':
     asyncio.run(ZhihuPreviewer().login())
-

@@ -8,8 +8,16 @@ import httpx
 from nonebot import on_message, Bot
 from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment
 
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="动图加速",
+    description="有一定概率对用户GIF动图进行加速",
+    usage="可以对GIF引用回复 加速 来手动加速"
+)
+
 from src.common.utils.gif_speed import re_speed, is_gif
-from src.plugins.common import get_message_image_urls
+from src.plugins._common import get_message_image_urls
 
 history: dict[str, float] = {}
 

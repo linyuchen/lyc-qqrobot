@@ -1,6 +1,13 @@
 from nonebot import on_command, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, MessageSegment, Message
 from nonebot.params import CommandArg
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="群积分",
+    description="群积分系统",
+    usage="签到、活跃度、活跃度排名、转活跃度 @对方 活跃度数量",
+)
 
 from src.common.group_point import group_point_action
 

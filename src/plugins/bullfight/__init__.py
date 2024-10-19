@@ -5,9 +5,18 @@ from nonebot import on_command, Bot
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
 from nonebot.params import CommandArg
 
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="斗牛",
+    description="斗牛棋牌游戏",
+    usage="斗牛 下注数量，如斗牛 100",
+)
+
 from src.common.bullfight import BullFight
 from src.common.group_point import group_point_action
-from src.plugins.common.rules import rule_args_num
+from src.plugins._common.rules import rule_args_num
+
 
 
 class BullGame(BullFight):

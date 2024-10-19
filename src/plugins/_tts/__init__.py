@@ -7,7 +7,7 @@ from nonebot.plugin.on import on_command, on_fullmatch
 from config import get_config
 from .auto_speaker import AutoSpeakerTTS, fs_speakers
 from .utils import wav2amr
-from ..common.rules import rule_args_num
+from .._common.rules import rule_args_num
 
 auto_speaker_tts = AutoSpeakerTTS(get_config("BV2_FASTAPI"))
 

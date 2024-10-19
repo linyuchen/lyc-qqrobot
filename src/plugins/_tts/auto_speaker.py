@@ -1,7 +1,7 @@
 import asyncio
 
-from bv2_fastapi import BV2Fastapi
-from fishaudio import get_speakers_without_lang, fs_tts
+from src.plugins.tts.bv2_fastapi import BV2Fastapi
+from .fishaudio import get_speakers_without_lang, fs_tts
 
 fs_speakers = asyncio.run(get_speakers_without_lang())
 

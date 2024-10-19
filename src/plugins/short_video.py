@@ -1,20 +1,13 @@
-import httpx
-from nonebot import on_command, on_fullmatch
+from nonebot import on_fullmatch
 from nonebot.adapters.onebot.v11 import MessageSegment
 
-box_office_cmd = on_fullmatch(('票房','电影票房', '票房排名', '票房排行'))
+from nonebot.plugin import PluginMetadata
 
-
-@box_office_cmd.handle()
-async def _():
-    url = "https://api.yujn.cn/api/piaofang.php?type=json"
-    async with httpx.AsyncClient() as http:
-        data = (await http.get(url)).json()
-        text = f"{data.get('time')}电影票房排名\n\n"
-        for i in data.get('data'):
-            text += f"《{i['title']}》: {i['sumBoxDesc']}, {i['releaseInfo']}\n"
-        await box_office_cmd.finish(text)
-
+__plugin_meta__ = PluginMetadata(
+    name="小视频",
+    description="美女短视频",
+    usage="随机视频、黑丝视频、白丝视频",
+)
 
 girl_video_cmd = on_fullmatch(('来点视频', '小姐姐视频', '随机视频'))
 

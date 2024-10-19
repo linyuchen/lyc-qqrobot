@@ -3,13 +3,19 @@ import time
 from pathlib import Path
 from typing import Callable, Coroutine
 
-from nonebot import on_command, on_message, Bot
-from nonebot.adapters.onebot.v11 import MessageEvent, Message, MessageSegment, GroupMessageEvent
-from nonebot.params import CommandArg
+from nonebot import on_message, Bot
+from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment, GroupMessageEvent
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="网页预览",
+    description="GitHub、知乎、微信公众号文章、萌娘百科、百度搜索等网页预览",
+    usage="发送链接即可"
+)
 
 import config
-from src.common.webpage_screenshot import screenshot_search_baidu, ZhihuPreviewer, screenshot_github_readme, screenshot_wx_article, screenshot_moe_wiki
-from src.plugins.common.rules import rule_args_num
+from src.common.browser.webpage_screenshot import (ZhihuPreviewer, screenshot_github_readme,
+                                                   screenshot_wx_article)
 
 zhihu_previewer = ZhihuPreviewer()
 
@@ -29,31 +35,6 @@ def check_url_recent(qq: str, url: str) -> bool:
         return False
     else:
         return True
-
-
-baidu_screenshot_cmd = on_command("百度", force_whitespace=True, rule=rule_args_num(min_num=1))
-
-
-@baidu_screenshot_cmd.handle()
-async def _(params: Message = CommandArg()):
-    """
-    百度搜索
-    """
-    img_path = await screenshot_search_baidu(params.extract_plain_text())
-    await baidu_screenshot_cmd.finish(MessageSegment.image(img_path))
-    img_path.unlink()
-
-
-moe_wiki_cmd = on_command("萌娘百科", force_whitespace=True, rule=rule_args_num(min_num=1))
-
-
-@moe_wiki_cmd.handle()
-async def _(params: Message = CommandArg()):
-    await moe_wiki_cmd.send("正在为您搜索萌娘百科...")
-    img_path = await screenshot_moe_wiki(params.extract_plain_text())
-    if img_path:
-        await moe_wiki_cmd.finish(MessageSegment.image(img_path))
-        img_path.unlink()
 
 
 async def screenshot(bot: Bot, event: MessageEvent, parse_url_func: Callable[[str], str | None],

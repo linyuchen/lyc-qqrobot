@@ -4,9 +4,17 @@ import threading
 from nonebot import on_command, Bot, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
 from nonebot.params import CommandArg
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="21点",
+    description="21点棋牌游戏",
+    usage="21点 下注数量，如21点 100",
+)
 
 from src.common.game21.game21point import Game
 from src.common.group_point import group_point_action
+from src.plugins._common.rules import rule_args_num
 
 
 class Game21(Game):
@@ -33,7 +41,7 @@ def get_game_instance(group_qq: str):
     return game
 
 
-game21_cmd = on_command("21点")
+game21_cmd = on_command("21点",  rule=rule_args_num(max_num=1))
 
 
 @game21_cmd.handle()

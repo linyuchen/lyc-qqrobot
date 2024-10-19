@@ -9,7 +9,7 @@ from typing import List, Union
 import requests
 from flask import Flask, request
 
-import src.plugins.common.rules
+import src.plugins._common.rules
 
 sys.path.append(str(PurePath(__file__).parent.parent.parent))
 import config

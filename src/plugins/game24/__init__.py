@@ -5,9 +5,17 @@ from nonebot import on_command, Bot, on_fullmatch
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
 from nonebot.params import CommandArg
 
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="24点",
+    description="24点口算游戏",
+    usage="24点"
+)
+
 from src.common.game24 import game24point
 from src.common.group_point import group_point_action
-from src.plugins.common.rules import rule_args_num
+from src.plugins._common.rules import rule_args_num
 
 
 class Game24(game24point.Game):

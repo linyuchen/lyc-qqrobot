@@ -6,8 +6,15 @@ from nonebot.adapters.onebot.v11 import Message, MessageSegment, Bot, MessageEve
 from nonebot.params import CommandArg
 from nonebot.typing import T_State
 from nonebot_plugin_waiter import waiter
+from nonebot.plugin import PluginMetadata
 
-from src.plugins.common.rules import rule_args_num
+__plugin_meta__ = PluginMetadata(
+    name="点歌",
+    description="点歌插件",
+    usage="点歌 <歌名>",
+)
+
+from src.plugins._common.rules import rule_args_num
 
 
 class SongDetail(TypedDict):
