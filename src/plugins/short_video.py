@@ -9,7 +9,7 @@ __plugin_meta__ = PluginMetadata(
     usage="随机视频、黑丝视频、白丝视频",
 )
 
-girl_video_cmd = on_fullmatch(('来点视频', '小姐姐视频', '随机视频'))
+girl_video_cmd = on_fullmatch(('小视频', '来点视频', '小姐姐视频', '随机视频'))
 
 
 @girl_video_cmd.handle()
