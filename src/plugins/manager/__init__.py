@@ -15,8 +15,7 @@ __plugin_meta__ = PluginMetadata(
     usage="插件列表，启用插件 插件名，禁用插件 插件名，全局启用插件 插件名，全局禁用插件 插件名",
 )
 
-from src.plugins.common import check_super_user
-from src.plugins.common.permission import add_permission_to_all
+from src.plugins.common.permission import add_permission_to_all, check_super_user
 from src.plugins.manager.util import find_plugin_by_name, init_plugin_manager_config, check_group_enable, \
     check_global_enable, \
     set_global_enable, set_group_enable

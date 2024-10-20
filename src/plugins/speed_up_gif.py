@@ -17,7 +17,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 from src.common.utils.gif_speed import re_speed, is_gif
-from src.plugins.common import get_message_image_urls
+from src.plugins.common.message import get_message_image_urls
 
 history: dict[str, float] = {}
 

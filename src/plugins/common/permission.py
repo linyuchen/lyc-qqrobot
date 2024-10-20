@@ -1,6 +1,6 @@
 from typing import Callable
 
-from nonebot import get_loaded_plugins, Bot
+from nonebot import get_loaded_plugins, Bot, get_driver
 from nonebot.internal.adapter import Event
 from nonebot.internal.matcher import Matcher
 
@@ -29,4 +29,7 @@ def init_permission():
 
             m.permission |= p_func
     inited = True
-    print('Permission added to all plugins.')
+
+
+def check_super_user(user_id: str):
+    return user_id in get_driver().config.superusers

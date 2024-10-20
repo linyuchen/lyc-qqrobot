@@ -12,7 +12,7 @@ __plugin_meta__ = PluginMetadata(
     usage="拉黑群 QQ号，拉黑用户 QQ号，取消拉黑群 QQ号，取消拉黑用户 QQ号",
 )
 
-from src.plugins.common import check_super_user
+from src.plugins.common.permission import check_super_user
 from src.plugins.common.rules import rule_args_num
 from src.plugins.blacklist.util import add_black_target, del_black_target, check_black_target, black_user_list, \
     black_group_list
