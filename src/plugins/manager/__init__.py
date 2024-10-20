@@ -2,6 +2,7 @@ from nonebot import get_loaded_plugins, Bot, get_driver, on_fullmatch, on_comman
 from nonebot.adapters import Event
 from nonebot.adapters.onebot.v11 import MessageEvent
 from nonebot.internal.adapter import Message
+from nonebot.internal.permission import Permission
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
@@ -15,7 +16,7 @@ __plugin_meta__ = PluginMetadata(
     usage="插件列表，启用插件 插件名，禁用插件 插件名，全局启用插件 插件名，全局禁用插件 插件名",
 )
 
-from src.plugins.common.permission import add_permission_to_all, check_super_user
+from src.plugins.common.permission import add_inject_permission_checker, check_super_user, check_group_admin
 from src.plugins.manager.util import find_plugin_by_name, init_plugin_manager_config, check_group_enable, \
     check_global_enable, \
     set_global_enable, set_group_enable
@@ -24,7 +25,7 @@ driver = get_driver()
 
 plugin_list_cmd = on_fullmatch('插件列表')
 global_cmd = on_command('全局禁用插件', aliases={'全局启用插件'}, permission=SUPERUSER)
-group_cmd = on_command('启用插件', aliases={'禁用插件'}, permission=SUPERUSER)
+group_cmd = on_command('启用插件', aliases={'禁用插件'}, permission=check_group_admin)
 
 
 @plugin_list_cmd.handle()
@@ -96,4 +97,4 @@ def manager_permission(matcher: Matcher, bot: Bot, event: Event):
 async def _():
     plugin_ids = [p.id_ for p in get_loaded_plugins()]
     init_plugin_manager_config(plugin_ids)
-    add_permission_to_all(manager_permission)
+    add_inject_permission_checker(manager_permission)
