@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
     usage="点歌 <歌名>",
 )
 
-from src.plugins._common.rules import rule_args_num
+from src.plugins.common.rules import rule_args_num
 
 
 class SongDetail(TypedDict):

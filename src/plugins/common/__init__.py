@@ -1,5 +1,11 @@
-from nonebot import get_driver
+from nonebot import get_driver, get_loaded_plugins
 from nonebot.adapters.onebot.v11 import Message
+from .permission import init_permission
+
+
+@get_driver().on_startup
+async def _():
+    init_permission()
 
 
 def get_message_image_urls(message: Message):

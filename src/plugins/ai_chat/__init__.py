@@ -8,7 +8,7 @@ from nonebot.adapters.onebot.v11 import Bot, GroupMessageEvent, PrivateMessageEv
 from nonebot.plugin import PluginMetadata
 
 from config import get_config
-from src.plugins._common.rules import is_at_me
+from src.plugins.common.rules import is_at_me
 
 __plugin_meta__ = PluginMetadata(
     name="AI聊天",
@@ -19,10 +19,10 @@ __plugin_meta__ = PluginMetadata(
 
 chat_records = {}
 
-chatgpt_cmd = on_message()
+ai_chat = on_message()
 
 
-@chatgpt_cmd.handle()
+@ai_chat.handle()
 async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
     if isinstance(event, GroupMessageEvent):
         sender_qq = event.group_id

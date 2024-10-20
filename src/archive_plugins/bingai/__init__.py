@@ -9,7 +9,7 @@ from config import get_config
 from src.common import PLAYWRIGHT_DATA_DIR
 from src.common.bingai.bingai_playwright import BinAITaskPool, BingAIChatTask, BingAIImageResponse, BingAIDrawTask
 from src.common.utils.nsfw_detector import nsfw_words_filter
-from src.plugins._common.rules import rule_args_num
+from src.plugins.common.rules import rule_args_num
 
 bingai = BinAITaskPool(get_config('GFW_PROXY'), headless=False, data_path=PLAYWRIGHT_DATA_DIR)
 

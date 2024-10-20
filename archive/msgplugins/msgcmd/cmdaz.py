@@ -9,7 +9,7 @@ from typing import Callable, Type
 
 from qqsdk.message import BaseMsg, GroupMsg, FriendMsg, MsgHandler
 
-import src.plugins._common.rules
+import src.plugins.common.rules
 from .permission import CMDPermissions, CMDPermissionGroup, check_permission
 
 

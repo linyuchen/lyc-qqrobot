@@ -12,7 +12,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 from src.common.browser.webpage_screenshot import screenshot_search_baidu
-from src.plugins._common.rules import rule_args_num
+from src.plugins.common.rules import rule_args_num
 
 baidu_screenshot_cmd = on_command("百度", force_whitespace=True, rule=rule_args_num(min_num=1))
 

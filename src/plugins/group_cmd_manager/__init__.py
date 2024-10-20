@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
     usage="屏蔽命令列表、添加屏蔽命令 命令名、删除屏蔽命令 命令名",
 )
 
-from .._common.permission import add_permission_to_all
+from ..common.permission import add_permission_to_all
 
 driver = get_driver()
 

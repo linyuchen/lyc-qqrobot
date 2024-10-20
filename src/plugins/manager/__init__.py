@@ -12,11 +12,11 @@ from nonebot.plugin import PluginMetadata
 __plugin_meta__ = PluginMetadata(
     name="插件管理",
     description="在当前群启用和关闭插件，也可全局（全部群）启用和关闭插件",
-    usage="启用插件 插件名，禁用插件 插件名，全局启用插件 插件名，全局禁用插件 插件名",
+    usage="插件列表，启用插件 插件名，禁用插件 插件名，全局启用插件 插件名，全局禁用插件 插件名",
 )
 
-from src.plugins._common import check_super_user
-from src.plugins._common.permission import add_permission_to_all
+from src.plugins.common import check_super_user
+from src.plugins.common.permission import add_permission_to_all
 from src.plugins.manager.util import find_plugin_by_name, init_plugin_manager_config, check_group_enable, \
     check_global_enable, \
     set_global_enable, set_group_enable
@@ -37,6 +37,8 @@ async def _(event: Event):
     group_id = getattr(event, 'group_id')
     res = '插件列表：\n'
     for plugin in plugins:
+        if plugin.id_ == 'common':
+            continue
         plugin_name = plugin.metadata.name if plugin.metadata else plugin.id_
         res += f'【{plugin_name}】'
         # 群里是否已开启

@@ -14,7 +14,7 @@ __plugin_meta__ = PluginMetadata(
 
 from src.common.game21.game21point import Game
 from src.common.group_point import group_point_action
-from src.plugins._common.rules import rule_args_num
+from src.plugins.common.rules import rule_args_num
 
 
 class Game21(Game):
