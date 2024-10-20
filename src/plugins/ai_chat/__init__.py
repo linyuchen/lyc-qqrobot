@@ -44,6 +44,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
     ai_server_host = get_config('AI_CHAT_SERVER')
     async with httpx.AsyncClient() as client:
         r = await client.post(f'{ai_server_host}/chat', json={
+            "token": get_config('AI_CHAT_TOKEN'),
             "user_id": str(sender_qq),
             "question": _chat_text
         }, timeout=60)

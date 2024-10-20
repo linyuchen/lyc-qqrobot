@@ -27,7 +27,8 @@ config_data = {
             "model": "gpt-3.5-turbo-0613"
         }
     ],
-    "AI_CHAT_SERVER": ""
+    "AI_CHAT_SERVER": "",
+    "AI_CHAT_TOKEN": ""
 }
 
 if config_path.exists():
