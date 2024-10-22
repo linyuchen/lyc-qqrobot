@@ -5,16 +5,23 @@
     <style>
         body {
             /*设置背景图 拉伸*/
-            background-image: url('./bg.jpg');
+            background-image: url('{{bg_img}}');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
 
-        .descriptionLabel, .usageLabel{
+        #header {
+            width: 95%;
+            height: 50%;
+            margin-left: 2.5%;
+        }
+
+        .descriptionLabel, .usageLabel {
             font-size: 18px;
             font-weight: bold;
         }
+
         .menuContext {
             display: flex;
             flex-direction: column;
@@ -24,6 +31,7 @@
             background-color: rgba(240, 240, 240, 0);
             border-radius: 10px 0 0 10px;
             padding-bottom: 20px;
+            margin-top: -200px;
         }
 
         .menuItem {
@@ -31,8 +39,8 @@
             display: flex;
             flex-direction: row;
             width: 100%;
-            height: 100px;
-            background-color: #fff;
+            min-height: 100px;
+            background-color: #ffffff00;
             box-shadow: 0 0 5px #ccc;
             border-radius: 10px;
         }
@@ -43,9 +51,40 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #db8282;
             padding: 10px;
             font-size: 18px;
+        }
+
+        .itemLeftColor1 {
+            background-color: #db8282;
+        }
+
+        .itemRightColor1 {
+            background-color: rgba(235, 205, 205, 0.81);
+        }
+
+        .itemLeftColor2 {
+            background-color: #22a3df;
+        }
+
+        .itemRightColor2 {
+            background-color: rgba(75, 178, 250, 0.73);
+        }
+
+        .itemLeftColor3 {
+            background-color: #f8f4a0;
+        }
+
+        .itemRightColor3 {
+            background-color: #f7fbc9bd;
+        }
+
+        .itemLeftColor4 {
+            background-color: #3fcb41a8;
+        }
+
+        .itemRightColor4 {
+            background-color: #a6d794cf;
         }
 
         .itemRight {
@@ -53,7 +92,6 @@
             color: #333;
             flex: 1;
             padding: 10px;
-            background-color: #ebcdcd;
             font-size: 17px;
             /* 里面元素垂直居中分布 */
             display: flex;
@@ -67,52 +105,38 @@
 
         .usage {
         }
+
+        #footer {
+            z-index: -1;
+            margin-top: -300px;
+        }
     </style>
 </head>
 <body>
-
+<img id="header" alt="" src="{{header_img}}">
 <div class="menuContext">
-    <div class="menuItem">
-        <div class="itemLeft">AI聊天你你你</div>
-        <div class="itemRight">
-            <div class="description">
-                插件介绍，巴拉巴拉巴拉，阿是扥阿是asdf
-                插件介绍，巴拉巴拉巴拉，阿是扥阿是asdf
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo, totam?
-            </div>
-            <div class="usage">
-                指令用法: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, ducimus!
-            </div>
-        </div>
-    </div>
-
-    <div class="menuItem">
-        <div class="itemLeft">AI聊天你你你</div>
-        <div class="itemRight">
-            <div class="description">
-                <label class="descriptionLabel">插件介绍：</label>巴拉巴拉巴拉，阿是扥阿是asdf
-                插件介绍，巴拉巴拉巴拉，阿是扥阿是asdf
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo, totam?
-            </div>
-            <div class="usage">
-                <label class="usageLabel">指令用法：</label> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, ducimus!
-            </div>
-        </div>
-    </div>
-
-    <div class="menuItem">
-        <div class="itemLeft">AI聊天你你你</div>
-        <div class="itemRight">
-            <div class="description">
-                插件介绍，巴拉巴拉巴拉，阿是扥阿是asdf
-                插件介绍，巴拉巴拉巴拉，阿是扥阿是asdf
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Explicabo, totam?
-            </div>
-            <div class="usage">
-                指令用法: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad, ducimus!
-            </div>
-        </div>
-    </div>
+    {{menu_items}}
+    <!--    <div class="menuItem">-->
+    <!--        <div class="itemLeft itemLeftColor1">{name}</div>-->
+    <!--        <div class="itemRight itemRightColor1">-->
+    <!--            <div class="description">-->
+    <!--                <label class="descriptionLabel">插件介绍：</label>{desc}-->
+    <!--            </div>-->
+    <!--            <div class="usage">-->
+    <!--                <label class="usageLabel">指令用法：</label>{usage} Lorem ipsum dolor sit amet, consectetur adipisicing-->
+    <!--                elit. Ab assumenda at autem debitis dolore dolores ea eaque eum facere illo impedit iste itaque iure-->
+    <!--                laboriosam laborum molestias necessitatibus nobis omnis provident quas quia, quidem similique soluta-->
+    <!--                suscipit tempore temporibus vel vitae. Atque aut commodi deserunt dolores dolorum fuga fugit illo minima-->
+    <!--                nisi, quisquam recusandae reiciendis reprehenderit sed, soluta voluptas? Ab aliquam at blanditiis-->
+    <!--                deleniti distinctio nihil non perspiciatis, provident quas quis ratione ullam. Accusamus eos iure magni-->
+    <!--                quia totam? Alias assumenda consectetur, est excepturi facilis magnam obcaecati perspiciatis quam. Amet-->
+    <!--                cupiditate dolor impedit mollitia necessitatibus perferendis placeat repellendus sint temporibus.Lorem-->
+    <!--                ipsum dolor sit amet, consectetur adipisicing elit. Eveniet laboriosam laudantium maxime, nesciunt-->
+    <!--                officiis quos saepe temporibus tenetur? Amet, est!-->
+    <!--            </div>-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <img id='footer' src="{{footer_img}}" alt="">
 </div>
 </body>
 </html>
