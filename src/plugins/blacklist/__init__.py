@@ -3,6 +3,7 @@ from nonebot.adapters.onebot.v11 import Message, MessageEvent
 from nonebot.message import event_preprocessor
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
+from nonebot.exception import IgnoredException
 
 from nonebot.plugin import PluginMetadata
 
@@ -70,7 +71,7 @@ async def _(event: MessageEvent):
     if check_super_user(user_id):
         return
     if check_black_target('user', user_id):
-        raise Exception(f'ignore black user {user_id}')
+        raise IgnoredException(f'ignore black user {user_id}')
 
     if check_black_target('group', group_id):
-        raise Exception(f'ignore black group {group_id}')
+        raise IgnoredException(f'ignore black group {group_id}')
