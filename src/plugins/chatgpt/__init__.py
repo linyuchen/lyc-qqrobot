@@ -8,6 +8,14 @@ from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent
     MessageSegment
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
+from nonebot.plugin import PluginMetadata
+
+__plugin_meta__ = PluginMetadata(
+    name="AI聊天",
+    description="让bot支持AI回复",
+    usage="@机器人+聊天内容，或者#聊天内容",
+)
+
 
 import config
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
@@ -126,8 +134,7 @@ async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
     async def gptchat():
         _res = chat(get_context_id(event), _chat_text)
         await bot.send(event, MessageSegment.reply(event.message_id) + _res)
-        voice_bytes = gen_voice(_res)
-        if voice_bytes:
-            await bot.send(event, MessageSegment.record(voice_bytes))
-
+        # voice_bytes = gen_voice(_res)
+        # if voice_bytes:
+        #     await bot.send(event, MessageSegment.record(voice_bytes))
     threading.Thread(target=lambda: asyncio.run(gptchat()), daemon=True).start()
