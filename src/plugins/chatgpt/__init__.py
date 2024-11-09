@@ -81,7 +81,7 @@ def get_context_id(msg: GroupMessageEvent | PrivateMessageEvent) -> str:
     return context_id
 
 
-set_prompt_cmd = on_command("设置人格", force_whitespace=True, rule=rule_args_num(1))
+set_prompt_cmd = on_command("设置人格", force_whitespace=True)
 
 
 @set_prompt_cmd.handle()
