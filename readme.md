@@ -45,6 +45,8 @@ Python3.11
 
 运行了`init.bat`之后会自动生成`config.json`
 
+ChatGPT 的全局默认人格在 `data/chatgpt_default_prompt.txt`，首次运行 Bot 会自动生成
+
 [参数文档](doc/config.md)
 
 ## 对接onebot(墙裂推荐)
