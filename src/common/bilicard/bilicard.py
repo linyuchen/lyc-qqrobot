@@ -120,7 +120,7 @@ async def gen_text(bv_id: str) -> str:
 
 async def get_subtitle(aid: str, cid: str):
     get_cookie()
-    url = f"https://api.bilibili.com/x/player/v2?aid={aid}&cid={cid}"
+    url = f"https://api.bilibili.com/x/player/wbi/v2?aid={aid}&cid={cid}"
 
     res = (await session.get(url)).json()
     subtitles = res["data"]["subtitle"]["subtitles"]

@@ -104,7 +104,6 @@ get_prompt_cmd = on_fullmatch("查看人格")
 
 @get_prompt_cmd.handle()
 async def _(msg: GroupMessageEvent | PrivateMessageEvent):
-    clear_prompt(get_context_id(msg))
     await get_prompt_cmd.finish("当前人格:\n\n" + get_prompt(get_context_id(msg)))
 
 
