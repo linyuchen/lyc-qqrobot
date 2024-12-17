@@ -10,25 +10,26 @@ def save_config():
 
 
 config_data = {
-    "GFW_PROXY": "http://192.168.1.4:7890",
-    "SD_HTTP_API": "http://192.168.1.4:7860",
-    "BV2_FASTAPI": "http://localhost:5001",
-    "TTS_ENABLED": True,
-    "MJ_DISCORD_TOKEN": "",
-    "MJ_DISCORD_CHANNEL_ID": "",
-    "MJ_DISCORD_GUILD_ID": "",
-    "MJ_DISCORD_CHANNEL_URL": "",
-    "BAIDU_TRANSLATE_APPID": "",
-    "BAIDU_TRANSLATE_SECRETKEY": "",
+    # "GFW_PROXY": "http://192.168.1.4:7890",
+    # "SD_HTTP_API": "http://192.168.1.4:7860",
+    # "BV2_FASTAPI": "http://localhost:5001",
+    # "TTS_ENABLED": True,
+    # "MJ_DISCORD_TOKEN": "",
+    # "MJ_DISCORD_CHANNEL_ID": "",
+    # "MJ_DISCORD_GUILD_ID": "",
+    # "MJ_DISCORD_CHANNEL_URL": "",
+    # "BAIDU_TRANSLATE_APPID": "",
+    # "BAIDU_TRANSLATE_SECRETKEY": "",
+    # "AI_CHAT_SERVER": "",
+    # "AI_CHAT_TOKEN": "",
     "CHATGPT": [
         {
             "key": "API_KEY",
-            "api": "https://api.openai.com/v1",
+            "api": "https://api.chatanywhere.tech",
             "model": "gpt-4o-mini"
         }
     ],
-    "AI_CHAT_SERVER": "",
-    "AI_CHAT_TOKEN": ""
+
 }
 
 if config_path.exists():

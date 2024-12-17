@@ -22,6 +22,7 @@ async def login():
                 cookie_path = COOKIE_PATH
                 cookie_path.write_text(cookies_text)
                 break
+        input('按回车关闭浏览器')
         await page.close()
         await browser.close()
 
