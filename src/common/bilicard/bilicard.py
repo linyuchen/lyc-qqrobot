@@ -1,14 +1,18 @@
 import re
 import tempfile
 import time
+from collections.abc import Coroutine
 from io import BytesIO
 from pathlib import Path, PurePath
+from typing import Awaitable
 
 import httpx
+import aiofiles
 from PIL import Image, ImageDraw, ImageFont
 
 from ..chatgpt.chatgpt import chat
 from ..stringplus import split_lines
+from .. import DATA_DIR
 
 # session = requests.session()
 headers = {
@@ -17,13 +21,15 @@ headers = {
     "Referer": "https://www.bilibili.com/",
     "Accept": "application/json;charset=UTF-8"
 }
+
+COOKIE_PATH = DATA_DIR / "bili_cookie.txt"
+
 session = httpx.AsyncClient(headers=headers, follow_redirects=True)
 
 
-def get_cookie():
-    base_path = PurePath(__file__).parent
-    with open(base_path / "cookie.txt") as f:
-        cookies = f.read()
+async def get_cookie():
+    async with aiofiles.open(COOKIE_PATH) as f:
+        cookies = await f.read()
         cookies = re.findall("(.*?)=(.*?); ", cookies)
         cookies = dict(cookies)
         session.cookies = cookies
@@ -119,7 +125,7 @@ async def gen_text(bv_id: str) -> str:
 
 
 async def get_subtitle(aid: str, cid: str):
-    get_cookie()
+    await get_cookie()
     url = f"https://api.bilibili.com/x/player/wbi/v2?aid={aid}&cid={cid}"
 
     res = (await session.get(url)).json()

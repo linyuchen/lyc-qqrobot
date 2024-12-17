@@ -1,52 +1,12 @@
 import asyncio
 import tempfile
 from pathlib import Path
-from urllib.parse import quote
 
 from playwright.async_api import Page
 
-from src.common.browser.playwright import new_page, load_all
+from src.common.browser.playwright import load_all
+from src.common.browser.screenshot.base import new_page
 from src.common.utils.image import merge_images
-
-
-async def screenshot_search_baidu(keyword: str) -> Path:
-    keyword = quote(keyword.encode("utf8"))
-
-    url = f"https://www.baidu.com/s?wd={keyword}"
-    async with new_page(url) as page:
-        e = page.locator("css=#content_left")
-        await e.evaluate("""
-        e = document.getElementById("content_left")
-        e.style.paddingLeft = "10px";
-        e.style.paddingRight = "10px";
-        document.getElementById("head").style.display="none";
-        try{
-            document.getElementById("searchTag").style.display="none";
-        }catch{}
-        """)
-        path = Path(tempfile.mktemp(suffix=".png"))
-        await e.screenshot(path=path)
-        await page.close()
-        return path
-
-
-async def screenshot_github_readme(url: str, http_proxy: str = "") -> Path | None:
-    async with new_page(url, http_proxy, headless=True) as page:
-        e = page.locator("css=.markdown-body")
-        if e.count() == 0:
-            return None
-        await e.evaluate(
-            """
-            let readme = document.getElementsByClassName("markdown-body")[0]
-            readme.style.padding = "40px";
-            let nav = document.querySelector("nav[aria-label='Repository files']")
-            nav.parentElement.remove()
-            """
-        )
-        path = Path(tempfile.mktemp(suffix=".png"))
-        await e.screenshot(path=path)
-        await page.close()
-        return path
 
 
 class ZhihuPreviewer:
@@ -140,49 +100,3 @@ class ZhihuPreviewer:
         except Exception as e:
             error = e
             print(e)
-
-
-async def screenshot_moe_wiki(keyword: str) -> Path | None:
-    async with new_page(f"https://zh.moegirl.org.cn/{keyword}") as page:
-        close_btn = page.locator("css=.n-base-close.n-base-close--absolute.n-card-header__close")
-        if await close_btn.count() > 0:
-            await close_btn.first.click()
-            await asyncio.sleep(1)
-        await load_all(page)
-        content = await page.query_selector("#mw-content-text")
-        if not content:
-            return
-        await content.evaluate(
-            """
-            e = document.getElementById("mw-content-text")
-            e.style.paddingLeft = "40px";
-            e.style.paddingRight = "40px";
-            """
-        )
-        path = Path(tempfile.mktemp(suffix=".png"))
-        await content.screenshot(path=path)
-        await page.close()
-        return path
-
-
-async def screenshot_wx_article(url: str) -> Path | None:
-    async with new_page(url) as page:
-        content = page.locator("css=#img-content")
-        if content.count() == 0:
-            return
-        await load_all(page)
-        await content.evaluate(
-            """
-            e = document.getElementById("img-content")
-            e.style.paddingLeft = "40px";
-            e.style.paddingRight = "40px";
-            """
-        )
-        path = Path(tempfile.mktemp(suffix=".png"))
-        await content.screenshot(path=path)
-        await page.close()
-        return path
-
-
-if __name__ == '__main__':
-    asyncio.run(ZhihuPreviewer().login())

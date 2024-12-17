@@ -11,7 +11,7 @@ __plugin_meta__ = PluginMetadata(
     usage="百度 关键字 进行百度搜索"
 )
 
-from src.common.browser.webpage_screenshot import screenshot_search_baidu
+from src.common.browser.screenshot.baidu import screenshot_search_baidu
 from src.plugins.common.rules import rule_args_num
 
 baidu_screenshot_cmd = on_command("百度", force_whitespace=True, rule=rule_args_num(min_num=1))

@@ -11,7 +11,7 @@ __plugin_meta__ = PluginMetadata(
     usage="萌娘百科 关键字"
 )
 
-from src.common.browser.webpage_screenshot import screenshot_moe_wiki
+from src.common.browser.screenshot.moegirl import screenshot_moe_wiki
 from src.plugins.common.rules import rule_args_num
 
 moe_wiki_cmd = on_command("萌娘百科", force_whitespace=True, rule=rule_args_num(min_num=1))

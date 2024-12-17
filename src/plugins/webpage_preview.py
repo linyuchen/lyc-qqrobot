@@ -14,8 +14,9 @@ __plugin_meta__ = PluginMetadata(
 )
 
 import config
-from src.common.browser.webpage_screenshot import (ZhihuPreviewer, screenshot_github_readme,
-                                                   screenshot_wx_article)
+from src.common.browser.screenshot.weixin import screenshot_wx_article
+from src.common.browser.screenshot.github import screenshot_github_readme
+from src.common.browser.screenshot.zhihu import ZhihuPreviewer
 
 zhihu_previewer = ZhihuPreviewer()
 
