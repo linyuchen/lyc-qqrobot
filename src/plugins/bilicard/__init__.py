@@ -1,14 +1,17 @@
 import time
 
-from nonebot import Bot
-from nonebot.adapters.onebot.v11 import Event, GroupMessageEvent, PrivateMessageEvent, MessageSegment
+from nonebot import Bot, on_command
+from nonebot.adapters.onebot.v11 import Event, GroupMessageEvent, PrivateMessageEvent, MessageSegment, Message
 from nonebot.message import event_preprocessor
 from nonebot.plugin import PluginMetadata
+from nonebot.params import CommandArg
+from nonebot.permission import SUPERUSER
+from src.common.bilicard.bilicard import COOKIE_PATH
 
 __plugin_meta__ = PluginMetadata(
     name="B站链接",
     description="B站视频链接解析",
-    usage="直接发送B站视频链接即可",
+    usage="直接发送B站视频链接即可\n设置B站cookie <cookies>",
 )
 
 
@@ -64,3 +67,14 @@ async def _(bot: Bot, event: Event):
                             MessageSegment.text("简介：" + video_info["desc"] + "\n\n" + summary +
                                                 "\n\n" + url)
                 await bot.send(event, reply_msg)
+
+
+set_cookie_cmd = on_command('设置B站cookie', permission=SUPERUSER)
+
+@set_cookie_cmd.handle()
+async def set_cookie(bot: Bot, event: Event, args: Message = CommandArg()):
+    msg_text = args.extract_plain_text()
+    if not msg_text:
+        await set_cookie_cmd.finish("请在命令后输入cookie")
+    COOKIE_PATH.write_text(msg_text)
+    await set_cookie_cmd.finish("设置成功")
