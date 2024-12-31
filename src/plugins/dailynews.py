@@ -1,7 +1,8 @@
 import httpx
-from nonebot import on_command, on_fullmatch
-from nonebot.adapters.onebot.v11 import MessageSegment
+from nonebot import on_fullmatch
+from nonebot.internal.adapter import Message
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import UniMsg
 
 
 __plugin_meta__ = PluginMetadata(
@@ -19,4 +20,4 @@ async def _():
     url = "http://dwz.2xb.cn/zaob"
     async with httpx.AsyncClient() as client:
         image_url = (await client.get(url)).json().get("imageUrl")
-        await news_cmd.finish(MessageSegment.image(image_url))
+        await news_cmd.finish(await UniMsg.image(url=image_url).export())

@@ -1,9 +1,8 @@
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.internal.adapter import Message
 from nonebot.params import CommandArg
-
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="百度搜索",
@@ -23,5 +22,6 @@ async def _(params: Message = CommandArg()):
     百度搜索
     """
     img_path = await screenshot_search_baidu(params.extract_plain_text())
-    await baidu_screenshot_cmd.finish(MessageSegment.image(img_path))
+    data = img_path.read_bytes()
     img_path.unlink()
+    await baidu_screenshot_cmd.finish(await UniMsg.image(raw=data).export())

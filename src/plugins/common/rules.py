@@ -1,11 +1,14 @@
-from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
+from nonebot import Bot
 from nonebot.internal.rule import Rule
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg, Event, Message
+from nonebot_plugin_alconna import UniMsg, At
+from nonebot_plugin_uninfo import Uninfo, get_session
 
 
-def is_at_me(event: GroupMessageEvent) -> bool:
-    for segment in event.original_message:
-        if segment.type == "at" and segment.data.get("qq") == str(event.self_id):
+def is_at_me(session: Uninfo, msg: UniMsg) -> bool:
+    ats = msg.get(At)
+    for segment in ats:
+        if segment.target == str(session.self_id):
             return True
 
 
@@ -24,3 +27,17 @@ def rule_args_num(num=None, min_num=None, max_num=None):
         return True
 
     return Rule(_)
+
+
+def rule_is_group_msg():
+    """
+    params notice: 是否提醒只能在群里使用
+    """
+
+    async def _(bot: Bot, event: Event):
+        session = await get_session(bot, event)
+        is_group = session.scene.is_group
+        return is_group
+
+    return Rule(_)
+

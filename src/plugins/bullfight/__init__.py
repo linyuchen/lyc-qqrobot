@@ -2,8 +2,9 @@ import asyncio
 import threading
 
 from nonebot import on_command, Bot
-from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
+from nonebot.internal.adapter import Message, Event
 from nonebot.params import CommandArg
+from nonebot_plugin_uninfo import get_session, Uninfo
 
 from nonebot.plugin import PluginMetadata
 
@@ -47,14 +48,21 @@ bull_game_cmd = on_command('斗牛', force_whitespace=True, rule=rule_args_num(1
 
 
 @bull_game_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
-    game = get_game_instance(str(event.group_id))
-
+async def _(bot: Bot, event: Event, args: Message = CommandArg()):
+    session = await get_session(bot, event)
+    if session.scene.is_group:
+        group_id = session.group.id
+    else:
+        return
+    user_id = session.user.id
+    user_nick = session.user.nick
+    game = get_game_instance(str(group_id))
     def reply(text):
+        # todo: Remove multiple thread
         threading.Thread(target=lambda: asyncio.run(bot.send(event, text))).start()
 
     def start():
-        start_result = game.start_game(str(event.user_id), str(event.sender.card or event.sender.nickname),
+        start_result = game.start_game(str(user_id), user_nick,
                                        reply,
                                        args.extract_plain_text().strip())
         asyncio.run(bot.send(event, start_result))

@@ -4,7 +4,7 @@ from pathlib import Path
 
 from playwright.async_api import Page
 
-from src.common.browser.playwright import load_all
+from src.common.browser.utils import load_all
 from src.common.browser.screenshot.base import new_page
 from src.common.utils.image import merge_images
 

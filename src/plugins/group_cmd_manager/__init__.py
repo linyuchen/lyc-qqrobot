@@ -1,10 +1,10 @@
-from nonebot import on_fullmatch, on_command, get_driver
-from nonebot.adapters.onebot.v11 import Message, MessageEvent, Bot, GroupMessageEvent
+from nonebot import on_fullmatch, on_command, get_driver, Bot
 from nonebot.internal.adapter import Event
 from nonebot.internal.matcher import Matcher
-from nonebot.params import CommandArg
+from nonebot.params import CommandArg, Message
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_uninfo import Uninfo
 
 from .util import check_group_message, get_group_ignore_cmds, add_group_ignore_cmd, remove_group_ignore_cmd
 
@@ -15,6 +15,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 from ..common.permission import add_inject_permission_checker
+from ..common.rules import rule_is_group_msg
 
 driver = get_driver()
 
@@ -33,31 +34,33 @@ async def _():
     add_inject_permission_checker(check_group_cmd_permission)
 
 
-list_cmd = on_fullmatch("屏蔽命令列表", permission=SUPERUSER)
+list_cmd = on_fullmatch("屏蔽命令列表", permission=SUPERUSER, rule=rule_is_group_msg())
 
 
 @list_cmd.handle()
-async def _(event: MessageEvent):
-    group_id = vars(event).get('group_id')
+async def _(session: Uninfo):
+    group_id = str(session.group.id)
     res = '屏蔽命令列表：' + '，'.join(get_group_ignore_cmds(group_id))
     await list_cmd.finish(res)
 
 
-add_cmd = on_command("添加屏蔽命令", permission=SUPERUSER)
+add_cmd = on_command("添加屏蔽命令", permission=SUPERUSER, rule=rule_is_group_msg())
 
 
 @add_cmd.handle()
-async def _(event: GroupMessageEvent, args: Message = CommandArg()):
+async def _(session: Uninfo, args: Message = CommandArg()):
+    group_id = session.group.id
     cmd = args.extract_plain_text()
-    add_group_ignore_cmd(str(event.group_id), cmd)
+    add_group_ignore_cmd(str(group_id), cmd)
     await add_cmd.finish('done')
 
 
-del_cmd = on_command("删除屏蔽命令", permission=SUPERUSER)
+del_cmd = on_command("删除屏蔽命令", permission=SUPERUSER, rule=rule_is_group_msg())
 
 
 @del_cmd.handle()
-async def _(event: GroupMessageEvent, args: Message = CommandArg()):
+async def _(session: Uninfo, args: Message = CommandArg()):
+    group_id = session.group.id
     cmd = args.extract_plain_text()
-    remove_group_ignore_cmd(str(event.group_id), cmd)
+    remove_group_ignore_cmd(str(group_id), cmd)
     await del_cmd.finish('done')

@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from src.common.browser.playwright import load_all
+from src.common.browser.utils import load_all
 from src.common.browser.screenshot.base import new_page
 
 

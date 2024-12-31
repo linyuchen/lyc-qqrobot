@@ -1,12 +1,10 @@
 from nonebot import get_loaded_plugins, Bot, get_driver, on_fullmatch, on_command
-from nonebot.adapters import Event
-from nonebot.adapters.onebot.v11 import MessageEvent
-from nonebot.internal.adapter import Message
-from nonebot.internal.permission import Permission
+from nonebot.internal.adapter import Message, Event
 from nonebot.matcher import Matcher
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import Plugin
+from nonebot_plugin_uninfo import get_session
 
 from nonebot.plugin import PluginMetadata
 
@@ -57,7 +55,7 @@ async def _(event: Event):
 
 
 @global_cmd.handle()
-async def _(event: MessageEvent, args: Message = CommandArg()):
+async def _(event: Event, args: Message = CommandArg()):
     plugin_name = args.extract_plain_text().strip()
     plugin = find_plugin_by_name(plugin_name)
     if not plugin:
@@ -69,7 +67,7 @@ async def _(event: MessageEvent, args: Message = CommandArg()):
 
 
 @group_cmd.handle()
-async def _(event: MessageEvent, args: Message = CommandArg()):
+async def _(event: Event, args: Message = CommandArg()):
     plugin_name = args.extract_plain_text().strip()
     plugin = find_plugin_by_name(plugin_name)
     if not plugin:
@@ -82,14 +80,16 @@ async def _(event: MessageEvent, args: Message = CommandArg()):
     await group_cmd.finish(f'插件 {plugin_name} 在本群已{"启用" if enable else "禁用"}')
 
 
-def manager_permission(matcher: Matcher, bot: Bot, event: Event):
+async def manager_permission(matcher: Matcher, bot: Bot, event: Event):
+    session = await get_session(bot, event)
     plugin: Plugin = matcher.plugin
     plugin_name = plugin.metadata.name if plugin.metadata else plugin.id_
     plugin_id = plugin.id_
     if not check_global_enable(plugin_id):
         return False
-    if not check_group_enable(plugin_id, getattr(event, 'group_id')):
-        return False
+    if session.scene.is_group:
+        if not check_group_enable(plugin_id, session.group.id):
+            return False
     return True
 
 

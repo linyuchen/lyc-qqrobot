@@ -6,9 +6,10 @@ from pathlib import Path
 import httpx
 
 from nonebot import on_message, Bot
-from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment
-
+from nonebot.internal.adapter import Event
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import UniMsg, Reply
+from nonebot_plugin_uninfo import get_session
 
 __plugin_meta__ = PluginMetadata(
     name="动图加速",
@@ -23,10 +24,16 @@ history: dict[str, float] = {}
 
 
 @on_message().handle()
-async def random_speed_up_gif(bot: Bot, event: MessageEvent):
+async def random_speed_up_gif(bot: Bot, event: Event, msg: UniMsg):
+    session = await get_session(bot, event)
     msg_text = event.message.extract_plain_text().strip()
-    reply_img_urls = get_message_image_urls(event.reply.message) if event.reply else []
-    img_urls = get_message_image_urls(event.message)
+    reply_msg = msg.get(Reply)
+    if reply_msg:
+        reply_msg = reply_msg[0]
+        reply_img_urls = get_message_image_urls(reply_msg)
+    else:
+        reply_img_urls = []
+    img_urls = get_message_image_urls(msg)
     img_urls = reply_img_urls + img_urls
     r_int = random.randint(0, 10)
     is_manual = msg_text == '加速'
@@ -41,12 +48,12 @@ async def random_speed_up_gif(bot: Bot, event: MessageEvent):
                 f.write(img_data)
             if not is_gif(img_path):
                 return
-        qq = event.group_id if hasattr(event, 'group_id') else event.user_id
+        qq = session.group.id if session.scene.is_group else session.user.id
         last_time = history.get(qq, 0)
         if (time.time() - last_time) < 5 * 60 and not is_manual:
             return
         history[qq] = time.time()
         re_path = re_speed(img_path, random.choice([30, 40, 50]))
-        await bot.send(event, MessageSegment.image(re_path))
+        await bot.send(event, await UniMsg.image(path=re_path).export())
         img_path.unlink()
         re_path.unlink()

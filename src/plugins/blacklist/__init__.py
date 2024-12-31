@@ -1,9 +1,11 @@
-from nonebot import on_fullmatch, get_driver, on_command
-from nonebot.adapters.onebot.v11 import Message, MessageEvent
+from nonebot import on_fullmatch, get_driver, on_command, Bot
+from nonebot.internal.adapter.message import Message
+from nonebot.internal.adapter import Event
 from nonebot.message import event_preprocessor
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot.exception import IgnoredException
+from nonebot_plugin_uninfo import Uninfo
 
 from nonebot.plugin import PluginMetadata
 
@@ -62,11 +64,11 @@ async def _(args: Message = CommandArg()):
 
 
 @event_preprocessor
-async def _(event: MessageEvent):
-    user_id = vars(event).get('user_id')
-    user_id = str(user_id) if user_id else None
-    group_id = vars(event).get('group_id')
-    group_id = str(group_id) if group_id else None
+async def _(session: Uninfo):
+    group_id = None
+    user_id = session.user.id
+    if session.scene.is_group:
+        group_id = session.group.id
 
     if check_super_user(user_id):
         return

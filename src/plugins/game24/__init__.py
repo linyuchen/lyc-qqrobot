@@ -2,10 +2,9 @@ import asyncio
 import threading
 
 from nonebot import on_command, Bot, on_fullmatch
-from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message
-from nonebot.params import CommandArg
-
+from nonebot.params import CommandArg, Message, Event
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_uninfo import Uninfo
 
 __plugin_meta__ = PluginMetadata(
     name="24点",
@@ -47,8 +46,11 @@ start_game24_cmd = on_fullmatch('24点')
 
 
 @start_game24_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent):
-    game = get_game_instance(str(event.group_id))
+async def _(bot: Bot, event: Event, session: Uninfo):
+    if not session.scene.is_group:
+        return
+    group_id = session.group.id
+    game = get_game_instance(str(group_id))
 
     def reply(text: str):
         threading.Thread(target=lambda: asyncio.run(bot.send(event, text)), daemon=True).start()
@@ -62,7 +64,12 @@ answer_game24_cmd = on_command('答24点', rule=rule_args_num(num=1))
 
 
 @answer_game24_cmd.handle()
-async def _(event: GroupMessageEvent, args: Message = CommandArg()):
-    game = get_game_instance(str(event.group_id))
-    res = game.judge(str(event.group_id), str(event.user_id), event.sender.card or event.sender.nickname, args.extract_plain_text())
+async def _(event: Event, session: Uninfo, args: Message = CommandArg()):
+    if not session.scene.is_group:
+        return
+    group_id = session.group.id
+    user_id = session.user.id
+    user_nick = session.user.nick
+    game = get_game_instance(str(group_id))
+    res = game.judge(str(group_id), str(user_id), user_nick, args.extract_plain_text())
     await answer_game24_cmd.finish(res)

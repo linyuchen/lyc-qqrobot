@@ -4,4 +4,4 @@ from .permission import init_permission
 
 @get_driver().on_startup
 async def _():
-    init_permission()
+    await init_permission()

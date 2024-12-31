@@ -1,9 +1,8 @@
 from nonebot import on_command
-from nonebot.adapters.onebot.v11 import MessageSegment
 from nonebot.internal.adapter import Message
 from nonebot.params import CommandArg
-
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="萌娘百科",
@@ -22,5 +21,7 @@ async def _(params: Message = CommandArg()):
     await moe_wiki_cmd.send("正在为您搜索萌娘百科...")
     img_path = await screenshot_moe_wiki(params.extract_plain_text())
     if img_path:
-        await moe_wiki_cmd.finish(MessageSegment.image(img_path))
+        data = img_path.read_bytes()
         img_path.unlink()
+        await moe_wiki_cmd.finish(await UniMsg.image(raw=data).export())
+

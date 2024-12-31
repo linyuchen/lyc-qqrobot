@@ -3,12 +3,13 @@ import re
 import threading
 import time
 
-from nonebot import on_command, on_message, on_fullmatch
-from nonebot.adapters.onebot.v11 import Message, MessageEvent, GroupMessageEvent, PrivateMessageEvent, Bot, \
-    MessageSegment
-from nonebot.params import CommandArg
+from nonebot import on_command, on_message, on_fullmatch, Bot
+from nonebot.params import CommandArg, Message, Event
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_uninfo import Uninfo
+from nonebot_plugin_alconna import UniMsg, UniMessage, Reply
+
 
 __plugin_meta__ = PluginMetadata(
     name="AI聊天",
@@ -65,7 +66,7 @@ summary_web_cmd = on_command("总结网页", force_whitespace=True, rule=rule_ar
 
 
 @summary_web_cmd.handle()
-def _(event: MessageEvent, args: Message = CommandArg()):
+def _(event: Event, args: Message = CommandArg()):
     text = ""
     if event.reply:
         text = event.reply.message.extract_plain_text()
@@ -76,8 +77,11 @@ def _(event: MessageEvent, args: Message = CommandArg()):
         summary_web_cmd.finish(result + "\n\n" + url)
 
 
-def get_context_id(msg: GroupMessageEvent | PrivateMessageEvent) -> str:
-    context_id = str(msg.group_id) + "g" if isinstance(msg, GroupMessageEvent) else str(msg.user_id) + "f"
+def get_context_id(session: Uninfo) -> str:
+    if session.scene.is_group:
+        context_id = "g" + str(session.group.id)
+    else:
+        context_id = "f" + str(session.user.id)
     return context_id
 
 
@@ -85,8 +89,8 @@ set_prompt_cmd = on_command("设置人格", force_whitespace=True)
 
 
 @set_prompt_cmd.handle()
-async def _(event: GroupMessageEvent | PrivateMessageEvent, args: Message = CommandArg()):
-    set_prompt(get_context_id(event), args.extract_plain_text())
+async def _(session: Uninfo, args: Message = CommandArg()):
+    set_prompt(get_context_id(session), args.extract_plain_text())
     await set_prompt_cmd.finish("人格设置成功")
 
 
@@ -94,8 +98,8 @@ clear_prompt_cmd = on_fullmatch(("清除人格", "恢复人格", "清空人格",
 
 
 @clear_prompt_cmd.handle()
-async def _(event: GroupMessageEvent | PrivateMessageEvent, args: Message = CommandArg()):
-    clear_prompt(get_context_id(event))
+async def _(session: Uninfo, args: Message = CommandArg()):
+    clear_prompt(get_context_id(session))
     clear_prompt_cmd.finish("人格清除成功")
 
 
@@ -103,8 +107,8 @@ get_prompt_cmd = on_fullmatch("查看人格")
 
 
 @get_prompt_cmd.handle()
-async def _(msg: GroupMessageEvent | PrivateMessageEvent):
-    await get_prompt_cmd.finish("当前人格:\n\n" + get_prompt(get_context_id(msg)))
+async def _(session: Uninfo):
+    await get_prompt_cmd.finish("当前人格:\n\n" + get_prompt(get_context_id(session)))
 
 
 chat_records = {}
@@ -113,26 +117,28 @@ chatgpt_cmd = on_message()
 
 
 @chatgpt_cmd.handle()
-async def _(bot: Bot, event: GroupMessageEvent | PrivateMessageEvent):
-    if isinstance(event, GroupMessageEvent):
-        sender_qq = event.group_id
-        if not is_at_me(event):
+async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
+    if session.scene.is_group:
+        sender_id = session.group.id
+        if not is_at_me(session, msg):
             if not event.get_plaintext().strip().startswith('#'):
                 return
     else:
-        sender_qq = event.user_id
+        sender_id = session.user.id
 
-    if time.time() - chat_records.setdefault(sender_qq, 0) < 5:
+    if time.time() - chat_records.setdefault(sender_id, 0) < 5:
         return
-    chat_records[sender_qq] = time.time()
+    chat_records[sender_id] = time.time()
 
     _chat_text = event.get_plaintext()
-    if event.reply:
-        _chat_text = event.reply.message.extract_plain_text() + '\n' + _chat_text
+    reply_msgs = msg.get(Reply)
+    if reply_msgs:
+        reply_msg: Reply = reply_msgs[0]
+        _chat_text = reply_msg.msg.extract_plain_text() + '\n' + _chat_text
 
     async def gptchat():
-        _res = chat(get_context_id(event), _chat_text)
-        await bot.send(event, MessageSegment.reply(event.message_id) + _res)
+        _res = chat(get_context_id(session), _chat_text)
+        await bot.send(event, UniMsg.reply(event.message_id) + _res)
         # voice_bytes = gen_voice(_res)
         # if voice_bytes:
         #     await bot.send(event, MessageSegment.record(voice_bytes))

@@ -1,7 +1,7 @@
 from nonebot import on_fullmatch, get_driver
-from nonebot.adapters.onebot.v11 import MessageSegment
-from nonebot.plugin import PluginMetadata, get_loaded_plugins
+from nonebot.plugin import PluginMetadata
 from src.plugins.menu.menu import generate_image, get_plugins, menu_image_path
+from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="菜单",
@@ -25,7 +25,7 @@ async def _():
     #     plugin_usage = '指令：' + plugin.metadata.usage
     #     menu_text += f'  {plugin_description}\n  {plugin_usage}\n\n'
     # await menu_cmd.finish(menu_text)
-    await menu_cmd.finish(MessageSegment.image(menu_image_path.read_bytes()))
+    await menu_cmd.finish(await UniMsg.image(raw=menu_image_path.read_bytes()).export())
 
 
 @get_driver().on_startup

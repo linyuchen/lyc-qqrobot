@@ -1,5 +1,5 @@
 import inspect
-from typing import Callable, Coroutine
+from typing import Callable, Coroutine, Awaitable
 
 from nonebot import get_loaded_plugins, get_driver
 from nonebot.adapters.onebot.v11 import PrivateMessageEvent, Bot, GroupMessageEvent
@@ -7,7 +7,7 @@ from nonebot.internal.adapter import Event
 from nonebot.internal.matcher import Matcher
 from nonebot.internal.permission import Permission
 
-TypePermissionChecker = Callable[[Matcher, Bot, Event], bool]
+TypePermissionChecker = Callable[[Matcher, Bot, Event], bool] | Awaitable
 
 inject_checkers: list[TypePermissionChecker] = []
 
@@ -19,7 +19,7 @@ def add_inject_permission_checker(func: TypePermissionChecker):
 inited = False
 
 
-def init_permission():
+async def init_permission():
     global inited
     if inited:
         return

@@ -4,8 +4,10 @@ from pathlib import Path
 from typing import Callable, Coroutine
 
 from nonebot import on_message, Bot
-from nonebot.adapters.onebot.v11 import MessageEvent, MessageSegment, GroupMessageEvent
 from nonebot.plugin import PluginMetadata
+from nonebot.internal.adapter import Event
+from nonebot_plugin_uninfo import Uninfo, get_session
+from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="网页预览",
@@ -14,6 +16,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 import config
+from src.common.bilicard.bilicard import session
 from src.common.browser.screenshot.weixin import screenshot_wx_article
 from src.common.browser.screenshot.github import screenshot_github_readme
 from src.common.browser.screenshot.zhihu import ZhihuPreviewer
@@ -38,9 +41,10 @@ def check_url_recent(qq: str, url: str) -> bool:
         return True
 
 
-async def screenshot(bot: Bot, event: MessageEvent, parse_url_func: Callable[[str], str | None],
+async def screenshot(bot: Bot, event: Event, parse_url_func: Callable[[str], str | None],
                      screenshot_func: Callable[[str], Coroutine[str, None, Path]]):
-    context_id = str(event.user_id) if not isinstance(event, GroupMessageEvent) else 'g' + str(event.group_id)
+    session = await get_session(bot, event)
+    context_id = str(session.user.id) if not session.scene.is_group else 'g' + str(session.group.id)
     msg_text = event.get_plaintext()
     url = parse_url_func(msg_text)
     if not url:
@@ -49,14 +53,14 @@ async def screenshot(bot: Bot, event: MessageEvent, parse_url_func: Callable[[st
         return False
     img_path = await screenshot_func(url)
     if img_path:
-        await bot.send(event, MessageSegment.image(img_path) + MessageSegment.text(url))
+        await bot.send(event, await (UniMsg.image(path=img_path) + UniMsg.text(url)).export())
         img_path.unlink()
         return True
     return False
 
 
 @on_message().handle()
-async def zhihu_preview(bot: Bot, event: MessageEvent):
+async def zhihu_preview(bot: Bot, event: Event):
     def parse_zhihu_question_url(msg_text: str):
         if "//www.zhihu.com/question" in msg_text:
             """
@@ -85,7 +89,7 @@ async def zhihu_preview(bot: Bot, event: MessageEvent):
 
 
 @on_message().handle()
-async def github_preview(bot: Bot, event: MessageEvent):
+async def github_preview(bot: Bot, event: Event):
     def parse_url(msg_text: str):
         if "//github.com/" in msg_text:
             # 获取github链接
@@ -97,7 +101,7 @@ async def github_preview(bot: Bot, event: MessageEvent):
 
 
 @on_message().handle()
-async def _(bot: Bot, event: MessageEvent):
+async def _(bot: Bot, event: Event):
     def parse_url(msg_text: str):
         if "mp.weixin.qq.com" in msg_text:
             # 获取github链接
