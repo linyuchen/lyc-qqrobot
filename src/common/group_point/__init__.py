@@ -13,7 +13,8 @@ Base = declarative_base()
 
 class GroupMember(Base):
     __tablename__ = 'group_members'
-    qq = Column(String, primary_key=True)
+    qq = Column(String, primary_key=True)  # 在 TG 或者别的平台它是 userid
+    username = Column(String, nullable=True, default=None)  # QQ 没这个字段
     nick = Column(String)
     point = Column(Integer, default=0)
     total_sign_count = Column(Integer, default=0)
