@@ -15,7 +15,7 @@ __plugin_meta__ = PluginMetadata(
 )
 
 from src.common.bullfight import BullFight
-from src.common.group_point import group_point_action
+from src.common.group_point.action import group_point_action
 from src.plugins.common.rules import rule_args_num
 
 

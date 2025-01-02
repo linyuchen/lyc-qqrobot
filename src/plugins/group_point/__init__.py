@@ -10,7 +10,7 @@ __plugin_meta__ = PluginMetadata(
     usage="签到、活跃度、活跃度排名、转活跃度 @对方 活跃度数量",
 )
 
-from src.common.group_point import group_point_action
+from src.common.group_point.action import group_point_action
 from src.plugins.common.rules import rule_is_group_msg
 
 sign_cmd = on_fullmatch('签到', rule=rule_is_group_msg())

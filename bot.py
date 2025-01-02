@@ -1,6 +1,9 @@
 import nonebot
 from nonebot.adapters.onebot.v11 import Adapter as OB11Adapter
 from nonebot.adapters.telegram import Adapter as TGAdapter
+from src.common.alembic.group_point.script import upgrade_group_point_db
+
+upgrade_group_point_db()
 
 nonebot.init()
 
