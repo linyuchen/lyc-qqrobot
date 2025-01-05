@@ -3,8 +3,8 @@ from threading import Lock
 
 import requests
 
-from src.common.utils.htmlhelper import html2txt
 from config import CHATGPT, get_config, set_config
+from src.common.utils.htmlhelper import html2txt
 from .base import ChatGPT
 from .. import DATA_DIR
 
@@ -34,7 +34,6 @@ try:
         default_prompt_text = f.read()
 except:
     pass
-
 
 prompt_dict = {}  # context_id: prompt_str
 
@@ -90,6 +89,11 @@ def set_prompt(context_id: str, prompt: str):
 
 def clear_prompt(context_id: str):
     set_prompt(context_id, default_prompt_text)
+
+
+def clear_history(context_id: str):
+    for gpt in __get_chatgpt(context_id):
+        gpt.clear_history()
 
 
 def get_prompt(context_id: str) -> str:

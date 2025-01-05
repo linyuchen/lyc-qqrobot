@@ -7,9 +7,8 @@ from nonebot import on_command, on_message, on_fullmatch, Bot
 from nonebot.params import CommandArg, Message, Event
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_alconna import UniMsg, Reply
 from nonebot_plugin_uninfo import Uninfo
-from nonebot_plugin_alconna import UniMsg, UniMessage, Reply
-
 
 __plugin_meta__ = PluginMetadata(
     name="AI聊天",
@@ -17,9 +16,8 @@ __plugin_meta__ = PluginMetadata(
     usage="@机器人+聊天内容，或者#聊天内容",
 )
 
-
 import config
-from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt
+from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
 from ..common.rules import is_at_me, rule_args_num
 
 wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
@@ -142,4 +140,14 @@ async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
         # voice_bytes = gen_voice(_res)
         # if voice_bytes:
         #     await bot.send(event, MessageSegment.record(voice_bytes))
+
     threading.Thread(target=lambda: asyncio.run(gptchat()), daemon=True).start()
+
+
+clear_history_cmd = on_fullmatch("清除记录")
+
+
+@clear_history_cmd.handle()
+async def _(session: Uninfo):
+    clear_history(get_context_id(session))
+    await clear_history_cmd.finish("AI 聊天记录清除成功")
