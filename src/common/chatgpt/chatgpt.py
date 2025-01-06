@@ -6,6 +6,7 @@ import requests
 from config import CHATGPT, get_config, set_config
 from src.common.utils.htmlhelper import html2txt
 from .base import ChatGPT
+from .config import CHATGPT_CONFIG
 from .. import DATA_DIR
 
 thread_lock = Lock()
@@ -55,7 +56,7 @@ def __get_chatgpt(context_id: str) -> list[ChatGPT]:
                 api_base=gpt_config['api'],
                 model=gpt_config['model'],
                 http_proxy=get_config("GFW_PROXY")
-                ) for gpt_config in CHATGPT
+                ) for gpt_config in CHATGPT_CONFIG
     ]
     if not context_id:
         return gpt_list

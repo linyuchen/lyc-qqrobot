@@ -3,7 +3,7 @@ import re
 import threading
 import time
 
-from nonebot import on_command, on_message, on_fullmatch, Bot
+from nonebot import on_command, on_message, on_fullmatch, Bot, get_plugin_config
 from nonebot.params import CommandArg, Message, Event
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
@@ -18,7 +18,10 @@ __plugin_meta__ = PluginMetadata(
 
 import config
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
+from src.common.chatgpt.config import set_chatgpt_config, ChatGPTConfig
 from ..common.rules import is_at_me, rule_args_num
+
+set_chatgpt_config(get_plugin_config(ChatGPTConfig))
 
 wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
 
@@ -96,7 +99,7 @@ clear_prompt_cmd = on_fullmatch(("清除人格", "恢复人格", "清空人格",
 
 
 @clear_prompt_cmd.handle()
-async def _(session: Uninfo, args: Message = CommandArg()):
+async def _(session: Uninfo):
     clear_prompt(get_context_id(session))
     clear_prompt_cmd.finish("人格清除成功")
 
@@ -136,7 +139,7 @@ async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
 
     async def gptchat():
         _res = chat(get_context_id(session), _chat_text)
-        await bot.send(event, UniMsg.reply(event.message_id) + _res)
+        await bot.send(event, await (UniMsg.reply(event.message_id) + _res).export())
         # voice_bytes = gen_voice(_res)
         # if voice_bytes:
         #     await bot.send(event, MessageSegment.record(voice_bytes))

@@ -30,6 +30,7 @@ class ChatGPT:
             session.proxies = proxies
             openai.api_engine = session
 
+        # todo: refactor to use AsyncOpenAI
         self.openai_client = openai.Client(api_key=self.api_key, base_url=self.api_base)
 
     def get_prompt(self):
