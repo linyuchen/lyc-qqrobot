@@ -1,12 +1,12 @@
+import os
 import traceback
 from threading import Lock
 
 import requests
 
-from config import CHATGPT, get_config, set_config
 from src.common.utils.htmlhelper import html2txt
 from .base import ChatGPT
-from .config import CHATGPT_CONFIG
+from src.common.config import CONFIG
 from .. import DATA_DIR
 
 thread_lock = Lock()
@@ -25,38 +25,51 @@ default_prompt_text = """遵循以下规则：
 9.发送菜单或者help可以查看功能列表
 """
 
-default_prompt_path = DATA_DIR / 'chatgpt_default_prompt.txt'
+chat_gpt_prompt_dir = DATA_DIR / 'chatgpt_prompt'
+
+if not chat_gpt_prompt_dir.exists():
+    chat_gpt_prompt_dir.mkdir()
+
+default_prompt_path = chat_gpt_prompt_dir / 'default.txt'
+
 if not default_prompt_path.exists():
     with open(default_prompt_path, 'w', encoding='utf-8') as f:
         f.write(default_prompt_text)
 
 try:
-    with open(DATA_DIR / 'chatgpt_default_prompt.txt', 'r', encoding='utf-8') as f:
+    with open(default_prompt_path, 'r', encoding='utf-8') as f:
         default_prompt_text = f.read()
 except:
     pass
 
 prompt_dict = {}  # context_id: prompt_str
 
-CONFIG_KEY = "chatgpt_prompts"
 
 
 def __read():
-    prompt_dict.update(get_config(CONFIG_KEY, {}))
+    context_ids = os.listdir(chat_gpt_prompt_dir)
+    for file_name in context_ids:
+        if not file_name.endswith('.txt'):
+            continue
+        with open(chat_gpt_prompt_dir / file_name, 'r', encoding='utf-8') as pf:
+            context_id = os.path.splitext(file_name)[0]
+            prompt_dict[context_id] = pf.read()
 
 
 def __save():
-    set_config(CONFIG_KEY, prompt_dict)
+    for context_id, prompt in prompt_dict.items():
+        with open(chat_gpt_prompt_dir / (context_id + '.txt'), 'w', encoding='utf-8') as pf:
+            pf.write(prompt)
 
 
 def __get_chatgpt(context_id: str) -> list[ChatGPT]:
     gpt_list = [
         ChatGPT(prompt=default_prompt_text if context_id else "",
-                api_key=gpt_config['key'],
-                api_base=gpt_config['api'],
-                model=gpt_config['model'],
-                http_proxy=get_config("GFW_PROXY")
-                ) for gpt_config in CHATGPT_CONFIG
+                api_key=gpt_config.key,
+                api_base=str(gpt_config.api),
+                model=gpt_config.model,
+                http_proxy=CONFIG.http_proxy
+                ) for gpt_config in CONFIG.chatgpt
     ]
     if not context_id:
         return gpt_list

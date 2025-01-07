@@ -1,11 +1,11 @@
 import inspect
 from typing import Callable, Coroutine, Awaitable
 
-from nonebot import get_loaded_plugins, get_driver
-from nonebot.adapters.onebot.v11 import PrivateMessageEvent, Bot, GroupMessageEvent
+from nonebot import get_loaded_plugins, get_driver, Bot
 from nonebot.internal.adapter import Event
 from nonebot.internal.matcher import Matcher
 from nonebot.internal.permission import Permission
+from nonebot_plugin_uninfo import Uninfo, get_session
 
 TypePermissionChecker = Callable[[Matcher, Bot, Event], bool] | Awaitable
 
@@ -63,10 +63,16 @@ def check_super_user(user_id: str):
     return user_id in get_driver().config.superusers
 
 
-async def check_group_admin(bot: Bot, event: PrivateMessageEvent | GroupMessageEvent):
-    if isinstance(event, PrivateMessageEvent):
-        return check_super_user(str(event.user_id))
+async def check_group_admin(bot: Bot, event: Event):
+    session = await get_session(bot, event)
+
+    if not session.scene.is_group:
+        return check_super_user(str(session.user.id))
     else:
-        member_info = await bot.get_group_member_info(group_id=event.group_id, user_id=event.user_id)
-        is_admin = member_info.get('role') in ['admin', 'owner']
-        return check_super_user(str(event.user_id)) or is_admin
+        if session.adapter.value == 'OneBot V11':
+            member_info = await bot.get_group_member_info(group_id=session.group.id, user_id=session.user.id)
+            is_admin = member_info.get('role') in ['admin', 'owner']
+        else:
+            # todo: add other platform support
+            is_admin = False
+        return check_super_user(str(session.user.id)) or is_admin

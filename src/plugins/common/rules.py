@@ -31,7 +31,6 @@ def rule_args_num(num=None, min_num=None, max_num=None):
 
 def rule_is_group_msg():
     """
-    params notice: 是否提醒只能在群里使用
     """
 
     async def _(bot: Bot, event: Event):

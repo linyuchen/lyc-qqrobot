@@ -15,8 +15,7 @@ __plugin_meta__ = PluginMetadata(
     usage="发送链接即可"
 )
 
-import config
-from src.common.bilicard.bilicard import session
+from src.common.config import CONFIG
 from src.common.browser.screenshot.weixin import screenshot_wx_article
 from src.common.browser.screenshot.github import screenshot_github_readme
 from src.common.browser.screenshot.zhihu import ZhihuPreviewer
@@ -97,7 +96,7 @@ async def github_preview(bot: Bot, event: Event):
             url = url[0] if url else None
             return url
 
-    await screenshot(bot, event, parse_url, lambda url: screenshot_github_readme(url, config.get_config('GFW_PROXY')))
+    await screenshot(bot, event, parse_url, lambda url: screenshot_github_readme(url, str(CONFIG.http_proxy)))
 
 
 @on_message().handle()

@@ -16,12 +16,9 @@ __plugin_meta__ = PluginMetadata(
     usage="@机器人+聊天内容，或者#聊天内容",
 )
 
-import config
 from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
-from src.common.chatgpt.config import set_chatgpt_config, ChatGPTConfig
 from ..common.rules import is_at_me, rule_args_num
 
-set_chatgpt_config(get_plugin_config(ChatGPTConfig))
 
 wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
 
@@ -39,16 +36,17 @@ def wiki(args: Message = CommandArg()):
 
 
 def gen_voice(text) -> bytes | None:
-    if not config.TTS_ENABLED:
-        return
-    from ..tts.genshinvoice_top import tts
-    # text = text.replace("喵", "")
-    if len(text) <= 60:
-        try:
-            voice_bytes = tts(text)
-            return voice_bytes
-        except Exception as e:
-            pass
+    pass
+    # if not config.TTS_ENABLED:
+    #     return
+    # from ..tts.genshinvoice_top import tts
+    # # text = text.replace("喵", "")
+    # if len(text) <= 60:
+    #     try:
+    #         voice_bytes = tts(text)
+    #         return voice_bytes
+    #     except Exception as e:
+    #         pass
 
 
 def get_url(text: str) -> str:
@@ -80,9 +78,9 @@ def _(event: Event, args: Message = CommandArg()):
 
 def get_context_id(session: Uninfo) -> str:
     if session.scene.is_group:
-        context_id = "g" + str(session.group.id)
+        context_id = session.adapter.value + "_group_" + str(session.group.id)
     else:
-        context_id = "f" + str(session.user.id)
+        context_id = session.adapter.value + "_private_" + str(session.user.id)
     return context_id
 
 
@@ -101,7 +99,7 @@ clear_prompt_cmd = on_fullmatch(("清除人格", "恢复人格", "清空人格",
 @clear_prompt_cmd.handle()
 async def _(session: Uninfo):
     clear_prompt(get_context_id(session))
-    clear_prompt_cmd.finish("人格清除成功")
+    await clear_prompt_cmd.finish("人格清除成功")
 
 
 get_prompt_cmd = on_fullmatch("查看人格")
@@ -139,7 +137,7 @@ async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
 
     async def gptchat():
         _res = chat(get_context_id(session), _chat_text)
-        await bot.send(event, await (UniMsg.reply(event.message_id) + _res).export())
+        await bot.send(event, await (UniMsg.reply(event.message_id) + _res).export(bot))
         # voice_bytes = gen_voice(_res)
         # if voice_bytes:
         #     await bot.send(event, MessageSegment.record(voice_bytes))

@@ -1,31 +1,63 @@
 import asyncio
+import tempfile
+from pathlib import Path
 
-from playwright.async_api import async_playwright
-
-from src.common import PLAYWRIGHT_DATA_DIR
-from src.common.bilicard.bilicard import COOKIE_PATH
+from playwright.async_api import async_playwright, BrowserContext, Page
 
 
-async def login():
-    async with async_playwright() as browser_context_manager:
-        browser = await browser_context_manager.chromium.launch_persistent_context(
-            PLAYWRIGHT_DATA_DIR,
-            headless=False)
-        page = await browser.new_page()
-        await page.goto("https://passport.bilibili.com/login")
-        while True:
+class BiliLogin:
+
+    def __init__(self):
+        self.browser: BrowserContext | None = None
+        self.page: Page | None = None
+
+    async def init(self):
+        browser_context_manager = await async_playwright().start()
+        self.browser = await browser_context_manager.chromium.launch_persistent_context(
+            tempfile.mkdtemp(),
+            headless=True)
+        self.page = await self.browser.new_page()
+        await self.page.goto("https://passport.bilibili.com/login")
+
+    async def get_qrcode(self) -> Path:
+        # 获取class='login-scan'
+        for i in range(30):
             await asyncio.sleep(1)
-            cookies = await browser.cookies()
-            cookie_parts = [f"{cookie['name']}={cookie['value']}" for cookie in cookies if "bilibili" in cookie["domain"]]
-            cookies_text = "; ".join(cookie_parts)
-            if "bili_jct" in cookies_text:
-                cookie_path = COOKIE_PATH
-                cookie_path.write_text(cookies_text)
-                break
-        input('按回车关闭浏览器')
-        await page.close()
-        await browser.close()
+            qrcode = await self.page.wait_for_selector(".login-scan")
+            # 截图到临时目录
+            tmp_path = tempfile.mktemp(suffix=".png")
+            await qrcode.screenshot(path=tmp_path)
+            return Path(tmp_path)
+
+        raise TimeoutError("获取B站登录二维码超时")
+
+    async def __get_cookie(self):
+        cookies = await self.browser.cookies()
+        cookie_parts = [f"{cookie['name']}={cookie['value']}" for cookie in cookies if "bilibili" in cookie["domain"]]
+        cookies_text = "; ".join(cookie_parts)
+        if "bili_jct" in cookies_text:
+            return cookies_text
+
+    async def get_cookie(self):
+        for i in range(120):
+            await asyncio.sleep(1)
+            cookie = await self.__get_cookie()
+            if cookie:
+                return cookie
+        raise TimeoutError("获取B站登录cookie超时")
+
+    async def close(self):
+        await self.page.close()
+        await self.browser.close()
 
 
 if __name__ == '__main__':
-    asyncio.run(login())
+    async def main():
+        bili_login = BiliLogin()
+        await bili_login.init()
+        qrcode_path = await bili_login.get_qrcode()
+        print(qrcode_path)
+        print(await bili_login.get_cookie())
+        await bili_login.close()
+
+    asyncio.run(main())

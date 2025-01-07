@@ -77,7 +77,9 @@ class GroupPointAction:
         other_user = session.query(GroupMember).filter_by(group_qq=group_qq, qq=other_qq).one_or_none()
         me = self.get_member(group_qq, my_qq)
         if not other_user:
-            return "对不起，您要转账的对象不存在！请先让他在群里签到。"
+            other_user = session.query(GroupMember).filter_by(group_qq=group_qq, username=other_qq).one_or_none()
+            if not other_user:
+                return "对不起，您要转账的对象不存在！请先让他在群里签到。"
         rest_point = me.point
         if point > rest_point:
             return "对不起，您的余额不够要转的额度！"

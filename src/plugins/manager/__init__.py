@@ -5,8 +5,8 @@ from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot.plugin import Plugin
 from nonebot_plugin_uninfo import get_session
-
 from nonebot.plugin import PluginMetadata
+from nonebot_plugin_uninfo import Uninfo
 
 __plugin_meta__ = PluginMetadata(
     name="插件管理",
@@ -15,27 +15,30 @@ __plugin_meta__ = PluginMetadata(
 )
 
 from src.plugins.common.permission import add_inject_permission_checker, check_super_user, check_group_admin
+from src.plugins.common.rules import rule_is_group_msg
 from src.plugins.manager.util import find_plugin_by_name, init_plugin_manager_config, check_group_enable, \
     check_global_enable, \
     set_global_enable, set_group_enable
 
 driver = get_driver()
 
-plugin_list_cmd = on_fullmatch('插件列表')
-global_cmd = on_command('全局禁用插件', aliases={'全局启用插件'}, permission=SUPERUSER)
-group_cmd = on_command('启用插件', aliases={'禁用插件'}, permission=check_group_admin)
+plugin_list_cmd = on_fullmatch('插件列表', rule=rule_is_group_msg())
+global_cmd = on_command('全局禁用插件', aliases={'全局启用插件', '全局关闭插件'}, permission=SUPERUSER)
+group_cmd = on_command('启用插件', aliases={'禁用插件', '关闭插件'}, permission=check_group_admin, rule=rule_is_group_msg())
 
 
 @plugin_list_cmd.handle()
-async def _(event: Event):
-    user_id = event.get_user_id()
+async def _(session: Uninfo):
+    user_id = session.user.id
     is_super_user = check_super_user(user_id)
     plugins = get_loaded_plugins()
     plugins = sorted(plugins, key=lambda x: x.metadata.name if x.metadata else x.id_)
-    group_id = getattr(event, 'group_id')
+    group_id = session.group.id if session.group else ''
     res = '插件列表：\n'
     for plugin in plugins:
-        if plugin.id_ == 'common':
+        # if not plugin.metadata:
+        #     continue
+        if plugin.id_ in ['common', 'uniseg']:
             continue
         plugin_name = plugin.metadata.name if plugin.metadata else plugin.id_
         res += f'【{plugin_name}】'
@@ -67,15 +70,16 @@ async def _(event: Event, args: Message = CommandArg()):
 
 
 @group_cmd.handle()
-async def _(event: Event, args: Message = CommandArg()):
+async def _(bot: Bot, event: Event, args: Message = CommandArg()):
+    session = await get_session(bot, event)
     plugin_name = args.extract_plain_text().strip()
     plugin = find_plugin_by_name(plugin_name)
     if not plugin:
         return await group_cmd.finish(f'插件{plugin_name}不存在')
 
     enable = event.get_plaintext().strip().startswith('启用')
-    if group_id := getattr(event, 'group_id'):
-        set_group_enable(plugin.id_, group_id, enable)
+    if group_id := getattr(session.group, 'id'):
+        set_group_enable(plugin.id_, str(group_id), enable)
 
     await group_cmd.finish(f'插件 {plugin_name} 在本群已{"启用" if enable else "禁用"}')
 

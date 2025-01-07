@@ -1,94 +1,15 @@
-import re
 import tempfile
-import time
-from collections.abc import Coroutine
 from io import BytesIO
-from pathlib import Path, PurePath
-from typing import Awaitable
+from pathlib import Path
 
-import httpx
-import aiofiles
 from PIL import Image, ImageDraw, ImageFont
 
+from .api import get_video_info, get_subtitle
+from .session import session
 from ..chatgpt.chatgpt import chat
 from ..stringplus import split_lines
-from .. import DATA_DIR
 
 # session = requests.session()
-headers = {
-    "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) "
-                  "Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.35",
-    "Referer": "https://www.bilibili.com/",
-    "Accept": "application/json;charset=UTF-8"
-}
-
-COOKIE_PATH = DATA_DIR / "bili_cookie.txt"
-
-session = httpx.AsyncClient(headers=headers, follow_redirects=True)
-
-
-async def get_cookie():
-    async with aiofiles.open(COOKIE_PATH) as f:
-        cookies = await f.read()
-        cookies = re.findall("(.*?)=(.*?); ", cookies)
-        cookies = dict(cookies)
-        session.cookies = cookies
-
-
-def check_is_b23(text: str) -> []:
-    b23tv = re.findall("(?<=b23.tv/)\w*", text)
-    return b23tv
-
-
-async def b32_to_bv(b23tv: str) -> str:
-    """
-    b23.tv链接转BV链接
-    """
-    url = f"https://b23.tv/{b23tv}"
-    url = (await session.get(url)).url
-    return str(url)
-
-
-def get_bv_id(text: str):
-    # 正则检查B站视频BV号
-    result = re.findall(r"(?<=BV)\w+", text, re.I)
-    return result and result[0] or ""
-
-
-def get_av_id(text: str):
-    result = re.findall(r"(?<=av)\d{4,}", text, re.I)
-    return result and result[0] or ""
-
-
-async def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:
-    # get_cookie()
-    url = ""
-    if bv_id:
-        url = f"http://api.bilibili.com/x/web-interface/view?bvid={bv_id}"
-    elif av_id:
-        url = f"http://api.bilibili.com/x/web-interface/view?aid={av_id}"
-    res = await session.get(url)
-    response_body = res.json().get("data", {})
-    if not response_body:
-        return
-    video_info = {
-        **response_body,
-        "title": response_body["title"],
-        "desc": response_body.get("desc", ""),
-        "cover_url": response_body["pic"],
-        "upload_time": time.strftime("%Y/%m/%d %H:%M", time.localtime(response_body["pubdate"])),
-        "duration":
-            f"{response_body['duration'] // 60}:{response_body['duration'] - response_body['duration'] // 60 * 60}",
-        "view": response_body["stat"]["view"],
-        "danmu": response_body["stat"]["danmaku"],
-        "like": response_body["stat"]["like"],
-        "coin": response_body["stat"]["coin"],
-        "share": response_body["stat"]["share"],
-        "favorite": response_body["stat"]["favorite"],
-        "owner": f"{response_body['owner']['name']}",
-        "owner_face": f"{response_body['owner']['face']}",
-    }
-    return video_info
 
 
 # 获取评论，https://api.bilibili.com/x/v2/reply/wbi/main?oid=683107021&type=1&mode=3
@@ -122,26 +43,6 @@ async def gen_text(bv_id: str) -> str:
            f"分享：{share:<7}上传时间：{upload_time}\n作者：{owner}\n"
 
     return text
-
-
-async def get_subtitle(aid: str, cid: str):
-    await get_cookie()
-    url = f"https://api.bilibili.com/x/player/wbi/v2?aid={aid}&cid={cid}"
-
-    res = (await session.get(url)).json()
-    subtitles = res["data"]["subtitle"]["subtitles"]
-    subtitle_urls = []
-    for sub_t in subtitles:
-        if sub_t["lan"] in ("ai-zh", "zh-Hans"):
-            subtitle_urls.append("https:" + sub_t["subtitle_url"])
-
-    subtitle_content = []
-    for subtitle_url in subtitle_urls:
-        res = (await session.get(subtitle_url)).json()
-        for i in res["body"]:
-            subtitle_content.append(i["content"])
-    subtitle = "\n".join(subtitle_content)
-    return subtitle
 
 
 async def get_video_summary_by_ai(aid, cid) -> str:
@@ -233,30 +134,3 @@ async def gen_image(video_info: dict) -> BytesIO:
 def get_font(size=20):
     font = ImageFont.truetype(str(Path(__file__).parent.parent.parent / "common/fonts/仓耳舒圆体.ttf"), size)
     return font
-
-
-if __name__ == "__main__":
-    _text = "https://www.bilibili.com/video/BV1814y1V7RS/?spm_id_from=333.1073.channel.secondary_floor_video.click"
-    _text = "https://www.bilibili.com/video/BV1Ps4y1v79v/?spm_id_from=444.41.list.card_archive.click&vd_source=210c4e2f9f0cdc36cd087b10ec64eedc"
-    _text = "https://www.bilibili.com/video/BV1Ss4y1b7r9/?spm_id_from=333.1007.partition_recommend.content.click"
-
-    # 白色背景封面
-    _text = "https://www.bilibili.com/video/BV1sP411g7PZ/?spm_id_from=333.337.search-card.all.click&vd_source=210c4e2f9f0cdc36cd087b10ec64eedc"
-
-    # _text = "https://www.bilibili.com/video/BV1MY4y1R7EN"
-
-    # 长标题
-    _text = "https://www.bilibili.com/video/BV17N411D7fB"
-
-    # 长字幕
-    # _text = 'https://www.bilibili.com/video/BV1MY4y1R7EN'
-
-    # 被翻译成英文了
-    # _text = 'https://bilibili.com/video/BV1Ds4y1e7ZB'
-    bvid = get_bv_id(_text)
-    # print(gen_text(bvid))
-    _video_info = get_video_info(bvid)
-    print(gen_image(_video_info))
-    _r = get_video_summary_by_ai(_video_info["aid"], _video_info["cid"])
-    # print(_r)
-    # print(b32_to_bv("LPrGvRX"))

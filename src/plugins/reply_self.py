@@ -5,11 +5,12 @@
 
 from nonebot.internal.adapter import Event
 from nonebot.message import event_preprocessor
+from nonebot.plugin import PluginMetadata
 from nonebot.adapters.onebot.v11 import Bot, MessageEvent
 
 
 @event_preprocessor
-async def do_something(bot: Bot, event: Event):
+async def _(bot: Bot, event: Event):
     if event.post_type == 'message_sent':
         sent_event = event.model_dump()
         sent_event['post_type'] = 'message'

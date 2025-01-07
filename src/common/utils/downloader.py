@@ -5,6 +5,8 @@ import httpx
 import requests
 from tqdm import tqdm
 
+import src.common.bilicard.session
+
 
 def download2temp(url, suffix="", http_proxy="") -> Path:
     res_f = requests.get(url, proxies={"http": http_proxy, "https": http_proxy} if http_proxy else {}).content
@@ -32,7 +34,7 @@ async def async_download_with_progressbar(url: str, file_path: Path | str, desc=
 
     async with httpx.AsyncClient() as session:
         async with session.stream("GET", url) as response:
-            total_size_in_bytes = int(response.headers.get('content-length', 0))
+            total_size_in_bytes = int(src.common.bilicard.session.headers.get('content-length', 0))
             progress_bar = tqdm(desc=desc, total=total_size_in_bytes, unit='iB', unit_scale=True)
 
             with open(file_path, 'wb') as file:
