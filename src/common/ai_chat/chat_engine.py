@@ -5,8 +5,9 @@ from threading import Lock
 import requests
 
 from src.common.utils.htmlhelper import html2txt
-from .base import ChatGPT
+from .base import AIChat
 from src.common.config import CONFIG
+from .models import get_chat_model
 from .. import DATA_DIR
 
 thread_lock = Lock()
@@ -62,39 +63,41 @@ def __save():
             pf.write(prompt)
 
 
-def __get_chatgpt(context_id: str) -> list[ChatGPT]:
-    gpt_list = [
-        ChatGPT(prompt=default_prompt_text if context_id else "",
-                api_key=gpt_config.key,
-                api_base=str(gpt_config.api),
-                model=gpt_config.model,
-                http_proxy=CONFIG.http_proxy
-                ) for gpt_config in CONFIG.chatgpt
-    ]
+def __get_chatgpt(context_id: str) -> AIChat:
+    if len(CONFIG.ai_chats) == 0:
+        raise Exception("未配置AI聊天模型")
+    chat_model = get_chat_model(context_id) or CONFIG.ai_chats[0].model
+    ai_chat_config = CONFIG.ai_chats[0]
+    for _config in CONFIG.ai_chats:
+        if _config.model == chat_model:
+            ai_chat_config = _config
+            break
+    ai_chat = AIChat(prompt=default_prompt_text if context_id else "",
+               api_key=ai_chat_config.api_key,
+               api_base=str(ai_chat_config.base_url),
+               model=ai_chat_config.model,
+               )
     if not context_id:
-        return gpt_list
+        return ai_chat
     if context_id not in context:
-        context[context_id] = gpt_list
+        context[context_id] = ai_chat
 
     return context[context_id]
 
 
 def chat(context_id: str | None, question: str) -> str:
-    for gpt in __get_chatgpt(context_id):
-        try:
-            res = gpt.chat(question)
-            return res
-        except Exception as e:
-            traceback.print_exc()
-            print(e)
-            continue
+    try:
+        res = __get_chatgpt(context_id).chat(question)
+        return res
+    except Exception as e:
+        traceback.print_exc()
     return "本喵累了，休息一下再来吧~"
 
 
 def set_prompt(context_id: str, prompt: str):
-    for gpt in __get_chatgpt(context_id):
-        gpt.set_prompt(prompt)
-        gpt.clear_history()
+    ai_chat = __get_chatgpt(context_id)
+    ai_chat.set_prompt(prompt)
+    ai_chat.clear_history()
 
     with thread_lock:
         prompt_dict[context_id] = prompt
@@ -106,8 +109,7 @@ def clear_prompt(context_id: str):
 
 
 def clear_history(context_id: str):
-    for gpt in __get_chatgpt(context_id):
-        gpt.clear_history()
+    __get_chatgpt(context_id).clear_history()
 
 
 def get_prompt(context_id: str) -> str:

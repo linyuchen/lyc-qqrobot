@@ -5,6 +5,7 @@ from nonebot import get_loaded_plugins
 from playwright.async_api import async_playwright
 
 from src.common import DATA_DIR
+from src.plugins.menu.ignore import ignore_plugin_ids
 
 cur_dir = Path(__file__).parent
 menu_image_path = DATA_DIR / 'menu.png'
@@ -41,7 +42,7 @@ def create_menu_item(name: str, desc: str, usage: str, color_index: int) -> str:
 def get_plugins():
     plugins = get_loaded_plugins()
     plugins = sorted(plugins, key=lambda x: x.metadata.name if x.metadata else x.id_)
-    plugins = [plugin for plugin in plugins if plugin.metadata]
+    plugins = [plugin for plugin in plugins if plugin.metadata and plugin.id_ not in ignore_plugin_ids]
     return plugins
 
 
@@ -59,8 +60,8 @@ def generate_menu():
     for index, plugin in enumerate(plugins):
         color_index = index % 4 + 1
         plugin_name = plugin.metadata.name
-        plugin_description = plugin.metadata.description
-        plugin_usage = plugin.metadata.usage
+        plugin_description = plugin.metadata.description.replace('\n', '<br>')
+        plugin_usage = plugin.metadata.usage.replace('\n', '<br>')
         menu_text += create_menu_item(plugin_name, plugin_description, plugin_usage, color_index)
 
     template_text = template_text.replace('{{menu_items}}', menu_text)

@@ -1,7 +1,6 @@
-import re
 import time
 
-from src.common.bilicard.session import session
+from src.common.bilibili.session import session
 
 
 async def get_my_info():
@@ -13,10 +12,6 @@ async def check_login() -> bool:
     my_info = await get_my_info()
     return my_info['code'] == 0
 
-def check_is_b23(text: str) -> []:
-    b23tv = re.findall("(?<=b23.tv/)\w*", text)
-    return b23tv
-
 
 async def b32_to_bv(b23tv: str) -> str:
     """
@@ -25,17 +20,6 @@ async def b32_to_bv(b23tv: str) -> str:
     url = f"https://b23.tv/{b23tv}"
     url = (await session.get(url)).url
     return str(url)
-
-
-def get_bv_id(text: str):
-    # 正则检查B站视频BV号
-    result = re.findall(r"(?<=BV)\w+", text, re.I)
-    return result and result[0] or ""
-
-
-def get_av_id(text: str):
-    result = re.findall(r"(?<=av)\d{4,}", text, re.I)
-    return result and result[0] or ""
 
 
 async def get_video_info(bv_id: str = "", av_id: str = "") -> None | dict:

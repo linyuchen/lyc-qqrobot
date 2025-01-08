@@ -20,16 +20,14 @@ class BiliLogin:
         await self.page.goto("https://passport.bilibili.com/login")
 
     async def get_qrcode(self) -> Path:
-        # 获取class='login-scan'
-        for i in range(30):
-            await asyncio.sleep(1)
+        try:
             qrcode = await self.page.wait_for_selector(".login-scan")
-            # 截图到临时目录
-            tmp_path = tempfile.mktemp(suffix=".png")
-            await qrcode.screenshot(path=tmp_path)
-            return Path(tmp_path)
+        except Exception as e:
+            raise TimeoutError("获取B站登录二维码超时")
+        tmp_path = tempfile.mktemp(suffix=".png")
+        await qrcode.screenshot(path=tmp_path)
+        return Path(tmp_path)
 
-        raise TimeoutError("获取B站登录二维码超时")
 
     async def __get_cookie(self):
         cookies = await self.browser.cookies()

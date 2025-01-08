@@ -16,7 +16,7 @@ __plugin_meta__ = PluginMetadata(
     usage="@机器人+聊天内容，或者#聊天内容",
 )
 
-from src.common.chatgpt.chatgpt import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
+from src.common.ai_chat.chat_engine import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
 from ..common.rules import is_at_me, rule_args_num
 
 

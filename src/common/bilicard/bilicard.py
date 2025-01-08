@@ -4,9 +4,9 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
-from .api import get_video_info, get_subtitle
-from .session import session
-from ..chatgpt.chatgpt import chat
+from src.common.bilibili.api import get_video_info, get_subtitle
+from src.common.bilibili.session import session
+from ..ai_chat.chat_engine import chat
 from ..stringplus import split_lines
 
 # session = requests.session()

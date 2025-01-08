@@ -4,7 +4,6 @@ import httpx
 from nonebot import on_command
 from nonebot.adapters.onebot.v11 import Message, MessageSegment, Bot, MessageEvent
 from nonebot.params import CommandArg
-from nonebot.typing import T_State
 from nonebot_plugin_waiter import waiter
 from nonebot.plugin import PluginMetadata
 

@@ -4,21 +4,23 @@ from pathlib import Path
 from typing import Callable, Coroutine
 
 from nonebot import on_message, Bot
+from nonebot.permission import SUPERUSER
 from nonebot.plugin import PluginMetadata
 from nonebot.internal.adapter import Event
-from nonebot_plugin_uninfo import Uninfo, get_session
+from nonebot.plugin.on import on_fullmatch
+from nonebot_plugin_uninfo import get_session
 from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="网页预览",
     description="GitHub、知乎、微信公众号文章、萌娘百科、百度搜索等网页预览",
-    usage="发送链接即可"
+    usage="发送链接即可，\n发送 登录知乎 进行登录（需要bot主人权限）",
 )
 
 from src.common.config import CONFIG
 from src.common.browser.screenshot.weixin import screenshot_wx_article
 from src.common.browser.screenshot.github import screenshot_github_readme
-from src.common.browser.screenshot.zhihu import ZhihuPreviewer
+from src.common.browser.screenshot.zhihu import ZhihuPreviewer, ZhihuLogin
 
 zhihu_previewer = ZhihuPreviewer()
 
@@ -92,7 +94,7 @@ async def github_preview(bot: Bot, event: Event):
     def parse_url(msg_text: str):
         if "//github.com/" in msg_text:
             # 获取github链接
-            url = re.findall(r"https://github.com/[a-zA-Z0-9_/-]+", msg_text)
+            url = re.findall(r"https?://github.com/[^/]+/[^/]+", msg_text)
             url = url[0] if url else None
             return url
 
@@ -109,3 +111,17 @@ async def _(bot: Bot, event: Event):
             return url
 
     await screenshot(bot, event, parse_url, screenshot_wx_article)
+
+
+zhihu_login_cmd = on_fullmatch("登录知乎", permission=SUPERUSER)
+
+@zhihu_login_cmd.handle()
+async def _():
+    zhihu_login = ZhihuLogin()
+    await zhihu_login.init()
+    qrcode_path = await zhihu_login.get_qrcode()
+    await zhihu_login_cmd.send(await UniMsg.image(raw=qrcode_path.read_bytes()).export())
+    qrcode_path.unlink()
+    login_result = await zhihu_login.check_login()
+    if login_result:
+        await zhihu_login_cmd.finish("登录成功")

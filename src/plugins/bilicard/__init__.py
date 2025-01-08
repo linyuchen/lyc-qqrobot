@@ -2,20 +2,21 @@ import time
 
 from nonebot import Bot, on_command, on_message
 from nonebot.adapters import Event
-from nonebot.message import event_preprocessor
 from nonebot.plugin import PluginMetadata
 from nonebot.params import CommandArg
 from nonebot.permission import SUPERUSER
 from nonebot_plugin_alconna import UniMsg
 from nonebot_plugin_uninfo import get_session
 
-from src.common.bilicard.session import COOKIE_PATH, set_bili_cookie
-from src.common.bilicard.api import check_login, get_video_info, b32_to_bv, check_is_b23, get_bv_id, get_av_id
+from src.common.bilibili.login import BiliLogin
+from src.common.bilibili.session import set_bili_cookie
+from src.common.bilibili.api import check_login, get_video_info, b32_to_bv
+from src.common.bilibili.utils import check_is_b23, get_bv_id, get_av_id
 
 __plugin_meta__ = PluginMetadata(
     name="B站链接",
     description="B站视频链接解析",
-    usage="直接发送B站视频链接即可\n设置B站cookie <cookies>",
+    usage="直接发送B站视频链接即可\n主人命令：设置B站cookie <cookies>，或直接发送 登录B站",
 )
 
 
@@ -81,6 +82,7 @@ async def _(bot: Bot, event: Event):
 
 
 set_cookie_cmd = on_command('设置B站cookie', permission=SUPERUSER)
+login_cmd = on_command('登录B站', aliases={'登录b站'}, permission=SUPERUSER)
 
 @set_cookie_cmd.handle()
 async def _(args = CommandArg()):
@@ -89,3 +91,22 @@ async def _(args = CommandArg()):
         await set_cookie_cmd.finish("请在命令后输入cookie")
     set_bili_cookie(msg_text)
     await set_cookie_cmd.finish("设置成功")
+
+
+@login_cmd.handle()
+async def _():
+    bili_login = BiliLogin()
+    await bili_login.init()
+    try:
+        qrcode_path = await bili_login.get_qrcode()
+        await login_cmd.send(await UniMsg.image(raw=qrcode_path.read_bytes()).export())
+        qrcode_path.unlink()
+    except Exception as e:
+        return await login_cmd.finish(str(e))
+
+    try:
+        cookies = await bili_login.get_cookie()
+        set_bili_cookie(cookies)
+        return await login_cmd.finish("登录成功")
+    except TimeoutError as e:
+        return await login_cmd.finish(str(e))
