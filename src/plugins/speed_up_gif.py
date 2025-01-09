@@ -29,7 +29,8 @@ async def random_speed_up_gif(bot: Bot, event: Event, msg: UniMsg):
     msg_text = event.message.extract_plain_text().strip()
     reply_msg = msg.get(Reply)
     if reply_msg:
-        reply_msg = reply_msg[0]
+        reply_msg: Reply = reply_msg[0]
+        reply_msg = await UniMsg.generate(message=reply_msg.msg)
         reply_img_urls = get_message_image_urls(reply_msg)
     else:
         reply_img_urls = []
@@ -54,6 +55,6 @@ async def random_speed_up_gif(bot: Bot, event: Event, msg: UniMsg):
             return
         history[qq] = time.time()
         re_path = re_speed(img_path, random.choice([30, 40, 50]))
-        await bot.send(event, await UniMsg.image(path=re_path).export())
+        await bot.send(event, await UniMsg.image(raw=re_path.read_bytes()).export())
         img_path.unlink()
         re_path.unlink()
