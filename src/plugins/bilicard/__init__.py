@@ -75,7 +75,7 @@ async def _(bot: Bot, event: Event):
 
         url = f"https://bilibili.com/video/{bvid}" if bvid else f"https://bilibili.com/video/av{avid}"
         if img:
-            reply_msg = UniMsg.image(img) + \
+            reply_msg = UniMsg.image(raw=img) + \
                         UniMsg.text("简介：" + video_info["desc"] + "\n\n" + summary +
                                             "\n\n" + url)
             await bot.send(event, await reply_msg.export())

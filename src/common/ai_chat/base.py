@@ -6,17 +6,16 @@ class AIChat:
     def __init__(self,
                  prompt="",
                  api_key: str = "",
-                 api_base: str = "",
+                 base_url: str = "",
                  model: str = "",  # 参考 https://docs.litellm.ai/docs/providers
                  history_max=10,
                  ):
         self.api_key = api_key
-        self.api_base = api_base
+        self.base_url = base_url
         self.model = model
         self.history_max = history_max
         self.prompt = prompt
         self.history = []  # messages
-
 
     def get_prompt(self):
         return self.prompt
@@ -41,6 +40,8 @@ class AIChat:
         messages.append(user_message)
 
         response = completion(
+            api_key=self.api_key,
+            base_url=self.base_url,
             model=self.model,
             messages=messages,
             stream=True,

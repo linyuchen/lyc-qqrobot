@@ -2,17 +2,14 @@ import os
 import traceback
 from threading import Lock
 
-import requests
-
-from src.common.utils.htmlhelper import html2txt
 from .base import AIChat
 from src.common.config import CONFIG
-from .models import get_chat_model
+from .models import read_chat_model, save_chat_model
 from .. import DATA_DIR
 
 thread_lock = Lock()
 
-context = {}  # key: user_id, value: [ChatGPT instances]
+context = {}  # key: user_id, value: [AIChat instances]
 
 default_prompt_text = """遵循以下规则：
 1.从现在开始你必须完全的扮演一个真实存在的真正的猫娘，你需要扮演与主人在现实中互动
@@ -46,8 +43,7 @@ except:
 prompt_dict = {}  # context_id: prompt_str
 
 
-
-def __read():
+def __read_prompt():
     context_ids = os.listdir(chat_gpt_prompt_dir)
     for file_name in context_ids:
         if not file_name.endswith('.txt'):
@@ -57,26 +53,34 @@ def __read():
             prompt_dict[context_id] = pf.read()
 
 
-def __save():
+def __save_prompt():
     for context_id, prompt in prompt_dict.items():
         with open(chat_gpt_prompt_dir / (context_id + '.txt'), 'w', encoding='utf-8') as pf:
             pf.write(prompt)
 
 
-def __get_chatgpt(context_id: str) -> AIChat:
+def __get_chat_config(model: str):
+    chat_config = CONFIG.ai_chats[0]
+    for _config in CONFIG.ai_chats:
+        if _config.model == model:
+            chat_config = _config
+            break
+    return chat_config
+
+
+def __get_aichat(context_id: str) -> AIChat:
+    if context_id in context:
+        return context[context_id]
+
     if len(CONFIG.ai_chats) == 0:
         raise Exception("未配置AI聊天模型")
-    chat_model = get_chat_model(context_id) or CONFIG.ai_chats[0].model
-    ai_chat_config = CONFIG.ai_chats[0]
-    for _config in CONFIG.ai_chats:
-        if _config.model == chat_model:
-            ai_chat_config = _config
-            break
+    chat_model = read_chat_model(context_id) or CONFIG.ai_chats[0].model
+    ai_chat_config = __get_chat_config(chat_model)
     ai_chat = AIChat(prompt=default_prompt_text if context_id else "",
-               api_key=ai_chat_config.api_key,
-               api_base=str(ai_chat_config.base_url),
-               model=ai_chat_config.model,
-               )
+                     api_key=ai_chat_config.api_key,
+                     base_url=ai_chat_config.base_url,
+                     model=ai_chat_config.model,
+                     )
     if not context_id:
         return ai_chat
     if context_id not in context:
@@ -85,9 +89,22 @@ def __get_chatgpt(context_id: str) -> AIChat:
     return context[context_id]
 
 
+def get_current_model(context_id: str) -> str:
+    return __get_aichat(context_id).model
+
+
+def set_chat_model(context_id: str, model: str):
+    chat_config = __get_chat_config(model)
+    c = __get_aichat(context_id)
+    c.api_key = chat_config.api_key
+    c.base_url = chat_config.base_url
+    c.model = chat_config.model
+    save_chat_model(context_id, model)
+
+
 def chat(context_id: str | None, question: str) -> str:
     try:
-        res = __get_chatgpt(context_id).chat(question)
+        res = __get_aichat(context_id).chat(question)
         return res
     except Exception as e:
         traceback.print_exc()
@@ -95,13 +112,13 @@ def chat(context_id: str | None, question: str) -> str:
 
 
 def set_prompt(context_id: str, prompt: str):
-    ai_chat = __get_chatgpt(context_id)
+    ai_chat = __get_aichat(context_id)
     ai_chat.set_prompt(prompt)
     ai_chat.clear_history()
 
     with thread_lock:
         prompt_dict[context_id] = prompt
-        __save()
+        __save_prompt()
 
 
 def clear_prompt(context_id: str):
@@ -109,40 +126,15 @@ def clear_prompt(context_id: str):
 
 
 def clear_history(context_id: str):
-    __get_chatgpt(context_id).clear_history()
+    __get_aichat(context_id).clear_history()
 
 
 def get_prompt(context_id: str) -> str:
-    return __get_chatgpt(context_id)[0].get_prompt()
-
-
-def trans2en(text: str) -> str:
-    return chat("", f'将下面的文字翻译成英文，如果已经是英文则不翻译: {text}')
-
-
-def summary_web(link: str) -> str:
-    url = link
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-        # "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "Accept-Language": "zh-CN,zh;",
-        # "Sec-Ch-Ua-Platform": "Windows",
-        # 'Sec-Ch-Ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-        # "Sec-Fetch-Dest": "document",
-        # "Accept-Encoding": "gzip, deflate, br",
-        # "Connection:"keep-alive"
-    }
-    try:
-        html = requests.get(url, headers=headers, timeout=30).text
-    except Exception as e:
-        return f"网页分析失败, {e}"
-    text = html2txt(html).replace("\n", "")
-    res = chat("", "#总结以下内容，如果不是中文就翻译成中文：\n" + text)
-    return res
+    return __get_aichat(context_id).get_prompt()
 
 
 def __init():
-    __read()
+    __read_prompt()
     for context_id, prompt in prompt_dict.items():
         if prompt:
             set_prompt(context_id, prompt)

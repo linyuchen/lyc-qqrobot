@@ -35,7 +35,7 @@ def rule_is_group_msg():
 
     async def _(bot: Bot, event: Event):
         session = await get_session(bot, event)
-        is_group = session.scene.is_group
+        is_group = session and session.scene.is_group
         return is_group
 
     return Rule(_)

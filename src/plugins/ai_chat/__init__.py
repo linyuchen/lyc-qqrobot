@@ -5,20 +5,25 @@ import time
 
 from nonebot import on_command, on_message, on_fullmatch, Bot, get_plugin_config
 from nonebot.params import CommandArg, Message, Event
-from nonebot.permission import SUPERUSER
+from nonebot.permission import SUPERUSER, Permission
 from nonebot.plugin import PluginMetadata
 from nonebot_plugin_alconna import UniMsg, Reply
 from nonebot_plugin_uninfo import Uninfo
 
+from nonebot_plugin_waiter import waiter
+
+from src.common.ai_chat.chat_engine import chat, set_prompt, get_prompt, clear_prompt, clear_history, \
+    set_chat_model, get_current_model
+from ...common.ai_chat.utils import summary_web
+from src.common.config import CONFIG
+from ..common.permission import check_group_admin
+from ..common.rules import is_at_me, rule_args_num
+
 __plugin_meta__ = PluginMetadata(
     name="AI聊天",
     description="让bot支持AI回复",
-    usage="@机器人+聊天内容，或者#聊天内容",
+    usage="@机器人+聊天内容，或者#聊天内容\n设置人格 <人格设定>, 查看人格, 清除人格, 设置聊天模型, 清除记录",
 )
-
-from src.common.ai_chat.chat_engine import chat, summary_web, set_prompt, get_prompt, clear_prompt, clear_history
-from ..common.rules import is_at_me, rule_args_num
-
 
 wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
 
@@ -152,3 +157,34 @@ clear_history_cmd = on_fullmatch("清除记录")
 async def _(session: Uninfo):
     clear_history(get_context_id(session))
     await clear_history_cmd.finish("AI 聊天记录清除成功")
+
+
+set_chat_model_cmd = on_command("设置聊天模型")
+
+
+@set_chat_model_cmd.handle()
+async def _(session: Uninfo):
+    context_id = get_context_id(session)
+    models = [c.model for c in CONFIG.ai_chats]
+    prompt = f'当前模型 {get_current_model(context_id)}\n\n' + '可选模型：\n'
+    for index, model in enumerate(models):
+        prompt += f'{index + 1}: {model}\n'
+    prompt += '\n请输入数字选择模型'
+    await set_chat_model_cmd.send(prompt)
+
+    @waiter(waits=['message'], keep_session=True)
+    async def check(event: Event):
+        return event.get_plaintext().strip()
+
+    async for resp in check(timeout=20):
+        if resp is None:
+            # await bot.delete_msg(message_id=song_list_msg_id)
+            return
+        if not resp.isdigit():
+            continue
+        model_index = int(resp)
+        if model_index <= 0 or model_index > len(models):
+            continue
+        model = models[model_index - 1]
+        set_chat_model(context_id, model)
+        return await set_chat_model_cmd.finish("聊天模型设置成功")

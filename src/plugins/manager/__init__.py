@@ -91,7 +91,7 @@ async def manager_permission(matcher: Matcher, bot: Bot, event: Event):
     plugin_id = plugin.id_
     if not check_global_enable(plugin_id):
         return False
-    if session.scene.is_group:
+    if session and session.scene.is_group:
         if not check_group_enable(plugin_id, session.group.id):
             return False
     return True
