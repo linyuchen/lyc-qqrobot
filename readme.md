@@ -62,3 +62,7 @@ python bot.py
 ## GitHub 链接无法预览，ChatGPT Gemini 等需要翻墙的服务无法使用
 
 修改 `.env` 的 `HTTP_PROXY` 配置代理
+
+## 修改了 config.json 但是没有生效
+
+新版本重构了配置文件，所有的配置都放到了 .env，config.json已弃用！
