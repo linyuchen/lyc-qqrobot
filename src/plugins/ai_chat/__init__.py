@@ -14,16 +14,27 @@ from nonebot_plugin_waiter import waiter
 
 from src.common.ai_chat.chat_engine import chat, set_prompt, get_prompt, clear_prompt, clear_history, \
     set_chat_model, get_current_model
+from src.common.ai_chat.base import set_ai_chat_proxy
 from ...common.ai_chat.utils import summary_web
 from src.common.config import CONFIG
 from ..common.permission import check_group_admin
 from ..common.rules import is_at_me, rule_args_num
+from nonebot import get_driver
 
 __plugin_meta__ = PluginMetadata(
     name="AI聊天",
     description="让bot支持AI回复",
     usage="@机器人+聊天内容，或者#聊天内容\n设置人格 <人格设定>, 查看人格, 清除人格, 设置聊天模型, 清除记录",
 )
+
+driver = get_driver()
+
+
+@driver.on_startup
+async def _():
+    if CONFIG.http_proxy:
+        set_ai_chat_proxy(str(CONFIG.http_proxy))
+
 
 wiki_cmd = on_command("百科", force_whitespace=True, permission=SUPERUSER, rule=rule_args_num(min_num=1))
 

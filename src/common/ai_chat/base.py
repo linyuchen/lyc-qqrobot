@@ -1,4 +1,9 @@
+import openai
 from litellm import completion
+
+
+def set_ai_chat_proxy(proxy: str):
+    openai.proxy = proxy
 
 
 class AIChat:

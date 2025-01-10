@@ -13,7 +13,7 @@ from nonebot_plugin_alconna import UniMsg
 
 __plugin_meta__ = PluginMetadata(
     name="网页预览",
-    description="GitHub、知乎、微信公众号文章、萌娘百科、百度搜索等网页预览",
+    description="GitHub、知乎、微信公众号文章等网页预览",
     usage="发送链接即可，\n发送 登录知乎 进行登录（需要bot主人权限）",
 )
 

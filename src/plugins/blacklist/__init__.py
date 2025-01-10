@@ -12,7 +12,7 @@ from nonebot.plugin import PluginMetadata
 __plugin_meta__ = PluginMetadata(
     name="黑名单",
     description="将群或者用户拉入黑名单，不会被机器人响应",
-    usage="拉黑群 QQ号，拉黑用户 QQ号，取消拉黑群 QQ号，取消拉黑用户 QQ号",
+    usage="拉黑群 群号，拉黑用户 用户ID，取消拉黑群 群号，取消拉黑用户 用户ID",
 )
 
 from src.plugins.common.permission import check_super_user
