@@ -1,0 +1,1 @@
+from .star import handle_stared
