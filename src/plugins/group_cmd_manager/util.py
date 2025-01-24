@@ -1,5 +1,5 @@
-from src.common.db.sqlalchemy import init_db
-from .model import GroupIgnoreCMD
+from src.db import init_db
+from src.db.models.group_cmd_manager import GroupIgnoreCMD
 
 db_session = init_db()
 

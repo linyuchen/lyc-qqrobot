@@ -9,7 +9,7 @@ from src.plugins.github.subscriber.db.util import add_subscriber_to_db
 add_subscriber_cmd = on_command('subscribe', permission=check_group_admin, rule=rule_is_group_msg())
 
 @add_subscriber_cmd.handle()
-async def add_subscriber(info: Uninfo, args: Message = CommandArg()):
+async def handle_add_subscriber(info: Uninfo, args: Message = CommandArg()):
     adapter_name = info.adapter.value
     group_id = info.group.id
     args = args.extract_plain_text().split()

@@ -1,7 +1,7 @@
 from typing import Literal
 
-from src.common.db.sqlalchemy import init_db
-from src.plugins.blacklist.model import BlackUserList, BlackGroupList
+from src.db import init_db
+from src.db.models.blacklist import BlackUserList, BlackGroupList
 
 db_session = init_db()
 

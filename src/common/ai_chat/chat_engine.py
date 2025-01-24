@@ -4,7 +4,7 @@ from threading import Lock
 
 from .base import AIChat
 from src.common.config import CONFIG
-from .models import read_chat_model, save_chat_model
+from .db_utils import read_chat_model, save_chat_model
 from .. import DATA_DIR
 
 thread_lock = Lock()

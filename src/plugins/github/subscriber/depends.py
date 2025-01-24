@@ -3,7 +3,7 @@ from nonebot import Bot
 from nonebot.params import Depends
 from nonebot.adapters.github import Event
 
-from .db.model import Subscriber
+from src.db.models.github import Subscriber
 from .db.util import get_subscribers_from_db
 
 

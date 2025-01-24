@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Integer
 
-from src.common.db.sqlalchemy import Base
+from src.db.models.base import Base
 
 
 class Subscriber(Base):

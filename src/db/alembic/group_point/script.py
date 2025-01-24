@@ -1,7 +1,6 @@
 from pathlib import Path
-from functools import partial
 
-from src.common.alembic.tool import upgrade, gen_migration, re_write_config
+from src.db.alembic.tool import upgrade, gen_migration, re_write_config
 from src.common.group_point.models import db_path
 
 cur_path = Path(__file__).parent

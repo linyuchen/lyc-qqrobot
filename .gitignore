@@ -26,4 +26,5 @@ qqsdk/message/cmd_config.json
 !data/.keep
 data/*
 .env.*
-src/common/alembic/group_point/alembic/versions/*
+src/db/alembic/group_point/alembic/versions/*
+src/db/alembic/common/alembic/versions/*

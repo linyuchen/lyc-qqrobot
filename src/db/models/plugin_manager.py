@@ -1,6 +1,6 @@
 from sqlalchemy.ext.mutable import MutableList
 
-from src.common.db.sqlalchemy import Base
+from src.db.models.base import Base
 from sqlalchemy import Column, String, Boolean, JSON
 
 

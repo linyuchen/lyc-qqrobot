@@ -1,5 +1,5 @@
 from nonebot import get_bots
-from src.plugins.github.subscriber.db.model import Subscriber
+from src.db.models.github import Subscriber
 from nonebot_plugin_alconna import UniMsg
 from nonebot.adapters.onebot.v11.adapter import Adapter as OB11Adapter, Bot as OB11Bot
 from nonebot.adapters.telegram.adapter import Adapter as TGAdapter, Bot as TGBot

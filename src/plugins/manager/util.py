@@ -1,7 +1,7 @@
 from nonebot import get_loaded_plugins
 
-from src.common.db.sqlalchemy import init_db
-from .model import PluginManager
+from ...db import init_db
+from src.db.models.plugin_manager import PluginManager
 
 
 def find_plugin_by_name(name: str):

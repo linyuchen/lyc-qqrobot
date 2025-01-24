@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String
 
-from src.common.db.sqlalchemy import Base
+from src.db.models.base import Base
 
 
 class BlackUserList(Base):

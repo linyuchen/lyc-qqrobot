@@ -1,5 +1,5 @@
-from src.common.db.sqlalchemy import init_db
-from .model import Subscriber
+from src.db import init_db
+from src.db.models.github import Subscriber
 
 session = init_db()
 

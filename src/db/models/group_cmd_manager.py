@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, JSON
 from sqlalchemy.ext.mutable import MutableList
 
-from src.common.db.sqlalchemy import Base
+from src.db.models.base import Base
 
 
 class GroupIgnoreCMD(Base):
