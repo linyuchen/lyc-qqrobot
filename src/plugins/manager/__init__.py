@@ -14,8 +14,8 @@ __plugin_meta__ = PluginMetadata(
     usage="插件列表，启用插件 插件名，禁用插件 插件名，全局启用插件 插件名，全局禁用插件 插件名",
 )
 
-from src.plugins.common.permission import add_inject_permission_checker, check_super_user, check_group_admin
-from src.plugins.common.rules import rule_is_group_msg
+from src.plugins.common.permission import check_super_user, check_group_admin
+from src.plugins.common.rules import rule_is_group_msg, inject_plugin_rule
 from src.plugins.manager.util import find_plugin_by_name, init_plugin_manager_config, check_group_enable, \
     check_global_enable, \
     set_global_enable, set_group_enable
@@ -84,7 +84,7 @@ async def _(bot: Bot, event: Event, args: Message = CommandArg()):
     await group_cmd.finish(f'插件 {plugin_name} 在本群已{"启用" if enable else "禁用"}')
 
 
-async def manager_permission(matcher: Matcher, bot: Bot, event: Event):
+async def manage_plugin_rule(matcher: Matcher, bot: Bot, event: Event):
     session = await get_session(bot, event)
     plugin: Plugin = matcher.plugin
     plugin_name = plugin.metadata.name if plugin.metadata else plugin.id_
@@ -101,4 +101,4 @@ async def manager_permission(matcher: Matcher, bot: Bot, event: Event):
 async def _():
     plugin_ids = [p.id_ for p in get_loaded_plugins()]
     init_plugin_manager_config(plugin_ids)
-    add_inject_permission_checker(manager_permission)
+    inject_plugin_rule(manage_plugin_rule)

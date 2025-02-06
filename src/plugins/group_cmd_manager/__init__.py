@@ -14,8 +14,7 @@ __plugin_meta__ = PluginMetadata(
     usage="屏蔽命令列表、添加屏蔽命令 命令名、删除屏蔽命令 命令名",
 )
 
-from ..common.permission import add_inject_permission_checker
-from ..common.rules import rule_is_group_msg
+from ..common.rules import rule_is_group_msg, inject_plugin_rule
 
 driver = get_driver()
 
@@ -31,7 +30,7 @@ def check_group_cmd_permission(matcher: Matcher, bot: Bot, event: Event):
 
 @driver.on_startup
 async def _():
-    add_inject_permission_checker(check_group_cmd_permission)
+    inject_plugin_rule(check_group_cmd_permission)
 
 
 list_cmd = on_fullmatch("屏蔽命令列表", permission=SUPERUSER, rule=rule_is_group_msg())

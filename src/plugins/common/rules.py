@@ -1,4 +1,8 @@
-from nonebot import Bot
+import inspect
+from typing import Callable, Awaitable, Coroutine, Type
+
+from nonebot import Bot, get_loaded_plugins
+from nonebot.internal.matcher import Matcher
 from nonebot.internal.rule import Rule
 from nonebot.params import CommandArg, Event, Message
 from nonebot_plugin_alconna import UniMsg, At
@@ -40,3 +44,35 @@ def rule_is_group_msg():
 
     return Rule(_)
 
+
+TypeRuleChecker = Callable[[Type[Matcher], Bot, Event], bool] | Awaitable
+inject_checkers: list[TypeRuleChecker] = []
+
+
+def inject_plugin_rule(func: TypeRuleChecker):
+    # 给每个插件注入规则检查函数
+    inject_checkers.append(func)
+
+
+inited = False
+
+
+async def init_rules():
+    global inited
+    if inited:
+        return
+    plugins = get_loaded_plugins()
+    for p in plugins:
+        for m in p.matcher:
+            async def inject_check(bot, event, matcher=m):
+                for func in inject_checkers:
+                    result = func(matcher, bot, event)
+                    if inspect.iscoroutinefunction(func) or isinstance(result, Coroutine):
+                        result = await result
+                    if not result:
+                        return False
+                return True
+
+            m.rule &= Rule(inject_check)
+
+    inited = True
