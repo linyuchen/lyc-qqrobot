@@ -170,7 +170,7 @@ async def _(session: Uninfo):
     await clear_history_cmd.finish("AI 聊天记录清除成功")
 
 
-set_chat_model_cmd = on_command("设置聊天模型")
+set_chat_model_cmd = on_command("设置聊天模型", aliases={'聊天模型'}, permission=check_group_admin)
 
 
 @set_chat_model_cmd.handle()
