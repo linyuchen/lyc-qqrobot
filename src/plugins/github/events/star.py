@@ -14,6 +14,6 @@ on_stared = on_type(
 
 @on_stared.handle()
 async def handle_stared(event: StarCreated, subscribers: Subscribers):
-    print(event, subscribers)
-    await send_msg_to_subscribers(subscribers, UniMsg.text('stared'))
+    repo = event.payload.repository
+    await send_msg_to_subscribers(subscribers, UniMsg.text(f'{event.payload.sender.name} stared {repo.owner}/{repo.name}, {repo.stargazers_count} stars'))
     await on_stared.finish()
