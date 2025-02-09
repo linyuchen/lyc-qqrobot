@@ -135,11 +135,13 @@ chatgpt_cmd = on_message()
 async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
     if session.scene.is_group:
         sender_id = session.group.id
-        if not is_at_me(session, msg):
+        if not is_at_me(session, msg, event):
             if not event.get_plaintext().strip().startswith('#'):
                 return
     else:
         sender_id = session.user.id
+        if not event.get_plaintext().strip().startswith('#'):
+            return
 
     if time.time() - chat_records.setdefault(sender_id, 0) < 5:
         return

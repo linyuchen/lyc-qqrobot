@@ -7,12 +7,19 @@ from nonebot.internal.rule import Rule
 from nonebot.params import CommandArg, Event, Message
 from nonebot_plugin_alconna import UniMsg, At
 from nonebot_plugin_uninfo import Uninfo, get_session
+from nonebot.adapters.onebot.v11 import GroupMessageEvent
 
 
-def is_at_me(session: Uninfo, msg: UniMsg) -> bool:
+def is_at_me(session: Uninfo, msg: UniMsg, event: Event=None) -> bool:
+    if isinstance(event, GroupMessageEvent):
+        event: GroupMessageEvent
+        ats = event.original_message.get('at')
+        for at in ats:
+            if at.data.get('qq') == session.self_id:
+                return True
     ats = msg.get(At)
     for segment in ats:
-        if segment.target == str(session.self_id):
+        if segment.target == session.self_id:
             return True
 
 
