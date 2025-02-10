@@ -102,9 +102,9 @@ def set_chat_model(context_id: str, model: str):
     save_chat_model(context_id, model)
 
 
-def chat(context_id: str | None, question: str) -> str:
+async def chat(context_id: str | None, question: str) -> str:
     try:
-        res = __get_aichat(context_id).chat(question)
+        res = await __get_aichat(context_id).chat(question)
         return res
     except Exception as e:
         traceback.print_exc()

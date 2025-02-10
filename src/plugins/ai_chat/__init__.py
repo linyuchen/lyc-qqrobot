@@ -153,14 +153,11 @@ async def _(bot: Bot, event: Event, session: Uninfo, msg: UniMsg):
         reply_msg: Reply = reply_msgs[0]
         _chat_text = reply_msg.msg.extract_plain_text() + '\n' + _chat_text
 
-    async def gptchat():
-        _res = chat(get_context_id(session), _chat_text)
-        await bot.send(event, await (UniMsg.reply(event.message_id) + _res).export(bot))
+    _res = await chat(get_context_id(session), _chat_text)
+    await bot.send(event, await (UniMsg.reply(event.message_id) + _res).export(bot))
         # voice_bytes = gen_voice(_res)
         # if voice_bytes:
         #     await bot.send(event, MessageSegment.record(voice_bytes))
-
-    threading.Thread(target=lambda: asyncio.run(gptchat()), daemon=True).start()
 
 
 clear_history_cmd = on_fullmatch("清除记录")

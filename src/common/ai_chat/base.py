@@ -1,6 +1,16 @@
-import openai
-from litellm import completion
+import uuid
 
+import openai
+import litellm
+from litellm import completion, acompletion
+from .txcloud import TXCloudLLM
+
+litellm.custom_provider_map = [
+    {
+        'provider': 'txcloud',
+        'custom_handler': TXCloudLLM()
+    }
+]
 
 def set_ai_chat_proxy(proxy: str):
     openai.proxy = proxy
@@ -21,6 +31,7 @@ class AIChat:
         self.history_max = history_max
         self.prompt = prompt
         self.history = []  # messages
+        self.session_id = str(uuid.uuid4())
 
     def get_prompt(self):
         return self.prompt
@@ -34,7 +45,7 @@ class AIChat:
     def clear_history(self):
         self.history.clear()
 
-    def chat(self, question: str) -> str:
+    async def chat(self, question: str) -> str:
         if len(self.history) > self.history_max:
             del self.history[:3]
         messages = self.history[:]
@@ -44,19 +55,23 @@ class AIChat:
         user_message = {'role': 'user', 'content': question}
         messages.append(user_message)
 
-        response = completion(
+        response = await acompletion(
             api_key=self.api_key,
             base_url=self.base_url,
             model=self.model,
             messages=messages,
-            stream=True,
+            session_id=self.session_id,
         )
-        reply = {'role': 'assistant', 'content': ''}
-        for event in response:
-            choice = event.choices[0]
-            if choice.finish_reason == 'stop':
-                break
-            reply['content'] += choice.delta.content
+        if isinstance(response, str):
+            res_str = response
+        else:
+            res_str = response.choices[0].delta.content
+        reply = {'role': 'assistant', 'content': res_str}
+        # async for event in response:
+        #     choice = event.choices[0]
+        #     if choice.finish_reason == 'stop':
+        #         break
+        #     reply['content'] += choice.delta.content
         self.history.append(user_message)
         self.history.append(reply)
         return reply['content']
